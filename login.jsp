@@ -16,7 +16,7 @@
 <body class="hold-transition login-page">
 <div class="login-box">
     <div class="login-logo">
-        <a href="../../index2.html"><b>CLEAR</b>&nbsp;信息发布系统</a>
+        <a style="cursor:default;"><b>CLEAR</b>&nbsp;信息发布系统</a>
     </div>
     <!-- /.login-logo -->
     <div class="login-box-body">
@@ -55,5 +55,6 @@
     <!-- /.login-box-body -->
 </div>
 <!-- /.login-box -->
+<div id="l_version">Version 3.0</div>
 </body>
 </html>
