@@ -1,4 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);
+
 /*!
  *   AdminLTE v2.3.3
  *   Author: Almsaeed Studio
@@ -21,8 +22,7 @@ html, body {
 body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial,
-    sans-serif;
+    font-family: 'Source Sans Pro', 'Microsoft YaHei',Î¢ÈíÑÅºÚ, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-weight: 400;
     overflow-x: hidden;
     overflow-y: auto;
@@ -5592,4 +5592,12 @@ table.text-center, table.text-center td, table.text-center th {
 #AutoComplete .hover {
     background: #6eb6fe;
     color: #fff;
+}
+
+#l_version {
+    bottom: 20px;
+    position: absolute;
+    width: 100px;
+    left: 50%;
+    margin-left: -40px;
 }
