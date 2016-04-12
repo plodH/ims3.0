@@ -96,7 +96,7 @@
         </div>
       </div>
       <!-- search form -->
-      <form action="#" method="get" class="sidebar-form">
+      <!--<form action="#" method="get" class="sidebar-form">
         <div class="input-group">
           <input type="text" name="q" class="form-control" placeholder="搜索...">
               <span class="input-group-btn">
@@ -104,7 +104,7 @@
                 </button>
               </span>
         </div>
-      </form>
+      </form>-->
       <!-- /.search form -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu">
@@ -132,6 +132,22 @@
             <li><a href="#"><i class="fa fa-circle-o"></i> 用户</a></li>
             <li><a href="#"><i class="fa fa-circle-o"></i> 角色</a></li>
           </ul>
+        </li>
+		<li class="treeview">
+          <a href="#">
+            <i class="glyphicon glyphicon-user"></i>
+            <span>频道</span>
+            <i class="fa fa-angle-left pull-right"></i>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="#channel/list"><i class="fa fa-circle-o"></i> 频道列表</a></li>
+            <li><a href="#channel/edit"><i class="fa fa-circle-o"></i> 新建频道</a></li>
+          </ul>
+        </li>
+		<li>
+          <a href="#layout/list">
+            <i class="fa fa-book"></i> <span>布局</span>
+          </a>
         </li>
       </ul>
     </section>

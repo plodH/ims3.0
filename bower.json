@@ -1,0 +1,14 @@
+{
+  "name": "ims3.0",
+  "description": "",
+  "main": "WEB-INF/views/index.jsp",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
