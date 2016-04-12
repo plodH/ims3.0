@@ -13,7 +13,7 @@ define(function(require, exports, module) {
 
 	function loadPage(){
 
-		var page = window.location.hash.match(/^#([^?]*)\?/);
+		var page = window.location.hash.match(/^#([^?]*)/);
 		page = page === null ? 'terminal/list' : page[1];
 
 		// load页面
