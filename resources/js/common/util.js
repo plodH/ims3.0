@@ -7,7 +7,7 @@ define(function(require, exports, module) {
 	exports.getHashParameters = function () {
 		var queryString = window.location.hash.match(/\?(.*)/);
 		if (queryString === null) {
-			return;
+			return {};
 		}
 		queryString = queryString[1];
 		var pairs = queryString.split('&');
