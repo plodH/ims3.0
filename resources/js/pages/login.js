@@ -39,7 +39,6 @@ function cookies(){
 		setCookie("develop",develop);
 	}else if(getCookie("develop") != ""){
 		var develop = $("#j_project_name").attr("value");
-		alert(develop);
 		setCookie("develop",develop);
 	}
 }

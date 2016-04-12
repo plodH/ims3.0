@@ -55,6 +55,6 @@
     <!-- /.login-box-body -->
 </div>
 <!-- /.login-box -->
-<div id="l_version">Version 3.0</div>
+<div id="l_version"><b>Version</b> 3.0.1</div>
 </body>
 </html>
