@@ -36,7 +36,6 @@ function getCookie(name){
 function cookies(){
 	if(getCookie("develop") == undefined){
 		var develop = $("#j_project_name").attr("value");
-		alert(develop);
 		setCookie("develop",develop);
 	}else if(getCookie("develop") != ""){
 		var develop = $("#j_project_name").attr("value");
