@@ -11,7 +11,7 @@ __p+='<tr data-channel-id="'+
 ((__t=(schedule_params))==null?'':__t)+
 '</td> <td>版本:'+
 ((__t=(version))==null?'':__t)+
-'</td> <td><button class="btn-channel-detail">编辑</button></td> </tr>';
+'</td> <td><button class="btn-channel-detail"></button></td> </tr>';
 }
 return __p;
 };});

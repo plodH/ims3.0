@@ -19,99 +19,23 @@ define(function(require, exports, module) {
     };
 
     function registerEventListeners() {
-        $('#channel-table').delegate('input[type="checkbox"]', 'ifClicked', function (ev) {
-            onSelectedItemChanged($(this.parentNode).hasClass('checked') ? -1 : 1);
+        $('#channel-table').delegate('input[type="checkbox"]', 'click', function (ev) {
         });
         $('#channel-table').delegate('tr', 'click', function (ev) {
-            var self = this;
-            $('#channel-table tr').each(function (idx, el) {
-                $(el).iCheck('uncheck');
-            });
-            $(self).iCheck('check');
-            onSelectedItemChanged();
         });
         $('#channel-table').delegate('.btn-channel-detail', 'click', function (ev) {
-            var channelId = getChannelId(ev.target);
-            console.log(channelId);
-            ev.stopPropagation();
         });
         $('#channel-list-controls .select-all').click(function (ev) {
-            var hasUncheckedItems = false;
-            $('#channel-table div').each(function (idx, el) {
-                if (!(hasUncheckedItems || $(el).hasClass('checked'))) {
-                    hasUncheckedItems = true;
-                }
-            });
-            $('#channel-table tr').each(function (idx, el) {
-                $(el).iCheck(hasUncheckedItems ? 'check' : 'uncheck');
-            });
-            onSelectedItemChanged();
         });
-        $('#channel-list-controls .btn-publish').click(publishChannel);
-        $('#channel-list-controls .btn-publish-later').click(publishChannelLater);
-        $('#channel-list-controls .btn-copy').click(copyChannel);
-        $('#channel-list-controls .btn-delete').click(deleteChannel);
+        $('#channel-list-controls .btn-publish').click(function (ev) {
+        });
+        $('#channel-list-controls .btn-publish-later').click(function (ev) {
+        });
+        $('#channel-list-controls .btn-copy').click(function (ev) {
+        });
+        $('#channel-list-controls .btn-delete').click(function (ev) {
+        });
 
-    }
-    
-    function publishChannel() {
-        alert('终端树还没有实现');
-    }
-    
-    function publishChannelLater() {
-        alert('终端树还没有实现');
-    }
-    
-    function copyChannel() {
-        var data = JSON.stringify({
-            Action: 'Copy',
-            Project: projectName,
-            ChannelID: getCurrentChannelId()
-        });
-        util.ajax('post', requestUrl + '/backend_mgt/v1/channels', data, function (res) {
-            console.log(res);
-            alert(Number(res.rescode) === 200 ? '复制成功' : '复制失败');
-        });
-    }
-    
-    function deleteChannel() {
-        var data = JSON.stringify({
-            Action: 'Delete',
-            Project: projectName
-        });
-        util.ajax('post', requestUrl + '/backend_mgt/v1/channels/' + getCurrentChannelId(), data, function (res) {
-            console.log(res);
-            alert(Number(res.rescode) === 200 ? '删除成功' : '删除失败');
-        });
-    }
-
-    function onSelectedItemChanged(arg0) {
-        var selectedCount = typeof(arg0) === 'number' ? arg0: 0;
-        $('#channel-table div').each(function (idx, el) {
-            if ($(el).hasClass('checked')) {
-                selectedCount++;
-            }
-        });
-        var hasUncheckedItems = selectedCount !== $('#channel-table tr').size();
-        $('#channel-list-controls .select-all>i')
-            .toggleClass('fa-square-o', hasUncheckedItems)
-            .toggleClass('fa-check-square-o', !hasUncheckedItems);
-        $('#channel-list-controls .btn-publish').prop('disabled', selectedCount !== 1);
-        $('#channel-list-controls .btn-publish-later').prop('disabled', selectedCount !== 1);
-        $('#channel-list-controls .btn-copy').prop('disabled', selectedCount !== 1);
-        $('#channel-list-controls .btn-delete').prop('disabled', selectedCount !== 1);
-    }
-
-    function getChannelId(el) {
-        var idAttr;
-        while (el && !(idAttr = el.getAttribute('data-channel-id'))) {
-            el = el.parentNode;
-        }
-        return Number(idAttr);
-    }
-    
-    function getCurrentChannelId() {
-        return Number($('#channel-table div.checked')[0].parentNode.getAttribute('data-channel-id'));
     }
 
     // 加载页面数据
@@ -129,7 +53,9 @@ define(function(require, exports, module) {
             Project: projectName,
             Pager: pager
         });
-        util.ajax('post', requestUrl + '/backend_mgt/v1/channels', data, render);
+        util.ajax('post', requestUrl + '/backend_mgt/v1/channels', data, function (res) {
+            render(res);
+        });
     }
 
     // 渲染界面
@@ -165,7 +91,6 @@ define(function(require, exports, module) {
             };
             $('#channel-table>tbody').append(templates.channel_table_row(data));
         });
-        onSelectedItemChanged();
 
         $('#channel-table input[type="checkbox"]').iCheck({
             checkboxClass: 'icheckbox_flat-blue',
