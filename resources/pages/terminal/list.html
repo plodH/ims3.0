@@ -15,27 +15,49 @@
   <div class="row">
     <div class="col-md-3">
       <!-- <div class="box box-solid sidebar"> -->
-      <div class="box box-solid treetree" style="overflow: scroll;">
+      <div class="box box-primary" style="overflow: scroll;">
+        <div class="box-header with-border">
+          <h3 class="box-title">终端分类</h3>
+          <div class="tools">
+            <i class="fa fa-edit"></i>
+            <i class="fa fa-trash-o"></i>
+            <i class="fa fa-plus"></i>
+          </div>
+        </div>
         <ul class="tree-menu">
-          <li class="treeview active">
-            <a href="http://www.baidu.com">
-              <i class="fa fa-angle-left"></i> <i class="fa fa-dashboard"></i> <span>终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端</span> 
+          <li class="treeview open">
+            <a href="#">
+              <i class="fa fa-angle-right"></i> <i class="fa fa-folder-open-o"></i> <!-- all -->
+              <div class="input-group tree-input-group">
+                <input type="text" class="form-control">
+                <span class="input-group-addon"><i class="fa fa-check"></i></span>
+              </div>
             </a>
             <ul class="tree-menu-2">
-              <li class="active"><a href="#terminal/list"><i class="fa fa-circle-o"></i> 终端</a></li>
-              <li><a href="#"><i class="fa fa-circle-o"></i> 日志</a></li>
-              <li class="treeview">
-                <a href="#resource/list">
-                  <i class="fa fa-angle-left"></i> <i class="fa fa-book"></i> <span>资源</span>
+              <li>
+                <a href="#">
+                  <i class="fa fa-folder-o"></i> 终端
+                </a>
+              </li>
+              <li class="treeview open">
+                <a href="#"><i class="fa fa-angle-right"></i> <i class="fa fa-folder-open-o"></i> <!-- 日志 -->
+                  <div class="input-group tree-input-group">
+                    <input type="text" class="form-control">
+                    <span class="input-group-addon"><i class="fa fa-check"></i></span>
+                  </div>
                 </a>
                 <ul class="tree-menu-2">
-                  <li><a href="#terminal/list"><i class="fa fa-circle-o"></i> 终端</a></li>
-                  <li><a href="#"><i class="fa fa-circle-o"></i> 日志</a></li>
-                  <li>
-                    <a href="#resource/list">
-                      <i class="fa fa-book"></i> <span>资源</span>
-                    </a>
-                  </li>
+                  <li class="open focus"><a href="#"><i class="fa fa-folder-open-o"></i> 终端</a></li>
+                  <li><a href="#"><i class="fa fa-folder-o"></i> 日志</a></li>
+                </ul>
+              </li>
+              <li class="treeview">
+                <a href="#">
+                  <i class="fa fa-angle-right"></i> <i class="fa fa-folder-o"></i> <span>资源</span>
+                </a>
+                <ul class="tree-menu-2">
+                  <li><a href="#"><i class="fa fa-folder-o"></i> 终端</a></li>
+                  <li><a href="#"><i class="fa fa-folder-o"></i> 日志</a></li>
                 </ul>
               </li>
             </ul>
