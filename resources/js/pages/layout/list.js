@@ -49,7 +49,6 @@ define(function(require, exports, module) {
 			onSelectedItemChanged();
 		});
         $('#channel-list-nav').keyup(function (ev) {
-            console.log(ev.which);
             if (ev.which === 13) {
                 onSearch($('#channel-list-nav input').val());
                 ev.stopPropagation();

@@ -1,0 +1,74 @@
+
+#layout-editor-wrapper {
+    width: 100%;
+}
+
+#layout-editor-wrapper .layout-editor-header {
+    height: 60px;
+    padding: 13px 44px;
+    border-bottom: 1px solid #000;
+}
+
+#layout-editor-wrapper .btn-complete-layout {
+}
+
+#layout-editor-wrapper .btn-save-layout {
+}
+
+#layout-editor-wrapper .layout-editor-body {
+    height: calc(100% - 100px);
+}
+
+#layout-editor-wrapper .layout-editor-body:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+#layout-editor-wrapper .layout-editor-toolbar {
+    float: left;
+    width: 220px;
+    height: 100%;
+    border-right: 1px solid #000;
+}
+
+#layout-editor-wrapper .layout-editor-toolbar ul {
+    list-style: none;
+    padding-left: 0;
+}
+#layout-editor-wrapper .layout-editor-toolbar li {
+    list-style: none;
+}
+
+#layout-editor-wrapper .layout-editor-toolbar li>label {
+    width: 70px;
+    text-align: right;
+}
+
+#layout-editor-wrapper .layout-editor-toolbar li>input {
+    width: 126px;
+}
+
+#layout-editor-wrapper .layout-editor-toolbar li {
+    text-align: center;
+}
+
+#layout-editor-wrapper .layout-editor-toolbar li>button {
+    width: 100px;
+}
+
+#layout-editor-wrapper .layout-editor-canvas {
+    float: left;
+    width: 1000px;
+    height: 100px;
+    background: black;
+}
+
+#layout-editor-wrapper .layout-editor-widget {
+    float: right;
+    width: 200px;
+    height: 100px;
+    background: red;
+}
+
+#layout-editor-wrapper .layout-editor-footer {}

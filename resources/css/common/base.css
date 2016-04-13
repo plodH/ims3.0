@@ -1,1 +1,18 @@
 .gray-light{color: #999;}
+
+.full-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.none {
+    display: none;
+}
+
+#edit-page-container {
+    z-index: 1031;
+    background: #ffffff;
+}
