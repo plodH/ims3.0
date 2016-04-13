@@ -85,8 +85,8 @@ define(function(require, exports, module) {
         });
     }
 
-    function onSelectedItemChanged(arg0) {
-        var selectedCount = typeof(arg0) === 'number' ? arg0: 0;
+    function onSelectedItemChanged(adjustCount) {
+        var selectedCount = typeof(adjustCount) === 'number' ? adjustCount: 0;
         $('#channel-table div').each(function (idx, el) {
             if ($(el).hasClass('checked')) {
                 selectedCount++;
