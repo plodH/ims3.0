@@ -1,3 +1,7 @@
 #channel-table-pager>.page>a {
     max-width: 33px;
 }
+
+#channel-list-controls {
+    height: 34px;
+}

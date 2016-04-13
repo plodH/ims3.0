@@ -7,16 +7,12 @@
 			<!-- Check all button -->
 			<button type="button" class="btn btn-default btn-sm checkbox-toggle select-all"><i class="fa fa-square-o"></i>
 			</button>
-			<div class="btn-group">
-				<button type="button" class="btn btn-default btn-sm btn-publish"><i class="fa fa-trash-o"></i></button>
-				<button type="button" class="btn btn-default btn-sm btn-publish-later"><i class="fa fa-reply"></i></button>
-				<button type="button" class="btn btn-default btn-sm btn-copy"><i class="fa fa-share"></i></button>
-				<button type="button" class="btn btn-default btn-sm btn-delete"><i class="fa fa-share"></i></button>
+			<div class="pull-right btn-group">
+				<button type="button" class="btn btn-default btn-flat btn-publish">发布</button>
+				<button type="button" class="btn btn-default btn-flat btn-publish-later">预发布</button>
+				<button type="button" class="btn btn-default btn-flat btn-copy">复制</button>
+				<button type="button" class="btn btn-default btn-flat btn-delete">删除</button>
 			</div>
-			<!-- /.btn-group -->
-			<button type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-
-			<!-- /.pull-right -->
 		</div>
 		<div class="table-responsive">
 			<table id="channel-table" class="table table-hover table-striped">
@@ -25,8 +21,10 @@
 			</table>
 		</div>
 
+        <div class="text-center">
 		<ul id="channel-table-pager" class="pagination">
 		</ul>
+        </div>
 	</div>
 </section>
 <!-- icheck -->
