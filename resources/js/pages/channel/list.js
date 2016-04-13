@@ -10,7 +10,8 @@ define(function(require, exports, module) {
     // global variables
     var requestUrl    = 'http://192.168.18.166',
         projectName   = 'develop',
-        nDisplayItems = 25;
+        nDisplayItems = 25,
+        keyword       = '';
 
     // 初始化页面
 	exports.init = function() {
@@ -51,7 +52,22 @@ define(function(require, exports, module) {
         $('#channel-list-controls .btn-publish-later').click(publishChannelLater);
         $('#channel-list-controls .btn-copy').click(copyChannel);
         $('#channel-list-controls .btn-delete').click(deleteChannel);
-
+        $('#channel-list-nav').keyup(function (ev) {
+            console.log(ev.which);
+            if (ev.which === 13) {
+                onSearch($('#channel-list-nav input').val());
+                ev.stopPropagation();
+            }
+        });
+        $('#channel-list-nav button').click(function (ev) {
+            onSearch($('#channel-list-nav input').val());
+        });
+        
+    }
+    
+    function onSearch(_keyword) {
+        keyword = typeof(_keyword) === 'string' ? _keyword : '';
+        loadPage(1);
     }
     
     function publishChannel() {
@@ -122,7 +138,7 @@ define(function(require, exports, module) {
             per_page: String(nDisplayItems),
             orderby: 'ID',
             sortby: '',
-            keyword: ''
+            keyword: keyword
         };
         var data = JSON.stringify({
             Action: 'GetPage',
@@ -136,6 +152,7 @@ define(function(require, exports, module) {
     function render(json) {
 
         var totalPages = Math.ceil(json.Pager.total / nDisplayItems);
+        totalPages = Math.max(totalPages, 1);
         $('#channel-table-pager').jqPaginator({
             totalPages: totalPages,
             visiblePages: 10,
