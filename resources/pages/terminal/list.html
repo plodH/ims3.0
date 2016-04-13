@@ -14,50 +14,35 @@
 <section class="content">
   <div class="row">
     <div class="col-md-3">
-      <a href="compose.html" class="btn btn-primary btn-block margin-bottom">Compose</a>
-
-      <div class="box box-solid">
-        <div class="box-header with-border">
-          <h3 class="box-title">Folders</h3>
-
-          <div class="box-tools">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-            </button>
-          </div>
-        </div>
-        <div class="box-body no-padding">
-          <ul class="nav nav-pills nav-stacked">
-            <li class="active"><a href="#"><i class="fa fa-inbox"></i> Inbox
-              <span class="label label-primary pull-right">12</span></a></li>
-            <li><a href="#"><i class="fa fa-envelope-o"></i> Sent</a></li>
-            <li><a href="#"><i class="fa fa-file-text-o"></i> Drafts</a></li>
-            <li><a href="#"><i class="fa fa-filter"></i> Junk <span class="label label-warning pull-right">65</span></a>
-            </li>
-            <li><a href="#"><i class="fa fa-trash-o"></i> Trash</a></li>
-          </ul>
-        </div>
+      <!-- <div class="box box-solid sidebar"> -->
+      <div class="box box-solid treetree" style="overflow: scroll;">
+        <ul class="tree-menu">
+          <li class="treeview active">
+            <a href="http://www.baidu.com">
+              <i class="fa fa-angle-left"></i> <i class="fa fa-dashboard"></i> <span>终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端终端</span> 
+            </a>
+            <ul class="tree-menu-2">
+              <li class="active"><a href="#terminal/list"><i class="fa fa-circle-o"></i> 终端</a></li>
+              <li><a href="#"><i class="fa fa-circle-o"></i> 日志</a></li>
+              <li class="treeview">
+                <a href="#resource/list">
+                  <i class="fa fa-angle-left"></i> <i class="fa fa-book"></i> <span>资源</span>
+                </a>
+                <ul class="tree-menu-2">
+                  <li><a href="#terminal/list"><i class="fa fa-circle-o"></i> 终端</a></li>
+                  <li><a href="#"><i class="fa fa-circle-o"></i> 日志</a></li>
+                  <li>
+                    <a href="#resource/list">
+                      <i class="fa fa-book"></i> <span>资源</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
         <!-- /.box-body -->
       </div>
-      <!-- /. box -->
-      <div class="box box-solid">
-        <div class="box-header with-border">
-          <h3 class="box-title">Labels</h3>
-
-          <div class="box-tools">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-            </button>
-          </div>
-        </div>
-        <div class="box-body no-padding">
-          <ul class="nav nav-pills nav-stacked">
-            <li><a href="#"><i class="fa fa-circle-o text-red"></i> Important</a></li>
-            <li><a href="#"><i class="fa fa-circle-o text-yellow"></i> Promotions</a></li>
-            <li><a href="#"><i class="fa fa-circle-o text-light-blue"></i> Social</a></li>
-          </ul>
-        </div>
-        <!-- /.box-body -->
-      </div>
-      <!-- /.box -->
     </div>
     <!-- /.col -->
     <div class="col-md-9">
@@ -65,7 +50,7 @@
         <div class="box-header with-border">
           <h3 class="box-title">Inbox</h3>
 
-          <div class="box-tools pull-right">
+          <div class="box-tools">
             <div class="has-feedback">
               <input type="text" class="form-control input-sm" placeholder="Search Mail">
               <span class="glyphicon glyphicon-search form-control-feedback"></span>
@@ -271,3 +256,6 @@
   </div>
   <!-- /.row -->
 </section>
+<script>
+  seajs.use("pages/terminal/list.js" , function(termList){ termList.init() })
+</script>
