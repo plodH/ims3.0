@@ -7,7 +7,6 @@ define(function(require, exports, module) {
         util = require('common/util');
 		
 	exports.init = function() {
-        console.log(util.getHashParameters());
 	};
 	
 });
