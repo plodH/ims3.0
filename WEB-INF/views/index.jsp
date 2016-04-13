@@ -1,5 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -27,6 +29,7 @@
   <![endif]-->
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
+<c:url value="/j_spring_security_logout" var="logoutUrl"/>
 <!-- Site wrapper -->
 <div class="wrapper">
 
@@ -54,7 +57,7 @@
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <img src="resources/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
-              <span class="hidden-xs">史迁</span>
+              <span class="hidden-xs"><sec:authentication property="name"/></span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
@@ -62,8 +65,8 @@
                 <img src="resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
 
                 <p>
-                  史迁
-                  <small>超级管理员</small>
+                	<sec:authentication property="name"/>
+                	<small>${project_name_cn}</small>
                 </p>
               </li>
               <!-- Menu Footer-->
@@ -91,8 +94,8 @@
           <img src="resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
         </div>
         <div class="pull-left info">
-          <p>史迁</p>
-          <h6 class="gray-light">超级管理员</h6>
+          <p><sec:authentication property="name"/></p>
+          <h6 class="gray-light">${project_name_cn}</h6>
         </div>
       </div>
       <!-- search form -->
@@ -190,5 +193,8 @@
 	})
 	seajs.use("pages/index" , function(index){ index.init(); })
 </script>
+<input id="Proj_Name" type="hidden" value="${project_name_cn}"/>
+<div id="User_Name" style="visibility:hidden;"><sec:authentication property="name"/></div>
+
 </body>
 </html>
