@@ -43,9 +43,14 @@ function cookies(){
 	}
 }
 
+$(function(){
+	if(getCookie("develop") != undefined){
+		auto($("#l_username"));
+	}
+})
 //用户名自动补全
-$(function(selector){
-    var elt = $("#l_username");
+function auto(selector){
+    var elt = selector;
     var autoComplete,autoLi;
     var strHtml = [];
     strHtml.push('<div class="AutoComplete" id="AutoComplete">');
@@ -111,4 +116,4 @@ $(function(selector){
     }).blur(function(){
         autoComplete.hide();
     });
-})
+}
