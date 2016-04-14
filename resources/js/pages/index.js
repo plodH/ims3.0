@@ -36,12 +36,14 @@ define(function (require, exports, module) {
     
 //    $(function(){
 //    	var json_data = {
-//    	        "Project": getCookie("develop"),
-//    	        "Action" : "Get"
+//    			"Project": "",
+//		        "Action" : "Get"
 //    	    }
 //    	var url = CONFIG.serverRoot + "/backend_mgt/v1/projects"
-//    	UTIL.ajax("get",url,json_data);
+//    	UTIL.ajax("post", url, json_data, render);
 //    })
     
-
+    function render(data){
+    	var proData = data.Projects;
+    }
 });

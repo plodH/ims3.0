@@ -16,7 +16,7 @@
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet" href="resources/dist/css/AdminLTE.min.css">
+  <link rel="stylesheet" href="resources/dist/css/AdminLTE.css">
   <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
   <link rel="stylesheet" href="resources/dist/css/skins/_all-skins.min.css">
@@ -121,7 +121,7 @@
           </ul>
         </li>
         <li>
-          <a href="#resource/list">
+          <a href="#materials/materials_list">
             <i class="fa fa-book"></i> <span>资源</span>
           </a>
         </li>
@@ -193,8 +193,6 @@
 	})
 	seajs.use("pages/index" , function(index){ index.init(); })
 </script>
-<input id="Proj_Name" type="hidden" value="${project_name_cn}"/>
-<div id="User_Name" style="visibility:hidden;"><sec:authentication property="name"/></div>
 
 </body>
 </html>
