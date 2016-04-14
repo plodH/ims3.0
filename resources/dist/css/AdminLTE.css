@@ -22,7 +22,7 @@ html, body {
 body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-family: 'Source Sans Pro', 'Microsoft YaHei',Î¢ÈíÑÅºÚ, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Source Sans Pro', 'Microsoft YaHei', å¾®è½¯é›…é»‘, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-weight: 400;
     overflow-x: hidden;
     overflow-y: auto;
@@ -5562,7 +5562,7 @@ table.text-center, table.text-center td, table.text-center th {
     }
 }
 
-/*loginÒ³Ãæ*/
+/*loginÃ’Â³ÃƒÃ¦*/
 #error_m {
     display: block;
     margin-top: 10px;
