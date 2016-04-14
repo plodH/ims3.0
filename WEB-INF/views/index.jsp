@@ -175,6 +175,10 @@
 </div>
 <!-- ./wrapper -->
 
+<!-- .full-screen -->
+<div class="full-screen none" id="edit-page-container"></div>
+<!-- /.full-screen -->
+
 <!-- jQuery 2.2.0 -->
 <script src="resources/plugins/jQuery/jQuery-2.2.0.min.js"></script>
 <!-- Bootstrap 3.3.6 -->
