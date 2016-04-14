@@ -20,7 +20,7 @@ return __p;
 exports['layout_edit_main']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div id="layout-editor-wrapper" class="container"> <div class="layout-editor-header row"> <button type="button" class="btn btn-flat btn-complete-layout">返回</button> <div class="button-group pull-right"> <button type="button" class="btn btn-flat btn-save-layout">保存</button> </div> </div> <div class="layout-editor-body row"> <div class="layout-editor-toolbar"> <ul> <li><button data-widget-id="image">图片控件</button></li> <li><button data-widget-id="video">视频控件</button></li> <li><button data-widget-id="html">Web文本控件</button></li> <li><button data-widget-id="clock">时钟控件</button></li> </ul> <ul> <li> <label>布局名称:</label> <input type="text" value="'+
+__p+='<div id="layout-editor-wrapper"> <div class="layout-editor-header"> <button type="button">返回</button> <div> <button type="button">保存</button> </div> </div> <div class="layout-editor-body"> <div class="layout-editor-toolbar"> <ul> <li><button data-widget-id="image">图片控件</button></li> <li><button data-widget-id="video">视频控件</button></li> <li><button data-widget-id="html">Web文本控件</button></li> <li><button data-widget-id="clock">时钟控件</button></li> </ul> <ul> <li> <label>布局名称:</label> <input type="text" value="'+
 ((__t=(name))==null?'':__t)+
 '"> </li> <li> <label>宽:</label> <input type="number" value="'+
 ((__t=(width))==null?'':__t)+
@@ -30,7 +30,14 @@ __p+='<div id="layout-editor-wrapper" class="container"> <div class="layout-edit
 ((__t=(background_color))==null?'':__t)+
 '"> </li> <li> <label>背景图片:</label> <input type="text" value="'+
 ((__t=(background_image))==null?'':__t)+
-'"> </li> </ul> </div> <div class="layout-editor-canvas"> </div> <div class="layout-editor-widget"> </div> </div> <div class="layout-editor-footer row"></div> </div>';
+'"> </li> </ul> </div> <div class="layout-editor-center"> <div class="layout-editor-canvas"></div> <ul class="layout-editor-widget-list"> </ul> </div> <div class="layout-editor-widget"> </div> </div> <div class="layout-editor-footer row"></div> </div>';
+}
+return __p;
+};
+exports['layout_edit_widget_item']=function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>$Title$</title> </head> <body> $END$ </body> </html>';
 }
 return __p;
 };

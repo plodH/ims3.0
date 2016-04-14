@@ -6,7 +6,6 @@
 #layout-editor-wrapper .layout-editor-header {
     height: 60px;
     padding: 13px 44px;
-    border-bottom: 1px solid #000;
 }
 
 #layout-editor-wrapper .btn-complete-layout {
@@ -29,7 +28,6 @@
     float: left;
     width: 220px;
     height: 100%;
-    border-right: 1px solid #000;
 }
 
 #layout-editor-wrapper .layout-editor-toolbar ul {
@@ -61,7 +59,7 @@
     float: left;
     width: 1000px;
     height: 100px;
-    background: black;
+    border: 1px solid #cccccc;
 }
 
 #layout-editor-wrapper .layout-editor-widget {

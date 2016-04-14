@@ -20,7 +20,18 @@ define(function(require, exports, module) {
                     layout_id: layoutId
                 }
             });
-            util.ajax('post', requestUrl + '/backend_mgt/v1/layout', data, render);
+            util.ajax('post', requestUrl + '/backend_mgt/v1/layout', data, function (layoutData) {
+                var data = JSON.stringify({
+                    project_name: projectName,
+                    action: 'getCBList',
+                    data: {
+                        layout_id: String(layoutId)
+                    }
+                });
+                util.ajax('post', requestUrl + '/backend_mgt/v1/layout', data, function (widgetData) {
+                    render(layoutData, widgetData);
+                });
+            });
         } else {
             var defaultLayout = {
                 layout_id: -1,
@@ -35,21 +46,25 @@ define(function(require, exports, module) {
                 BottomMargin: '0',
                 LeftMargin: '0'
             };
-            render(defaultLayout);
+            var defaultWidget = {
+                
+            };
+            render(defaultLayout, defaultWidget);
         }
 	};
 
-    function render(json) {
+    function render(layout, widget) {
         var data = {
-            name: json.Name,
-            width: json.Width,
-            height: json.Height,
-            background_color: json.BackgroundColor,
-            background_image: JSON.stringify(json.BackgroundPic)
+            name: layout.Name,
+            width: layout.Width,
+            height: layout.Height,
+            background_color: layout.BackgroundColor,
+            background_image: JSON.stringify(layout.BackgroundPic)
         };
         $('#edit-page-container')
             .html(templates.layout_edit_main(data))
             .removeClass('none');
+        widget
     }
 	
 });
