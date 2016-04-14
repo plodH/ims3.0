@@ -1,1 +1,152 @@
+/*font-color*/
 .gray-light{color: #999;}
+/*treetree*/
+.tree-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  min-width: 100%;
+}
+.tree-menu > li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+.box .tools {
+  display: inline-block;
+  float: right;
+}
+.tree-menu > li > a {
+  padding: 12px 5px 12px 15px;
+  display: block;
+}
+.tree-menu > li > a > .fa,
+.tree-menu > li > a > .glyphicon,
+.tree-menu > li > a > .ion {
+  width: 20px;
+}
+.tree-menu > li .label,
+.tree-menu > li .badge {
+  margin-top: 3px;
+  margin-right: 5px;
+}
+.tree-menu li.header {
+  padding: 10px 25px 10px 15px;
+  font-size: 12px;
+}
+.tree-menu li > a > .fa-angle-right {
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin-right: 10px;
+  margin-top: 3px;
+}
+.tree-menu li.open > a > .fa-angle-right {
+  -webkit-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+.tree-menu li.open > .tree-menu-2 {
+  display: block;
+}
+.tree-menu .tree-menu-2 {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  padding-left: 5px;
+}
+.tree-menu .tree-menu-2 .tree-menu-2 {
+  padding-left: 20px;
+}
+.tree-menu .tree-menu-2 > li {
+  margin: 0;
+}
+.tree-menu .tree-menu-2 > li > a {
+  padding: 5px 5px 5px 15px;
+  font-size: 14px;
+}
+.tree-menu > li > a,
+.tree-menu .tree-menu-2 > li > a {
+  display: table;
+}
+.tree-menu > li > a > i,
+.tree-menu .tree-menu-2 > li > a > i {
+  display: table-cell;
+  vertical-align: middle;
+  padding: 5px !important; 
+}
+.tree-menu > li > a > .tree-input-group,
+.tree-menu .tree-menu-2 > li > a > .tree-input-group {
+  display: inline-block; 
+  width: 189px;
+}
+.tree-menu > li > a > .tree-input-group > input,
+.tree-menu .tree-menu-2 > li > a > .tree-input-group > input {
+  display: inline-block;
+  width: 150px;
+}
+.tree-menu > li > a > .tree-input-group > span,
+.tree-menu .tree-menu-2 > li > a > .tree-input-group > span {
+  width:38px; 
+  height: 34px;
+}
+.tree-menu .tree-menu-2 > li > a > .fa,
+.tree-menu .tree-menu-2 > li > a > .glyphicon,
+.tree-menu .tree-menu-2 > li > a > .ion {
+  width: 20px;
+}
+.tree-menu .tree-menu-2 > li > a > .fa-angle-right,
+.tree-menu .tree-menu-2 > li > a > .fa-angle-down {
+  width: auto;
+}
+.tree-menu,
+.tree-menu > li.header {
+  white-space: nowrap;
+  /*overflow: hidden;*/
+}
+.tree-menu:hover {
+  overflow: visible;
+}
+.tree-menu > li.header {
+  /*overflow: hidden;
+  text-overflow: clip;*/
+}
+.tree-menu li > a {
+  position: relative;
+}
+.tree-menu li > a > .pull-right {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  margin-top: -7px;
+}
+/*treetree style*/
+.tree-menu > li > a {
+  border-left: 3px solid transparent;
+}
+.tree-menu > li.open > a {
+  color: #000000;
+}
+.tree-menu > li > a:hover,
+.tree-menu > li.focus > a {
+  color: #3c8dbc;
+  font-weight: bold;
+}
+.tree-menu > li > .tree-menu-2 {
+  margin: 0 1px;
+}
+.tree-menu-2 > li > a {
+  color: #000000;
+  border-left: 3px solid transparent;
+}
+.tree-menu-2 > li.open > a{
+  color: #000000;
+}
+.tree-menu-2 > li.focus > a,
+.tree-menu-2 > li > a:hover {
+  color: #3c8dbc;
+  font-weight: bold;
+}
