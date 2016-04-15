@@ -1,5 +1,97 @@
 /*font-color*/
 .gray-light{color: #999;}
+/*login页面*/
+#error_m {
+    display: block;
+    margin-top: 10px;
+    color: #3c8dbc;
+}
+
+#AutoComplete {
+    background: #fff;
+    border: 1px solid #4190db;
+    display: none;
+    width: 320px;
+}
+
+#AutoComplete ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#AutoComplete li {
+    color: #333;
+    cursor: pointer;
+    font-size: 14px;
+    text-indent: 12px;
+    line-height: 30px;
+}
+
+#AutoComplete .hover {
+    background: #6eb6fe;
+    color: #fff;
+}
+
+#l_version {
+    bottom: 20px;
+    position: absolute;
+    width: 100px;
+    left: 50%;
+    margin-left: -40px;
+}
+
+/*资源列表页面*/
+#mtr_title {
+    padding: 0px 10px;
+}
+
+#mtrT_name {
+    margin-left: 15px;
+}
+
+.mtrList {
+    padding: 0px 10px;
+}
+
+.materils li {
+    list-style-type: none;
+}
+
+.materils span {
+    display: inline-flex;
+    height: 36px;
+    line-height: 36px;
+}
+
+.mtr_cb{
+    width: 15px;
+    height: 15px;
+}
+
+.mtr_name {
+    width: 30%;
+    text-align: left;
+    padding-left: 10px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+}
+
+.mtr_size {
+    width: 10%;
+    text-align: center;
+}
+
+.mtr_time {
+    width: 10%;
+    text-align: center;
+}
+
+.mtr_uploadDate {
+    width: 15%;
+    text-align: center;
+}
 /*layout edit*/
 .full-screen {
     position: absolute;
@@ -16,6 +108,9 @@
     background: #ffffff;
 }
 /*treetree*/
+.tree-box{
+  overflow: auto;
+}
 .tree-menu {
   list-style: none;
   margin: 0;
@@ -31,6 +126,11 @@
 .box .tools {
   display: inline-block;
   float: right;
+}
+.box .tools > a,
+.tree-menu > li > a,
+.tree-menu .tree-menu-2 > li > a {
+  cursor: pointer;
 }
 .tree-menu > li > a {
   padding: 12px 5px 12px 15px;

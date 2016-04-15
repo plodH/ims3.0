@@ -1,10 +1,12 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>ims3-demo</title>
+  <title>Clear信息发布平台</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.6 -->
@@ -14,7 +16,7 @@
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet" href="resources/dist/css/AdminLTE.min.css">
+  <link rel="stylesheet" href="resources/dist/css/AdminLTE.css">
   <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
   <link rel="stylesheet" href="resources/dist/css/skins/_all-skins.min.css">
@@ -27,6 +29,7 @@
   <![endif]-->
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
+<c:url value="/j_spring_security_logout" var="logoutUrl"/>
 <!-- Site wrapper -->
 <div class="wrapper">
 
@@ -54,7 +57,7 @@
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <img src="resources/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
-              <span class="hidden-xs">史迁</span>
+              <span class="hidden-xs"><sec:authentication property="name"/></span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
@@ -62,14 +65,14 @@
                 <img src="resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
 
                 <p>
-                  史迁
-                  <small>超级管理员</small>
+                	<sec:authentication property="name"/>
+                	<small>${project_name_cn}</small>
                 </p>
               </li>
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-right">
-                  <a href="#" class="btn btn-default btn-flat">退出</a>
+                  <a id="logout" class="btn btn-default btn-flat">退出</a>
                 </div>
               </li>
             </ul>
@@ -91,8 +94,8 @@
           <img src="resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
         </div>
         <div class="pull-left info">
-          <p>史迁</p>
-          <h6 class="gray-light">超级管理员</h6>
+          <p><sec:authentication property="name"/></p>
+          <h6 class="gray-light">${project_name_cn}</h6>
         </div>
       </div>
       <!-- search form -->
@@ -118,7 +121,7 @@
           </ul>
         </li>
         <li>
-          <a href="#resource/list">
+          <a href="#materials/materials_list">
             <i class="fa fa-book"></i> <span>资源</span>
           </a>
         </li>
@@ -194,5 +197,6 @@
 	})
 	seajs.use("pages/index" , function(index){ index.init(); })
 </script>
+
 </body>
 </html>
