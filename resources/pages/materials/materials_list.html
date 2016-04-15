@@ -16,13 +16,16 @@
             <div class="box">
                 <div class="box-header">
                     <input type="checkbox" id="mtr_cbAll" class="mtr_cb"><a>全选</a>
-
+					<a id="mtr_upload" class="glyphicon glyphicon-eye-open">上传</a>
+                   	<a id="mtr_addText" class="glyphicon glyphicon-eye-open">添加文本</a>
+                   	<a id="mtr_addLive" class="glyphicon glyphicon-eye-open">添加直播</a>
                     <div class="box-tools">
+                    	
                     	<div>
-                            <a class="glyphicon glyphicon-eye-open">预览</a>
-                            <a class="glyphicon glyphicon-cloud-download">下载</a>
-                            <a class="glyphicon glyphicon-edit">编辑</a>
-                            <a class="glyphicon glyphicon-trash">删除</a>
+                            <a id="mtr_view" class="glyphicon glyphicon-eye-open">预览</a>
+                            <a id="mtr_download" class="glyphicon glyphicon-cloud-download">下载</a>
+                            <a id="mtr_edit" class="glyphicon glyphicon-edit">编辑</a>
+                            <a id="mtr_delete" class="glyphicon glyphicon-trash">删除</a>
                         </div>
                         <!--<div class="input-group input-group-sm" style="width: 150px;">-->
                             <!--<input type="text" name="table_search" class="form-control pull-right" placeholder="Search">-->
@@ -50,6 +53,8 @@
     </div>
     <!-- /.box -->
 
+    <!-- upload按钮-->
+    <input id="file" name="file" type="file" multiple="multiple" accept="image/*, audio/*, video/*"/>
 </section>
 <!-- /.content -->
 <script>
