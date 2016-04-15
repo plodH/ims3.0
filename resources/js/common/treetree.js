@@ -33,12 +33,20 @@ define(function(require, exports, module) {
   		      e.stopPropagation();
 	        	var li = $(this).parent().parent();
 						if (li.hasClass('open')) {
-							li.removeClass('open');
+							tree.closeNode(li);
 						}else{
-							li.addClass('open');
+							tree.openNode(li);
 						}
 	        })
 	      })
+	    }
+
+	    tree.openNode = function(dom){
+	    	dom.addClass('open');
+	    }
+
+	    tree.closeNode = function(dom){
+	    	dom.removeClass('open');
 	    }
 
 	    tree.setFocus = function(dom){
