@@ -189,8 +189,8 @@ define(function(require, exports, module) {
                 h = widget.getHeight() * self.mZoomFactor;
             switch (dragType) {
                 case POSITION_EXTRA.CONTENT:
-                    l = l + ry - dragPoint.y;
-                    t = t + rx - dragPoint.x;
+                    l = l + rx - dragPoint.x;
+                    t = t + ry - dragPoint.y;
                     dragPoint = {x: rx, y: ry};
                     break;
                 case POSITION_EXTRA.TOP:
@@ -359,7 +359,8 @@ define(function(require, exports, module) {
         $(this.mElement).mouseenter(function (ev) {
             $(this).on('mousemove', onMove);
             $(this).one('mouseleave', function (evt) {
-                $(this).off('mousemove', onMove);
+                $(this).off('mousemove');
+                $(this).off('mouseup');
             });
         });
 
@@ -388,8 +389,8 @@ define(function(require, exports, module) {
                         break;
                     case POSITION_EXTRA.CONTENT:
                         dragPoint = {
-                            x: rx * self.mZoomFactor,
-                            y: ry * self.mZoomFactor
+                            x: rx,
+                            y: ry
                         };
                         break;
                     case POSITION_EXTRA.LEFT_TOP:
@@ -430,7 +431,7 @@ define(function(require, exports, module) {
                         break;
                 }
                 $(this).on('mousemove', onDrag);
-                $(this).one('mouseup', function (evt) {
+                $(this).on('mouseup', function (evt) {
                     $(this).off('mousemove', onDrag);
                 });
             }
