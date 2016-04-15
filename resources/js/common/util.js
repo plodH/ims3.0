@@ -29,6 +29,21 @@ define(function(require, exports, module) {
 		return ret;
 	};
 
+	//设置cookie
+	exports.setCookie = function (name,value,days){
+		//var exp=new Date();
+		//exp.setTime(exp.getTime() + days*24*60*60*1000);
+		//var arr=document.cookie.match(new RegExp("(^| )"+name+"=([^;]*)(;|$)"));
+		document.cookie=name+"="+escape(value);
+	}
+	exports.getCookie = function (name){
+		var arr=document.cookie.match(new RegExp("(^| )"+name+"=([^;]*)(;|$)"));
+		if(arr!=null){
+			return unescape(arr[2]);
+			return null;
+		}
+	}
+
 	function ajax(type, url, data, successFn){
 
 		$.ajax({
