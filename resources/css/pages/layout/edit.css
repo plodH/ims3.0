@@ -1,6 +1,7 @@
 
 #layout-editor-wrapper {
     width: 100%;
+    height: 100%;
 }
 
 #layout-editor-wrapper .layout-editor-header {
@@ -16,16 +17,12 @@
 
 #layout-editor-wrapper .layout-editor-body {
     height: calc(100% - 100px);
-}
-
-#layout-editor-wrapper .layout-editor-body:after {
-    content: '';
-    display: block;
-    clear: both;
+    position: relative;
+    width: 100%;
 }
 
 #layout-editor-wrapper .layout-editor-toolbar {
-    float: left;
+    position: absolute;
     width: 220px;
     height: 100%;
 }
@@ -56,17 +53,54 @@
 }
 
 #layout-editor-wrapper .layout-editor-canvas {
-    float: left;
-    width: 1000px;
-    height: 100px;
+    position: absolute;
+    left: 220px;
+    width: calc(100% - 440px);
+    height: 100%;
     border: 1px solid #cccccc;
+    overflow: auto;
 }
 
 #layout-editor-wrapper .layout-editor-widget {
-    float: right;
-    width: 200px;
+    position: absolute;
+    right: 0;
+    width: 220px;
+}
+
+#layout-editor-wrapper .layout-editor-widget ul {
+    list-style: none;
+    padding-left: 0;
+}
+#layout-editor-wrapper .layout-editor-widget li {
+    list-style: none;
+}
+
+#layout-editor-wrapper .layout-editor-widget li>label {
+    width: 70px;
+    text-align: right;
+}
+
+#layout-editor-wrapper .layout-editor-widget li>input,
+#layout-editor-wrapper .layout-editor-widget li>select
+{
+    width: 126px;
+}
+
+#layout-editor-wrapper .layout-editor-widgets {
+    width: 100%;
     height: 100px;
-    background: red;
+    overflow-y: auto;
+}
+
+#layout-editor-wrapper .layout-editor-widgets ul {
+    list-style: none;
+    display: table;
+}
+
+#layout-editor-wrapper .layout-editor-widgets li {
+    width: 100px;
+    height: 100px;
+    border: solid 1px #C97626;
 }
 
 #layout-editor-wrapper .layout-editor-footer {}

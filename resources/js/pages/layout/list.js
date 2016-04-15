@@ -49,7 +49,7 @@ define(function(require, exports, module) {
 			onSelectedItemChanged();
 		});
         $('#channel-list-nav').keyup(function (ev) {
-            if (ev.which === 13) {
+	            if (ev.which === 13) {
                 onSearch($('#channel-list-nav input').val());
                 ev.stopPropagation();
             }

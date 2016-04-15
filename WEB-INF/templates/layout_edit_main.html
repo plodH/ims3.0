@@ -14,35 +14,14 @@
                 <li><button data-widget-id="html">Web文本控件</button></li>
                 <li><button data-widget-id="clock">时钟控件</button></li>
             </ul>
-            <ul>
-                <li>
-                    <label>布局名称:</label>
-                    <input type="text" value="<%=name%>">
-                </li>
-                <li>
-                    <label>宽:</label>
-                    <input type="number" value="<%=width%>">
-                </li>
-                <li>
-                    <label>高:</label>
-                    <input type="number" value="<%=height%>">
-                </li>
-                <li>
-                    <label>背景颜色:</label>
-                    <input type="text" value="<%=background_color%>">
-                </li>
-                <li>
-                    <label>背景图片:</label>
-                    <input type="text" value="<%=background_image%>">
-                </li>
+            <ul class="layout-editor-properties">
             </ul>
         </div>
-        <div class="layout-editor-center">
-            <div class="layout-editor-canvas"></div>
-            <ul class="layout-editor-widget-list">
-            </ul>
-        </div>
+        <div class="layout-editor-canvas"></div>
         <div class="layout-editor-widget">
+            <ul class="layout-editor-widget-properties">
+            </ul>
+            <div class="layout-editor-widgets"></div>
         </div>
     </div>
     <div class="layout-editor-footer row"></div>
