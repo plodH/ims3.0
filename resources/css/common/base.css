@@ -92,6 +92,29 @@
     width: 15%;
     text-align: center;
 }
+
+/*资源上传页面*/
+#page_upload {
+    z-index: 2005;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+#upload_box {
+	width: 600px;
+    margin: 10%auto;
+}
+
+#box_fileList{
+	overflow: auto;
+    max-height: 450px;
+}
+#file {
+    /*display: none;*/
+}
 /*layout edit*/
 .full-screen {
     position: absolute;
