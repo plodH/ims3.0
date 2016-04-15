@@ -34,17 +34,17 @@ function getCookie(name){
 }
 
 function cookies(){
-	if(getCookie("develop") == undefined){
-		var develop = $("#j_project_name").attr("value");
-		setCookie("develop",develop);
-	}else if(getCookie("develop") != ""){
-		var develop = $("#j_project_name").attr("value");
-		setCookie("develop",develop);
+	if(getCookie("project_name") == undefined){
+		var project_name = $("#j_project_name").attr("value");
+		setCookie("project_name",project_name);
+	}else if(getCookie("project_name") != ""){
+		var project_name = $("#j_project_name").attr("value");
+		setCookie("project_name",project_name);
 	}
 }
 
 $(function(){
-	if(getCookie("develop") != undefined){
+	if(getCookie("project_name") != undefined){
 		auto($("#l_username"));
 	}
 })
@@ -55,7 +55,7 @@ function auto(selector){
     var strHtml = [];
     strHtml.push('<div class="AutoComplete" id="AutoComplete">');
     strHtml.push('    <ul class="AutoComplete_ul">');
-    strHtml.push('        <li hz="@'+getCookie("develop")+'"></li>');
+    strHtml.push('        <li hz="@'+getCookie("project_name")+'"></li>');
     strHtml.push('    </ul>');
     strHtml.push('</div>');
     
