@@ -127,7 +127,9 @@
   display: inline-block;
   float: right;
 }
-.box .tools > a{
+.box .tools > a,
+.tree-menu > li > a,
+.tree-menu .tree-menu-2 > li > a {
   cursor: pointer;
 }
 .tree-menu > li > a {
