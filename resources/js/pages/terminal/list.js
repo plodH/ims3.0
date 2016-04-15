@@ -55,6 +55,10 @@ define(function(require, exports, module) {
               li.append(ul);
             }
             tree.createNode(ul, newNode);
+            var dom = ul.children('li:nth('+(ul.children().length-1)+')');
+            tree.openNode(li);
+            tree.setFocus(dom);
+            tree.showEditInput(dom);
             
           })
 

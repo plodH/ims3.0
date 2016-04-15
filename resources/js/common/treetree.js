@@ -41,12 +41,38 @@ define(function(require, exports, module) {
 	      })
 	    }
 
+	    tree.showEditInput = function(dom,fn){
+	    	var t = dom.children('a').find('span');
+        if(t.css('display') === 'none'){
+          var input = dom.children('a').find('div > input');
+          input.focus();
+          return;
+        }
+        t.css('display', 'none');
+
+        var input_div = $('' + 
+        '<div class="input-group tree-input-group">' +
+          '<input type="text" class="form-control">' +
+          '<span class="input-group-addon"><i class="fa fa-check"></i></span>' +
+        '</div>');
+
+        var input = input_div.find('input');
+        var done = input_div.find('span');
+        input.val($.trim(t.html()));
+        dom.children('a').append(input_div);
+        input.focus();
+
+	    	// 判断fn是否传入再处理
+	    }
+
 	    tree.openNode = function(dom){
 	    	dom.addClass('open');
+	    	dom.children('a').find('.fa-folder-o').removeClass('fa-folder-o').addClass('fa-folder-open-o');
 	    }
 
 	    tree.closeNode = function(dom){
 	    	dom.removeClass('open');
+	    	dom.children('a').find('.fa-folder-open-o').removeClass('fa-folder-open-o').addClass('fa-folder-o');
 	    }
 
 	    tree.setFocus = function(dom){
