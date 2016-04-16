@@ -41,6 +41,23 @@ define(function(require, exports, module) {
 	      })
 	    }
 
+	    tree.addParentCss = function(dom){
+	    	dom.addClass('treeview');
+        var a = dom.children('a');
+        var angle = $('<i class="fa fa-angle-right"></i>');
+        a.prepend(angle);
+        angle.click(function(e){
+        	e.preventDefault();
+		      e.stopPropagation();
+        	var li = $(this).parent().parent();
+					if (li.hasClass('open')) {
+						tree.closeNode(li);
+					}else{
+						tree.openNode(li);
+					}
+        })
+	    }
+
 	    tree.showEditInput = function(dom,fn){
 	    	var t = dom.children('a').find('span');
         if(t.css('display') === 'none'){
@@ -62,7 +79,19 @@ define(function(require, exports, module) {
         dom.children('a').append(input_div);
         input.focus();
 
-	    	// 判断fn是否传入再处理
+        input.click(function(e){
+          e.preventDefault();
+          e.stopPropagation();
+        })
+
+        done.click(function(e){
+          e.preventDefault();
+          e.stopPropagation();
+        })
+
+        if(fn != undefined){
+        	fn(input);
+        }
 	    }
 
 	    tree.openNode = function(dom){
