@@ -8,6 +8,10 @@ define(function(require, exports, module) {
     initTree();
 	}
 
+  function loadTermList(){
+    console.log('loadtermlist: '+$('#termclass-tree').find('.focus').attr('node-id'));
+  }
+
   function initTree(){
 
     var dataParameter = {
@@ -25,13 +29,15 @@ define(function(require, exports, module) {
           var tree = {domId: 'termclass-tree', canCheck: false};
           tree = TREE.new(tree);
           tree.createTree($('#'+tree.domId), data);
-          alert('loadtermlist: '+$('#termclass-tree').find('.focus').attr('node-id'))
+          // alert('loadtermlist: '+$('#termclass-tree').find('.focus').attr('node-id'))
+          loadTermList();
 
           // 终端分类列表各项点击
           $('#termclass-tree li > a').each(function(i, e){
             $(this).click(function(e){
               tree.setFocus($(this).parent());
-               alert('loadtermlist: '+$(this).parent().attr('node-id'))
+               // alert('loadtermlist: '+$(this).parent().attr('node-id'))
+               loadTermList();
             })
           })
 
@@ -66,7 +72,8 @@ define(function(require, exports, module) {
             var dom = ul.children('li:nth('+(ul.children().length-1)+')');
             tree.openNode(li);
             tree.setFocus(dom);
-            alert('loadtermlist: '+dom.attr('node-id'));
+            // alert('loadtermlist: '+dom.attr('node-id'));
+            loadTermList();
             tree.showEditInput(dom,function(input){
               input.blur(function(e){
                 addTermClassName(input);
@@ -108,7 +115,8 @@ define(function(require, exports, module) {
                     li.attr('node-id',data.categoryID);
                     a.click(function(e){
                       tree.setFocus(li);
-                      alert('loadtermlist: '+li.attr('node-id'));
+                      // alert('loadtermlist: '+li.attr('node-id'));
+                      loadTermList();
                     })
                   }else{
                     alert('新建终端分类失败');
@@ -146,7 +154,8 @@ define(function(require, exports, module) {
                       if(data.rescode == '200'){
                         var focus = $('#termclass-tree').find('.focus');
                         tree.setFocus(focus.parent().parent());
-                        alert('loadtermlist: '+focus.parent().parent().attr('node-id'));
+                        // alert('loadtermlist: '+focus.parent().parent().attr('node-id'));
+                        loadTermList();
                         focus.remove();
                       }else{
                         alert('删除终端分类失败');
