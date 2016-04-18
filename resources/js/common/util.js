@@ -51,13 +51,13 @@ define(function(require, exports, module) {
 		  url: url,
 		  dataType: 'json',
 		  data: data,
-		  timeout: 3000,
+		  timeout: 10000,
 		  success: function(data){
 		    successFn(data);
 		  },
 		  error: function(XMLHttpRequest, textStatus, errorThrown){
 		  	// XMLHttpRequest.status
-		    alert('连接服务器出错: ' + errorThrown);
+		    alert('连接服务器出错 ' + textStatus + errorThrown);
 		  }
 		})
 

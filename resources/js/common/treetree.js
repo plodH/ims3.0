@@ -41,12 +41,67 @@ define(function(require, exports, module) {
 	      })
 	    }
 
+	    tree.addParentCss = function(dom){
+	    	dom.addClass('treeview');
+        var a = dom.children('a');
+        var angle = $('<i class="fa fa-angle-right"></i>');
+        a.prepend(angle);
+        angle.click(function(e){
+        	e.preventDefault();
+		      e.stopPropagation();
+        	var li = $(this).parent().parent();
+					if (li.hasClass('open')) {
+						tree.closeNode(li);
+					}else{
+						tree.openNode(li);
+					}
+        })
+	    }
+
+	    tree.showEditInput = function(dom,fn){
+	    	var t = dom.children('a').find('span');
+        if(t.css('display') === 'none'){
+          var input = dom.children('a').find('div > input');
+          input.focus();
+          return;
+        }
+        t.css('display', 'none');
+
+        var input_div = $('' + 
+        '<div class="input-group tree-input-group">' +
+          '<input type="text" class="form-control">' +
+          '<span class="input-group-addon"><i class="fa fa-check"></i></span>' +
+        '</div>');
+
+        var input = input_div.find('input');
+        var done = input_div.find('span');
+        input.val($.trim(t.html()));
+        dom.children('a').append(input_div);
+        input.focus();
+
+        input.click(function(e){
+          e.preventDefault();
+          e.stopPropagation();
+        })
+
+        done.click(function(e){
+          e.preventDefault();
+          e.stopPropagation();
+        })
+
+        if(fn != undefined){
+        	fn(input);
+        }
+	    }
+
 	    tree.openNode = function(dom){
 	    	dom.addClass('open');
+	    	dom.children('a').find('.fa-folder-o').removeClass('fa-folder-o').addClass('fa-folder-open-o');
 	    }
 
 	    tree.closeNode = function(dom){
 	    	dom.removeClass('open');
+	    	dom.children('a').find('.fa-folder-open-o').removeClass('fa-folder-open-o').addClass('fa-folder-o');
 	    }
 
 	    tree.setFocus = function(dom){
