@@ -1,5 +1,6 @@
 /*font-color*/
 .gray-light{color: #999;}
+.pointer{cursor: pointer;}
 /*login页面*/
 #error_m {
     display: block;

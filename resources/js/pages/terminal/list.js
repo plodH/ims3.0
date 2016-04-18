@@ -3,13 +3,137 @@ define(function(require, exports, module) {
   var TREE = require("common/treetree.js");
   var CONFIG = require("common/config.js");
   var UTIL = require("common/util.js");
+  var _timerLoadTermList;
+  var _pagesize = 15;
+  var _pageNO = 1;
 
 	exports.init = function(){
     initTree();
 	}
 
   function loadTermList(){
-    console.log('loadtermlist: '+$('#termclass-tree').find('.focus').attr('node-id'));
+    
+    if(_timerLoadTermList){
+      clearInterval(_timerLoadTermList);
+    }
+
+    if($('#termclass-tree').length > 0){
+      _timerLoadTermList = setInterval(function(){loadTermList()}, CONFIG.termListLoadInterval);
+    }
+    else{
+      return;
+    }
+    
+    // loadlist start
+    var searchKeyword = $.trim($('#term_search').val());
+    
+    var status = 0;
+    var bp = $('#term_status').find('.btn-primary');
+    if(bp.length > 0){
+      status = bp.attr('code');
+    }
+
+    var termClassId = $('#termclass-tree').find('.focus').attr('node-id');
+
+    var data = {
+      "project_name": CONFIG.projectName,
+      "action": "getTermList",
+      "categoryID": termClassId,
+      "Pager":{
+        "total": -1,
+        "per_page": _pagesize,
+        "page": _pageNO,
+        "orderby": "",
+        "sortby": "desc",
+        "keyword": searchKeyword
+      }
+    }
+
+    UTIL.ajax(
+      'POST', 
+      CONFIG.serverRoot + '/backend_mgt/v2/termcategory',
+      JSON.stringify(data), 
+      function(data){
+        if(data.rescode != 200){
+          alert('获取终端列表出错：'+rescode.errInfo);
+          return;
+        }
+        // set pagebar
+
+        try{
+          $('#term-table-pager').jqPaginator('destroy');
+        }catch(error){
+          console.error("$('#term-table-pager').jqPaginator 未创建");
+        }
+        
+        var totalPages = Math.ceil(data.totalStatistic.totalTermNum / _pagesize);
+        totalPages = Math.max(totalPages, 1);
+
+        $('#term-table-pager').jqPaginator({
+          totalPages: totalPages,
+          visiblePages: 10,
+          currentPage: _pageNO,
+          onPageChange: function (num, type) {
+            _pageNO = num;
+            if (type === 'change') {
+             loadTermList();
+            }
+          }
+        });
+
+        // term_download_status
+        $('#term_download_status').html(' 下载（' + data.totalStatistic.downloadFileNum + '/' + data.totalStatistic.downloadAllFileNum + '） 预下载（' + data.totalStatistic.preDownloadFileNum + '/' + data.totalStatistic.preDownloadAllFileNum + '）');
+      
+        // term_online_status
+        $('#term_online_1').html(data.totalStatistic.onlineTermNum + '/' + data.totalStatistic.totalTermNum);
+
+        // term_list
+        var tl = data.termList.terms;
+        $('#term_list').empty();
+        for(var i = 0; i < tl.length; i++){
+
+          var downloadStatus = JSON.parse(tl[i].CurrentChannelDownloadInfo);
+          var downloadNum = downloadStatus.DownloadFiles +'/' + downloadStatus.AllFiles;
+          downloadStatus = downloadStatus.DownloadFiles/downloadStatus.AllFiles*100;
+
+          var preloadStatus = JSON.parse(tl[i].PreDownloadInfo);
+          var preloadNum = preloadStatus.DownloadFiles +'/' + preloadStatus.AllFiles;
+          preloadStatus = preloadStatus.DownloadFiles/preloadStatus.AllFiles*100;
+
+          $('#term_list').append('' +
+            '<tr tid='+ tl[i].ID +'>' +
+              '<td><input type="checkbox"></td>' +
+              '<td>'+ tl[i].Name +'<br />'+ tl[i].Description +'<br />'+ tl[i].Status +'</td>' +
+              '<td>当前频道：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ChannelName) +'<br />当前节目：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ProgramName) +'<br />当前视频：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ProgramPlayInfo) +
+              '</td>' +
+              '<td>' +
+                '<span style="font-size: 12px; color: grey;">下载：'+downloadNum+'</span>' +
+                '<div style="height: 10px; margin-top: 0px;" class="progress progress-striped">' +
+                   '<div class="progress-bar progress-bar-success" role="progressbar" ' +
+                      'aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" ' +
+                      'style="width: '+ downloadStatus +'%;">' +
+                      '<span class="sr-only">'+ downloadStatus +'% 完成（成功）</span>' +
+                   '</div>' +
+                '</div>' +
+                '<span style="font-size: 12px; color: grey;">预下载：'+preloadNum+'</span>' +
+                '<div style="height: 10px; margin-top: 0px;" class="progress progress-striped">' +
+                   '<div class="progress-bar progress-bar-success" role="progressbar" ' +
+                      'aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" ' +
+                      'style="width: '+ preloadStatus +'%;">' +
+                      '<span class="sr-only">'+ preloadStatus +'% 完成（成功）</span>' +
+                   '</div>' +
+                '</div>' +
+              '</td>' +
+              '<td>' +
+              'ip：192.123.22.12<br />' +
+              '版本信息' +
+              '</td>' +
+              '<td><a class="pointer">编辑</a> <br/><a class="pointer">截屏</a></td>' +
+            '</tr>'
+          )
+        }  
+      }
+    )
   }
 
   function initTree(){
