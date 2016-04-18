@@ -21,6 +21,7 @@
        folder instead of downloading all of them to reduce the load. -->
   <link rel="stylesheet" href="resources/dist/css/skins/_all-skins.min.css">
   <link rel="stylesheet" href="resources/css/common/base.css">
+  <link rel="stylesheet" href="resources/plugins/iCheck/all.css"/>
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -52,32 +53,7 @@
       </a>
 
       <div class="navbar-custom-menu">
-        <ul class="nav navbar-nav">
-          <!-- User Account: style can be found in dropdown.less -->
-          <li class="dropdown user user-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <img src="resources/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
-              <span class="hidden-xs"><sec:authentication property="name"/></span>
-            </a>
-            <ul class="dropdown-menu">
-              <!-- User image -->
-              <li class="user-header">
-                <img src="resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
-
-                <p>
-                	<sec:authentication property="name"/>
-                	<small>${project_name_cn}</small>
-                </p>
-              </li>
-              <!-- Menu Footer-->
-              <li class="user-footer">
-                <div class="pull-right">
-                  <a id="logout" class="btn btn-default btn-flat">退出</a>
-                </div>
-              </li>
-            </ul>
-          </li>
-        </ul>
+        <a id="dpUpl" class="glyphicon glyphicon-cloud"></a>
       </div>
     </nav>
   </header>
@@ -194,6 +170,8 @@
 <script src="resources/dist/js/app.min.js"></script>
 <!-- Sea.js 3.0.0 -->
 <script src="resources/js/common/sea.js"></script>
+<script src="resources/plugins/iCheck/icheck.min.js"></script>
+<script src="resources/plugins/jqPaginator/jqPaginator.min.js"></script>
 <script>
 	seajs.config({
 	  base: "./resources/js/"
