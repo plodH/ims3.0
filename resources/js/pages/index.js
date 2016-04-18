@@ -12,6 +12,11 @@ define(function (require, exports, module) {
 
     };
 
+    exports.upl = function(){
+        $("#page_upload").load('resources/pages/materials/materials_upload.html');
+        $("#page_upload").css("display","flex");
+    }
+
     function loadPage() {
 
         var page = window.location.hash.match(/^#([^?]*)/);

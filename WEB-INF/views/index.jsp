@@ -82,6 +82,9 @@
     </nav>
   </header>
 
+  <!-- 资源上传弹层区域 -->
+  <section id="page_upload"></section>
+
   <!-- =============================================== -->
 
   <!-- Left side column. contains the sidebar -->

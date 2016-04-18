@@ -30,19 +30,18 @@ define(function(require, exports, module) {
 	};
 
 	//设置cookie
-	exports.setCookie = function(name,value,days){
-	    //var exp=new Date();
-	    //exp.setTime(exp.getTime() + days*24*60*60*1000);
-	    //var arr=document.cookie.match(new RegExp("(^| )"+name+"=([^;]*)(;|$)"));
-	    document.cookie=name+"="+escape(value);
+	exports.setCookie = function (name,value,days){
+		//var exp=new Date();
+		//exp.setTime(exp.getTime() + days*24*60*60*1000);
+		//var arr=document.cookie.match(new RegExp("(^| )"+name+"=([^;]*)(;|$)"));
+		document.cookie=name+"="+escape(value);
 	}
-
-	exports.getCookie = function(name){
+	exports.getCookie = function (name){
 		var arr=document.cookie.match(new RegExp("(^| )"+name+"=([^;]*)(;|$)"));
 		if(arr!=null){
-	    	return unescape(arr[2]);
-	    	return null;
-	 	}
+			return unescape(arr[2]);
+			return null;
+		}
 	}
 
 	function ajax(type, url, data, successFn){
@@ -52,13 +51,13 @@ define(function(require, exports, module) {
 		  url: url,
 		  dataType: 'json',
 		  data: data,
-		  timeout: 3000,
+		  timeout: 10000,
 		  success: function(data){
 		    successFn(data);
 		  },
 		  error: function(XMLHttpRequest, textStatus, errorThrown){
 		  	// XMLHttpRequest.status
-		    alert('连接服务器出错: ' + errorThrown);
+		    alert('连接服务器出错 ' + textStatus + errorThrown);
 		  }
 		})
 
