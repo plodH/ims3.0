@@ -1,45 +1,28 @@
+
 <li>
     <label>控件类型:</label>
-    <select>
-        <% if (type !== 'image') { %>
-        <option value="image">图片控件</option>
-        <% } else { %>
-        <option value="image" selected="selected">图片控件</option>
-        <% } %>
-        <% if (type !== 'video') { %>
-        <option value="video">视频控件</option>
-        <% } else { %>
-        <option value="video" selected="selected">视频控件</option>
-        <% } %>
-        <% if (type !== 'html') { %>
-        <option value="html">Web文本控件</option>
-        <% } else { %>
-        <option value="html" selected="selected">Web文本控件</option>
-        <% } %>
-        <% if (type !== 'clock') { %>
-        <option value="clock">时钟控件</option>
-        <% } else { %>
-        <option value="clock" selected="selected">时钟控件</option>
-        <% } %>
-    </select>
+    <input type="text" readonly="readonly" value="<%=type%>">
 </li>
 <li>
     <label>上边距:</label>
-    <input type="number" value="<%=top%>">
+    <input type="number" value="<%=top%>" data-property-id="widget-top">
 </li>
 <li>
     <label>左边距:</label>
-    <input type="text" value="<%=left%>">
+    <input type="text" value="<%=left%>" data-property-id="widget-left">
 </li>
 <li>
     <label>宽:</label>
-    <input type="number" value="<%=width%>">
+    <input type="number" value="<%=width%>" data-property-id="widget-width">
 </li>
 <li>
     <label>高:</label>
-    <input type="text" value="<%=height%>">
+    <input type="text" value="<%=height%>" data-property-id="widget-height">
 </li>
 <li>
-    <label>层级顺序:</label>
-    <input type="number" value="<%=zIndex%>">
+    <button class="btn-layout-editor-zindex-increase">上移一层</button>
+    <button class="btn-layout-editor-zindex-decrease">下移一层</button>
+</li>
+<li>
+    <button class="btn-layout-editor-delete-widget">删除控件</button>
 </li>
