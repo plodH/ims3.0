@@ -104,17 +104,34 @@ define(function(require, exports, module) {
     function registerEventListeners() {
         $('#layout-editor-wrapper input').change(onInputChanged);
         $('#layout-editor-wrapper .btn-add-widget').click(onAddWidget);
+        $('#layout-editor-wrapper .btn-layout-editor-background').click(function () {
+            alert('资源列表还未实现');
+        });
+        $('#layout-editor-wrapper .btn-layout-editor-delete-widget').click(function () {
+            editor.getLayout().deleteWidget(editor.getLayout().getFocusedWidget());
+        });
+        $('#layout-editor-wrapper .btn-layout-editor-zindex-decrease').click(function () {
+            editor.getLayout().getFocusedWidget().move(-1);
+        });
+        $('#layout-editor-wrapper .btn-layout-editor-zindex-increase').click(function () {
+            editor.getLayout().getFocusedWidget().move(1);
+        });
         editor.getLayout().onFocusedWidgetChanged(onUpdateFocusedWidget);
+        editor.getLayout().onWidgetListChanged(onUpdateWidgetList);
+    }
+    
+    function onUpdateWidgetList(json) {
+        console.log(json);
     }
 
     function onUpdateFocusedWidget() {
-        var widgetProperties = $('#layout-editor-wrapper .layout-editor-widget-properties li'),
+        var widgetProperties = $('#layout-editor-wrapper .layout-editor-widget-properties input'),
             focusedWidget = editor.getLayout().getFocusedWidget();
         widgetProperties[0].value = focusedWidget ? focusedWidget.mTypeName :'';
-        widgetProperties[1].value = focusedWidget ? focusedWidget.mTop: 0;
-        widgetProperties[2].value = focusedWidget ? focusedWidget.mLeft : 0;
-        widgetProperties[3].value = focusedWidget ? focusedWidget.mWidth: 0;
-        widgetProperties[4].value = focusedWidget ? focusedWidget.mHeight : 0;
+        widgetProperties[1].value = focusedWidget ? Math.round(focusedWidget.mTop): 0;
+        widgetProperties[2].value = focusedWidget ? Math.round(focusedWidget.mLeft) : 0;
+        widgetProperties[3].value = focusedWidget ? Math.round(focusedWidget.mWidth) : 0;
+        widgetProperties[4].value = focusedWidget ? Math.round(focusedWidget.mHeight) : 0;
     }
 
     function onAddWidget(ev) {

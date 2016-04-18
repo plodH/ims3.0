@@ -120,6 +120,9 @@ define(function(require, exports, module) {
 		$('#layout-table-pager').jqPaginator({
 			totalPages: totalPages,
 			visiblePages: 10,
+			first: '<li><a href="javascript:;">首页</a></li>',
+			page: '<li><a href="javascript:;">{{page}}</a></li>',
+			last: '<li><a href="javascript:;">尾页</a></li>',
 			currentPage: Number(json.Pager.page),
 			onPageChange: function (num, type) {
 				if (type === 'change') {

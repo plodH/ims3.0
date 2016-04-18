@@ -421,6 +421,7 @@ define(function (require, exports, module) {
         this.mElement.appendChild(this.mContent);
         this.mElement.style.boxShadow = '0 5px 10px 0 rgba(0, 0, 0, 0.26)';
         this.mDataChangedListener = null;
+        this.mWidgetListChangedListener = null;
         this.mFocusedWidgetChangedListener = null;
 
         /************* focus on last widget ***************/
@@ -514,6 +515,52 @@ define(function (require, exports, module) {
         this.mWidgets.push(widget);
         widget.onDraw();
         this.mContent.insertBefore(widget.mElement, this.mFocusMask);
+    };
+
+    Layout.prototype.deleteWidget = function (widget) {
+        var wIndex = -1;
+        for (var i = 0; i < this.mWidgets.length; i++) {
+            if (widget === this.mWidgets[i]) {
+                wIndex = i;
+                break;
+            }
+        }
+        if (wIndex !== -1) {
+            this.mContent.removeChild(widget.mElement);
+            if (wIndex !== 0) {
+                this.mWidgets.splice(wIndex, 1);
+                this.mWidgets[wIndex - 1].requestFocus();
+            } else if (this.mWidgets.length > 1) {
+                this.mWidgets.splice(wIndex, 1);
+                this.mWidgets[wIndex + 1].requestFocus();
+            }
+            this.notifyWidgetListChanged();
+        }
+    };
+
+    Layout.prototype.move = function (widget, step) {
+        var wIndex = -1;
+        for (var i = 0; i < this.mWidgets.length; i++) {
+            if (widget === this.mWidgets[i]) {
+                wIndex = i;
+                break;
+            }
+        }
+        if (wIndex !== -1 && step !== 0 && (wIndex + step < this.mWidgets.length && wIndex + step >= 0)) {
+            this.mWidgets.splice(wIndex, 1);
+            this.mWidgets.splice(wIndex + step, 0, widget);
+            var el = this.mContent.childNodes[wIndex];
+            this.mContent.removeChild(el);
+            this.mContent.insertBefore(el, this.mContent.childNodes[wIndex + step]);
+        }
+    };
+
+    Layout.prototype.onWidgetListChanged = function (listener) {
+        this.mWidgetListChangedListener = listener;
+    };
+
+    Layout.prototype.notifyWidgetListChanged = function () {
+        this.mWidgetListChangedListener && this.mWidgetListChangedListener(this.exportToJSON());
     };
 
     Layout.prototype.findWidgetById = function (id) {
