@@ -1,7 +1,13 @@
-<ul>
+<% if (widgets.length == 0) %>
+<ul class="no-widget">
+    没有控件!
+    <% else { %>
+    <ul></ul>
+    <% } %>
     <% widgets.forEach(function(el, idx, arr) { %>
     <li>
         <div><%=el.name%></div>
     </li>
-    <% }); %>
+    <% });  %>
+
 </ul>

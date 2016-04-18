@@ -8,8 +8,8 @@ define(function(require, exports, module) {
 		util      = require('common/util');
 
 	// global variables
-	var requestUrl    = 'http://192.168.18.166',
-		projectName   = 'develop',
+	var requestUrl    = config.serverRoot,
+		projectName   = config.projectName,
 		nDisplayItems = 10,
         keyword       = '';
 

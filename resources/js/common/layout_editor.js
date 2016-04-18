@@ -36,7 +36,7 @@ define(function (require, exports, module) {
             };
         }
 
-        var h = 0.8, s = 0.5, v = 0.95, a = 0.7;
+        var h = 0.8, s = 0.5, v = 0.95, a = 0.9;
 
         return function () {
             h += 0.618033988749895;
@@ -52,7 +52,8 @@ define(function (require, exports, module) {
             ClockBox: 'clock',
             VideoBox: 'video',
             WebBox: 'html',
-            ImageBox: 'image'
+            ImageBox: 'image',
+            AudioBox: 'audio'
         }[type];
     }
 
@@ -61,339 +62,389 @@ define(function (require, exports, module) {
             clock: 'ClockBox',
             video: 'VideoBox',
             html: 'WebBox',
-            image: 'ImageBox'
+            image: 'ImageBox',
+            audio: 'AudioBox'
         }[type];
     }
+
+    function onResize(widget, resizeType, zoomFactor, resizePoint, currentPoint) {
+        var rx = currentPoint.x,
+            ry = currentPoint.y,
+            nx = resizePoint.x,
+            ny = resizePoint.y,
+            t = widget.getTop() * zoomFactor,
+            l = widget.getLeft() * zoomFactor,
+            w = widget.getWidth() * zoomFactor,
+            h = widget.getHeight() * zoomFactor;
+        switch (resizeType) {
+            case WIDGET_AREA.TOP:
+            case WIDGET_AREA.BOTTOM:
+                if (ry < ny) {
+                    t = ry;
+                    h = ny - ry;
+                } else {
+                    t = ny;
+                    h = ry - ny;
+                }
+                break;
+            case WIDGET_AREA.RIGHT:
+            case WIDGET_AREA.LEFT:
+                if (rx < nx) {
+                    l = rx;
+                    w = nx - rx;
+                } else {
+                    l = nx;
+                    w = rx - nx;
+                }
+                break;
+            case WIDGET_AREA.LEFT_TOP:
+            case WIDGET_AREA.LEFT_BOTTOM:
+            case WIDGET_AREA.RIGHT_TOP:
+            case WIDGET_AREA.RIGHT_BOTTOM:
+                if (nx < rx) {
+                    l = nx;
+                    w = rx - nx;
+                } else {
+                    l = rx;
+                    w = nx - rx;
+                }
+                if (ny < ry) {
+                    t = ny;
+                    h = ry - ny;
+                } else {
+                    t = ry;
+                    h = ny - ry;
+                }
+                break;
+            default:
+                return;
+        }
+        widget.resize({
+            top: t / zoomFactor,
+            left: l / zoomFactor,
+            width: w / zoomFactor,
+            height: h / zoomFactor
+        });
+        widget.notifyDataChanged();
+    }
+
+    function updateCursor(area) {
+        var cursorStyle;
+        switch (area) {
+            case WIDGET_AREA.LEFT:
+                cursorStyle = 'w-resize';
+                break;
+            case WIDGET_AREA.RIGHT:
+                cursorStyle = 'e-resize';
+                break;
+            case WIDGET_AREA.CONTENT:
+                cursorStyle = 'move';
+                break;
+            case WIDGET_AREA.LEFT_TOP:
+                cursorStyle = 'nw-resize';
+                break;
+            case WIDGET_AREA.TOP:
+                cursorStyle = 'n-resize';
+                break;
+            case WIDGET_AREA.RIGHT_TOP:
+                cursorStyle = 'ne-resize';
+                break;
+            case WIDGET_AREA.LEFT_BOTTOM:
+                cursorStyle = 'sw-resize';
+                break;
+            case WIDGET_AREA.BOTTOM:
+                cursorStyle = 's-resize';
+                break;
+            case WIDGET_AREA.RIGHT_BOTTOM:
+                cursorStyle = 'se-resize';
+                break;
+            default:
+                cursorStyle = 'default';
+        }
+        return cursorStyle;
+    }
+
+    function beginResize(widget, area, zoomFactor) {
+        var t = widget.getTop(),
+            l = widget.getLeft(),
+            w = widget.getWidth(),
+            h = widget.getHeight(),
+            x, y;
+        switch (area) {
+            case WIDGET_AREA.LEFT:
+                x = l + w;
+                y = t;
+                break;
+            case WIDGET_AREA.RIGHT:
+                x = l;
+                y = t;
+                break;
+            case WIDGET_AREA.LEFT_TOP:
+                x = l + w;
+                y = t + h;
+                break;
+            case WIDGET_AREA.TOP:
+                x = l;
+                y = t + h;
+                break;
+            case WIDGET_AREA.RIGHT_TOP:
+                x = l;
+                y = t + h;
+                break;
+            case WIDGET_AREA.LEFT_BOTTOM:
+                x = l + w;
+                y = t;
+                break;
+            case WIDGET_AREA.BOTTOM:
+                x = l;
+                y = t;
+                break;
+            case WIDGET_AREA.RIGHT_BOTTOM:
+                x = l;
+                y = t;
+                break;
+        }
+        return {
+            x: x * zoomFactor,
+            y: y * zoomFactor
+        };
+    }
+
+    var WIDGET_AREA = {
+        NONE: 0,
+        CONTENT: 1,
+        TOP: 2,
+        BOTTOM: 3,
+        LEFT_TOP: 4,
+        LEFT: 5,
+        LEFT_BOTTOM: 6,
+        RIGHT_TOP: 7,
+        RIGHT: 8,
+        RIGHT_BOTTOM: 9
+    };
+    var RULER_WIDTH = 0;
+    var MIN_CANVAS_SCALE = 0.9;
+    var WIDGET_BORDER_TOLERATE = 5;
+
+    function LayoutEditor(layoutJSON, viewWidth, viewHeight) {
+
+        this.mTopRuler          = document.createElement('div');
+        this.mLeftRuler         = document.createElement('div');
+        this.mCanvas            = document.createElement('div');
+        this.mCanvasContainer   = document.createElement('div');
+        this.mCanvasContainer.appendChild(this.mCanvas);
+        this.mElement           = document.createElement('div');
+        this.mElement.appendChild(this.mTopRuler);
+        this.mElement.appendChild(this.mLeftRuler);
+        this.mElement.appendChild(this.mCanvasContainer);
+        
+        var lw          = Number(layoutJSON.Width);
+        var lh          = Number(layoutJSON.Height);
+        var zx          = (viewWidth - RULER_WIDTH) / lw;
+        var zy          = (viewHeight - RULER_WIDTH) / lh;
+        var zoomFactor  = Math.min(zx, zy) * MIN_CANVAS_SCALE;
+        var ccvw        = viewWidth - RULER_WIDTH;
+        var ccvh        = viewHeight - RULER_WIDTH;
+        
+        var layout = new Layout({
+            width:              lw,
+            height:             lh,
+            backgroundColor:    layoutJSON.BackgroundColor,
+            backgroundImage:    layoutJSON.BackgroundPic,
+            topMargin:          Number(layoutJSON.TopMargin),
+            bottomMargin:       Number(layoutJSON.BottomMargin),
+            leftMargin:         Number(layoutJSON.LeftMargin),
+            rightMargin:        Number(layoutJSON.RightMargin),
+            id:                 layoutJSON.layout_id,
+            name:               layoutJSON.Name,
+            nameEng:            layoutJSON.Name_eng,
+            widgets:            layoutJSON.Layout_ControlBoxs,
+            element:            this.mCanvas,
+            context:            this
+        });
+
+        this.mCcvw          = ccvw;
+        this.mCcvh          = ccvh;
+        this.mViewWidth      = viewWidth;
+        this.mViewHeight     = viewHeight;
+        this.mLayout        = layout;
+        this.mZoomFactor    = zoomFactor;
+
+        this.mTopRuler.style.height =
+            this.mLeftRuler.style.width =
+                this.mCanvasContainer.style.top =
+                    this.mCanvasContainer.style.left =
+                        RULER_WIDTH + 'px';
+        this.mCanvasContainer.style.position = 'absolute';
+        this.mCanvasContainer.style.overflow = 'auto';
+        this.mCanvas.style.position = 'absolute';
+
+        var resizeType, resizeWidget, resizePoint, isResizing = false, self = this;
+
+        $(this.mCanvas).mouseenter(function (ev) {
+            $(this).on('mousemove', function (evt) {
+                var offset = $(this).offset(),
+                    rx = evt.pageX - offset.left,
+                    ry = evt.pageY - offset.top;
+                var result = self.mLayout.findWidgetAndAreaByOffset(rx, ry);
+                if (isResizing) {
+                    if (resizeType === WIDGET_AREA.CONTENT) {
+                        var offsetX = (rx - resizePoint.x) / self.mZoomFactor,
+                            offsetY = (ry - resizePoint.y) / self.mZoomFactor;
+                        resizePoint.x = rx;
+                        resizePoint.y = ry;
+                        resizeWidget.translateTo(
+                            resizeWidget.getLeft() + offsetX,
+                            resizeWidget.getTop() + offsetY
+                        );
+                    } else {
+                        onResize(resizeWidget, resizeType, self.mZoomFactor, resizePoint, {x: rx, y: ry});
+                    }
+                    resizeWidget.requestFocus();
+                }
+                this.style.cursor = updateCursor(result.area);
+                this.lastChild.title = (result.widget && result.widget.mTypeName) || '';
+                return false;
+            });
+            $(this).one('mouseleave', function (evt) {
+                $(this).off('mousemove');
+                isResizing = false;
+                return false;
+            });
+            return false;
+        });
+
+        $(this.mCanvas).mousedown(function (ev) {
+            var offset = $(this).offset(),
+                rx = ev.pageX - offset.left,
+                ry = ev.pageY - offset.top;
+            var result = self.mLayout.findWidgetAndAreaByOffset(rx, ry);
+            resizeType = result.area;
+            if (resizeType === WIDGET_AREA.CONTENT) {
+                resizePoint = {x: rx, y: ry};
+                resizeWidget = result.widget;
+                resizeWidget.requestFocus();
+                isResizing = true;
+            } else if (resizeType !== WIDGET_AREA.NONE) {
+                resizeWidget = result.widget;
+                resizePoint = beginResize(resizeWidget, resizeType, self.mZoomFactor);
+                resizeWidget.requestFocus();
+                isResizing = true;
+            }
+            $(this).one('mouseup', function (evt) {
+                isResizing = false;
+                return false;
+            });
+            return false;
+        });
+
+    }
+    
+    LayoutEditor.prototype.onDraw = function () {
+        this.mElement.style.width = this.mViewWidth + 'px';
+        this.mElement.style.height = this.mViewHeight + 'px';
+        this.mTopRuler.style.width = this.mViewWidth + 'px';
+        this.mLeftRuler.style.height = this.mViewHeight - RULER_WIDTH + 'px';
+        this.mCanvasContainer.style.height = this.mCcvh + 'px';
+        this.mCanvasContainer.style.width = this.mCcvw + 'px';
+        this.mCanvas.style.top = (this.mCcvh - this.mLayout.mHeight * this.mZoomFactor) / 2 + 'px';
+        this.mCanvas.style.left = (this.mCcvw - this.mLayout.mWidth * this.mZoomFactor) / 2 + 'px';
+
+        this.mLayout.onDraw();
+    };
+
+    LayoutEditor.prototype.resize = function (viewWidth, viewHeight) {
+        var zx          = (viewWidth - RULER_WIDTH) / this.mLayout.mWidth;
+        var zy          = (viewHeight - RULER_WIDTH) / this.mLayout.mHeight;
+        this.mZoomFactor= Math.min(zx, zy) * MIN_CANVAS_SCALE;
+        this.mCcvw      = viewWidth - RULER_WIDTH;
+        this.mCcvh      = viewHeight - RULER_WIDTH;
+    };
+
+    LayoutEditor.prototype.onResize = function () {
+
+        this.onDraw();
+    };
+    
+    LayoutEditor.prototype.zoom = function (zoomFactor) {
+        // var x = zoomFactor * this.mLayout.mWidth / this.mCcvw,
+        //     y = zoomFactor * this.mLayout.mHeight / this.mCcvh;
+        // if (Math.max(x, y) < MIN_CANVAS_SCALE) {
+        //     return false;
+        // }
+        var t = zoomFactor / this.mZoomFactor;
+        this.mCcvw *= t;
+        this.mCcvh *= t;
+        this.mZoomFactor = zoomFactor;
+        this.onDraw();
+    };
+    
+    LayoutEditor.prototype.attachToDOM  = function (el) {
+        this.onDraw();
+        el.appendChild(this.mElement);
+    };
+    
+    LayoutEditor.prototype.getLayout = function () {
+        return this.mLayout;
+    };
+    
+    LayoutEditor.prototype.getZoomFactor = function () {
+        return this.mZoomFactor;  
+    };
 
     function Layout(obj) {
         this.mWidth             = obj.width;
         this.mHeight            = obj.height;
-        this.mBackgroundColor   = typeof obj.backgroundColor === 'string' ? obj.backgroundColor : null;
-        this.mBackgroundImage   = typeof obj.backgroundImage === 'object' ? obj.backgroundImage : null;
-        this.mTopMargin         = typeof obj.topMargin === 'number' ? obj.topMargin : 0;
-        this.mBottomMargin      = typeof obj.bottomMargin === 'number' ? obj.bottomMargin : 0;
-        this.mLeftMargin        = typeof obj.leftMargin === 'number' ? obj.leftMargin: 0;
-        this.mRightMargin       = typeof obj.rightMargin === 'number' ? obj.rightMargin: 0;
-        this.mZoomFactor        = typeof obj.zoomFactor === 'number' ? obj.zoomFactor : 1;
+        this.mBackgroundColor   = obj.backgroundColor;
+        this.mBackgroundImage   = obj.backgroundImage;
+        this.mTopMargin         = obj.topMargin;
+        this.mBottomMargin      = obj.bottomMargin;
+        this.mLeftMargin        = obj.leftMargin;
+        this.mRightMargin       = obj.rightMargin;
+        this.mId                = obj.id;
+        this.mName              = obj.name;
+        this.mNameEng           = obj.nameEng;
+        this.mElement           = obj.element;
+        this.mContext           = obj.context;
+
         this.mWidgets           = [];
-        this.mFocusedWidget     = null;
-        this.mFocusMask         = document.createElement('div');
-        this.mFocusMask.style.position  = 'absolute';
         this.mColorIterator     = createColorIterator();
-        this.mElement           = document.createElement('div');
-        this.mElement.appendChild(this.mFocusMask);
-        this.mElement.style.position    = 'relative';
-        this.mElement.style.backgroundSize = 'contain';
-        //this.mElementContainer  = document.createElement('div');
-        //this.mElementContainer.style.boxShadow = 'box-shadow: 0 2px 5px 0 rgba(0,0,0,.26)';
-        var self = this;
+        
+        this.mFocusMask                     = document.createElement('div');
+        this.mFocusMask.style.position      = 'absolute';
+        this.mContent                       = document.createElement('div');
+        this.mContent.appendChild(this.mFocusMask);
+        this.mContent.style.position        = 'absolute';
+        this.mContent.style.top             = this.mTopMargin + 'px';
+        this.mContent.style.left            = this.mLeftMargin + 'px';
+        this.mContent.style.backgroundSize  = 'contain';
+        this.mElement.appendChild(this.mContent);
+        this.mElement.style.boxShadow = '0 5px 10px 0 rgba(0, 0, 0, 0.26)';
+        this.mDataChangedListener = null;
+        this.mFocusedWidgetChangedListener = null;
 
-        function onDrag(ev) {
-            var offset = $(self.mElement).offset(),
-                rx = ev.pageX - offset.left,
-                ry = ev.pageY - offset.top,
-                widget = self.mFocusedWidget,
-                t = widget.getTop() * self.mZoomFactor,
-                l = widget.getLeft() * self.mZoomFactor,
-                w = widget.getWidth() * self.mZoomFactor,
-                h = widget.getHeight() * self.mZoomFactor;
-            switch (dragType) {
-                case POSITION_EXTRA.CONTENT:
-                    l = l + rx - dragPoint.x;
-                    t = t + ry - dragPoint.y;
-                    dragPoint = {x: rx, y: ry};
-                    break;
-                case POSITION_EXTRA.TOP:
-                case POSITION_EXTRA.BOTTOM:
-                    if (ry < fixedPoint.y) {
-                        t = ry;
-                        h = fixedPoint.y - ry;
-                    } else {
-                        t = fixedPoint.y;
-                        h = ry - fixedPoint.y;
-                    }
-                    break;
-                case POSITION_EXTRA.RIGHT:
-                case POSITION_EXTRA.LEFT:
-                    if (rx < fixedPoint.x) {
-                        l = rx;
-                        w = fixedPoint.x - rx;
-                    } else {
-                        l = fixedPoint.x;
-                        w = rx - fixedPoint.x;
-                    }
-                    break;
-                case POSITION_EXTRA.LEFT_TOP:
-                case POSITION_EXTRA.LEFT_BOTTOM:
-                case POSITION_EXTRA.RIGHT_TOP:
-                case POSITION_EXTRA.RIGHT_BOTTOM:
-                    if (fixedPoint.x < rx) {
-                        l = fixedPoint.x;
-                        w = rx - fixedPoint.x;
-                    } else {
-                        l = rx;
-                        w = rx - fixedPoint.x;
-                    }
-                    if (fixedPoint.y < ry) {
-                        t = fixedPoint.y;
-                        h = ry - fixedPoint.y;
-                    } else {
-                        t = ry;
-                        h = fixedPoint.y - ry;
-                    }
-                    break;
-            }
-            self.mFocusedWidget.resize({
-                top: t / self.mZoomFactor,
-                left: l / self.mZoomFactor,
-                width: w / self.mZoomFactor,
-                height: h / self.mZoomFactor
-            });
-            widget.requestFocus();
-            //http://stackoverflow.com/questions/1909760/how-to-get-mouseup-to-fire-once-mousemove-complete
-            return false;
-        }
-
-        var POSITION_EXTRA = {
-            NONE: 0,
-            CONTENT: 1,
-            TOP: 2,
-            BOTTOM: 3,
-            LEFT_TOP: 4,
-            LEFT: 5,
-            LEFT_BOTTOM: 6,
-            RIGHT_TOP: 7,
-            RIGHT: 8,
-            RIGHT_BOTTOM: 9
-        };
-
-        function determineWidget(layout, rx, ry) {
-            var l1, l2, t1, t2, r1, r2, b1, b2, widget, borderOffset = 5, posExtra = POSITION_EXTRA.NONE;
-            for (var i = layout.mWidgets.length - 1; i >= 0; i--) {
-                widget = layout.mWidgets[i];
-                l1 = widget.getLeft() * layout.mZoomFactor - borderOffset;
-                l2 = widget.getLeft() * layout.mZoomFactor + borderOffset;
-                t1 = widget.getTop() * layout.mZoomFactor - borderOffset;
-                t2 = widget.getTop() * layout.mZoomFactor + borderOffset;
-                r1 = (widget.getLeft() + widget.getWidth()) * layout.mZoomFactor - borderOffset;
-                r2 = (widget.getLeft() + widget.getWidth()) * layout.mZoomFactor + borderOffset;
-                b1 = (widget.getTop() + widget.getHeight()) * layout.mZoomFactor - borderOffset;
-                b2 = (widget.getTop() + widget.getHeight()) * layout.mZoomFactor + borderOffset;
-                if (ry < b2 && ry > t1) {
-                    if (rx < r1 && rx > l2) {
-                        if (ry > t2) {
-                            if (ry < b1) {
-                                posExtra = POSITION_EXTRA.CONTENT;
-                                break;
-                            } else {
-                                posExtra = POSITION_EXTRA.BOTTOM;
-                                break;
-                            }
-                        } else {
-                            posExtra = POSITION_EXTRA.TOP;
-                            break;
-                        }
-                    } else if (rx > l1 && rx <= l2) {
-                        if (ry > t2) {
-                            if (ry < b1) {
-                                posExtra = POSITION_EXTRA.LEFT;
-                                break;
-                            } else {
-                                posExtra = POSITION_EXTRA.LEFT_BOTTOM;
-                                break;
-                            }
-                        } else {
-                            posExtra = POSITION_EXTRA.LEFT_TOP;
-                            break;
-                        }
-                    } else if (rx >= r1 && rx < r2) {
-                        if (ry > t2) {
-                            if (ry < b1) {
-                                posExtra = POSITION_EXTRA.RIGHT;
-                                break;
-                            } else {
-                                posExtra = POSITION_EXTRA.RIGHT_BOTTOM;
-                                break;
-                            }
-                        } else {
-                            posExtra = POSITION_EXTRA.RIGHT_TOP;
-                            break;
-                        }
-                    }
-                }
-            }
-            return {
-                widget: widget,
-                posExtra: posExtra
-            }
-        }
-
-        function onMove(ev) {
-            var offset = $(self.mElement).offset(),
-                rx = ev.pageX - offset.left,
-                ry = ev.pageY - offset.top,
-                cursorStyle = null;
-            var result = determineWidget(self, rx, ry);
-            switch (result.posExtra) {
-                case POSITION_EXTRA.LEFT:
-                    cursorStyle = 'w-resize';
-                    break;
-                case POSITION_EXTRA.RIGHT:
-                    cursorStyle = 'e-resize';
-                    break;
-                case POSITION_EXTRA.CONTENT:
-                    cursorStyle = 'move';
-                    break;
-                case POSITION_EXTRA.LEFT_TOP:
-                    cursorStyle = 'nw-resize';
-                    break;
-                case POSITION_EXTRA.TOP:
-                    cursorStyle = 'n-resize';
-                    break;
-                case POSITION_EXTRA.RIGHT_TOP:
-                    cursorStyle = 'ne-resize';
-                    break;
-                case POSITION_EXTRA.LEFT_BOTTOM:
-                    cursorStyle = 'sw-resize';
-                    break;
-                case POSITION_EXTRA.BOTTOM:
-                    cursorStyle = 's-resize';
-                    break;
-                case POSITION_EXTRA.RIGHT_BOTTOM:
-                    cursorStyle = 'se-resize';
-                    break;
-                default:
-                    cursorStyle = 'default';
-            }
-            this.style.cursor = cursorStyle;
-            return false;
-        }
-
-        $(this.mElement).mouseenter(function (ev) {
-            $(this).on('mousemove', onMove);
-            console.log('mouseenter & on mousemove');
-            $(this).one('mouseleave', function (evt) {
-                $(this).off('mousemove');
-                $(this).off('mouseup');
-                console.log('mousleave & off mousemove');
-            });
+        /************* focus on last widget ***************/
+        var lastWidget  = null, self = this;
+        obj.widgets.forEach(function (el) {
+            var widget  = Widget.createByJSON(el, self.mContext, self);
+            self.addWidget(widget);
+            lastWidget  = widget;
         });
-
-        var dragType = POSITION_EXTRA.NONE, fixedPoint, dragPoint;
-        $(this.mElement).mousedown(function (ev) {
-            var offset = $(self.mElement).offset(),
-                rx = ev.pageX - offset.left,
-                ry = ev.pageY - offset.top;
-            var result = determineWidget(self, rx, ry);
-            dragType = result.posExtra;
-            if (result.widget) {
-                self.mFocusedWidget = result.widget;
-                var t = result.widget.getTop(), l = result.widget.getLeft(), w = result.widget.getWidth(), h = result.widget.getHeight();
-                switch (result.posExtra) {
-                    case POSITION_EXTRA.LEFT:
-                        fixedPoint = {
-                            x: (l + w) * self.mZoomFactor,
-                            y: t * self.mZoomFactor
-                        };
-                        break;
-                    case POSITION_EXTRA.RIGHT:
-                        fixedPoint = {
-                            x: l * self.mZoomFactor,
-                            y: t * self.mZoomFactor
-                        };
-                        break;
-                    case POSITION_EXTRA.CONTENT:
-                        dragPoint = {
-                            x: rx,
-                            y: ry
-                        };
-                        break;
-                    case POSITION_EXTRA.LEFT_TOP:
-                        fixedPoint = {
-                            x: (l + w) * self.mZoomFactor,
-                            y: (t + h) * self.mZoomFactor
-                        };
-                        break;
-                    case POSITION_EXTRA.TOP:
-                        fixedPoint = {
-                            x: l * self.mZoomFactor,
-                            y: (t + h) * self.mZoomFactor
-                        };
-                        break;
-                    case POSITION_EXTRA.RIGHT_TOP:
-                        fixedPoint = {
-                            x: l * self.mZoomFactor,
-                            y: (t + h) * self.mZoomFactor
-                        };
-                        break;
-                    case POSITION_EXTRA.LEFT_BOTTOM:
-                        fixedPoint = {
-                            x: (l + w) * self.mZoomFactor,
-                            y: t * self.mZoomFactor
-                        };
-                        break;
-                    case POSITION_EXTRA.BOTTOM:
-                        fixedPoint = {
-                            x: l * self.mZoomFactor,
-                            y: t * self.mZoomFactor
-                        };
-                        break;
-                    case POSITION_EXTRA.RIGHT_BOTTOM:
-                        fixedPoint = {
-                            x: l * self.mZoomFactor,
-                            y: t * self.mZoomFactor
-                        };
-                        break;
-                }
-                $(this).on('mousemove', onDrag);
-                console.log('mousedown & on mousemove');
-                $(this).one('mouseup', function (evt) {
-                    $(this).off('mousemove', onDrag);
-                    console.log('mouseup & off mousemove');
-                });
-                return false;
-            }
-        });
-
+        this.mFocusedWidget = lastWidget;
+        /**************** end of this section **************/
+        
     }
 
-    Layout.createByJSON = function (json, zoomFactor) {
-        var layout = new Layout({
-            width:              Number(json.Width),
-            height:             Number(json.Height),
-            backgroundColor:    json.BackgroundColor,
-            backgroundImage:    json.BackgroundPic,
-            topMargin:          Number(json.TopMargin),
-            bottomMargin:       Number(json.BottomMargin),
-            leftMargin:         Number(json.LeftMargin),
-            rightMargin:        Number(json.RightMargin),
-            zoomFactor:         typeof zoomFactor === 'number' ? zoomFactor : 1
-        });
-        layout.setName(json.Name);
-        layout.setNameEng(json.Name_eng);
-        layout.setId(json.layout_id);
-        var lastWidget = null;
-        json.Layout_ControlBoxs.forEach(function (el) {
-            var widget = Widget.createByJSON(el);
-            layout.addWidget(widget);
-            lastWidget = widget;
-        });
-        if (lastWidget) {
-            lastWidget.requestFocus();
-        }
-        return layout;
-    };
-
-    Layout.prototype.exportAsJSON = function () {
+    Layout.prototype.exportToJSON = function () {
         var widgets = [];
         var zIndexCount = 0;
         this.mWidgets.forEach(function (el) {
-            var widgetJSON = el.widget.exportAsJSON();
+            var widgetJSON = el.widget.exportToJSON();
             widgetJSON.Zorder = zIndexCount;
             zIndexCount++;
             widgets.push(widgetJSON);
         });
-        var json = {
+        return {
             Width:          String(this.mWidth),
             Height:         String(this.mHeight),
             BackgroundColor:this.mBackgroundColor,
@@ -407,7 +458,10 @@ define(function (require, exports, module) {
             layout_id:      this.mId,
             Layout_ControlBoxs: widgets
         };
-        return json;
+    };
+
+    Layout.prototype.onFocusedWidgetChanged = function (listener) {
+        this.mFocusedWidgetChangedListener = listener;
     };
 
     Layout.prototype.setName = function (name) {
@@ -434,39 +488,32 @@ define(function (require, exports, module) {
         return this.mId;
     };
 
-    Layout.prototype.getZoomFactor = function () {
-        return this.mZoomFactor;
-    };
-
-    Layout.prototype.zoom = function (zoomFactor) {
-        this.mZoomFactor = zoomFactor;
-        this.onDraw();
-    };
-
-    Layout.prototype.displayOn = function (el) {
-        this.onDraw();
-        el.appendChild(this.mElement);
-    };
-
     Layout.prototype.setBackgroundColor = function (backgroundColor) {
         this.mBackgroundColor = backgroundColor;
-        this.mElement.style.backgroundColor = backgroundColor;
+        this.mContent.style.backgroundColor = backgroundColor;
     };
 
     Layout.prototype.setBackgroundImage = function (backgroundImage) {
         this.mBackgroundImage = backgroundImage;
         if (this.mBackgroundImage && this.mBackgroundImage.Type === 'Image') {
-            this.mElement.style.backgroundImage = 'url(' + this.mBackgroundImage.URL + ')';
+            this.mContent.style.backgroundImage = 'url(' + this.mBackgroundImage.URL + ')';
         } else {
-            this.mElement.style.backgroundImage = 'none';
+            this.mContent.style.backgroundImage = 'none';
         }
+    };
+
+    Layout.prototype.notifyDataChanged = function () {
+        this.mDataChangedListener && this.mDataChangedListener(this);
+    };
+
+    Layout.prototype.onDataChanged = function (dataChangedListener) {
+        this.mDataChangedListener = dataChangedListener;
     };
 
     Layout.prototype.addWidget = function (widget) {
         this.mWidgets.push(widget);
-        widget.setLayout(this);
         widget.onDraw();
-        this.mElement.insertBefore(widget.mElement, this.mFocusMask);
+        this.mContent.insertBefore(widget.mElement, this.mFocusMask);
     };
 
     Layout.prototype.findWidgetById = function (id) {
@@ -478,14 +525,90 @@ define(function (require, exports, module) {
         });
         return widget;
     };
+    
+    Layout.prototype.findWidgetAndAreaByOffset = function (rx, ry) {
+
+        function findAreaByOffset(widget, zoomFactor, rx, ry) {
+            var l1, l2, t1, t2, r1, r2, b1, b2;
+            l1 = widget.getLeft()   * zoomFactor - WIDGET_BORDER_TOLERATE;
+            l2 = widget.getLeft()   * zoomFactor + WIDGET_BORDER_TOLERATE;
+            t1 = widget.getTop()    * zoomFactor - WIDGET_BORDER_TOLERATE;
+            t2 = widget.getTop()    * zoomFactor + WIDGET_BORDER_TOLERATE;
+            r1 = (widget.getLeft()  + widget.getWidth())    * zoomFactor - WIDGET_BORDER_TOLERATE;
+            r2 = (widget.getLeft()  + widget.getWidth())    * zoomFactor + WIDGET_BORDER_TOLERATE;
+            b1 = (widget.getTop()   + widget.getHeight())   * zoomFactor - WIDGET_BORDER_TOLERATE;
+            b2 = (widget.getTop()   + widget.getHeight())   * zoomFactor + WIDGET_BORDER_TOLERATE;
+            if (ry < b2 && ry > t1) {
+                if (rx < r1 && rx > l2) {
+                    if (ry > t2) {
+                        if (ry < b1) {
+                            return WIDGET_AREA.CONTENT;
+                        } else {
+                            return WIDGET_AREA.BOTTOM;
+                        }
+                    } else {
+                        return WIDGET_AREA.TOP;
+                    }
+                } else if (rx > l1 && rx <= l2) {
+                    if (ry > t2) {
+                        if (ry < b1) {
+                            return WIDGET_AREA.LEFT;
+                        } else {
+                            return WIDGET_AREA.LEFT_BOTTOM;
+                        }
+                    } else {
+                        return WIDGET_AREA.LEFT_TOP;
+                    }
+                } else if (rx >= r1 && rx < r2) {
+                    if (ry > t2) {
+                        if (ry < b1) {
+                            return WIDGET_AREA.RIGHT;
+                        } else {
+                            return WIDGET_AREA.RIGHT_BOTTOM;
+                        }
+                    } else {
+                        return WIDGET_AREA.RIGHT_TOP;
+                    }
+                }
+            }
+            return WIDGET_AREA.NONE;
+        }
+
+        if (!this.mFocusedWidget) {
+            return {
+                widget: null,
+                area: WIDGET_AREA.NONE
+            }
+        }
+        var widget = this.mFocusedWidget, area = findAreaByOffset(this.mFocusedWidget, this.mContext.getZoomFactor(), rx, ry);
+        for (var i = this.mWidgets.length - 1; i >= 0 && area === WIDGET_AREA.NONE; i--) {
+            widget = this.mWidgets[i];
+            if (this.mFocusedWidget === widget) {
+                continue;
+            }
+            area = findAreaByOffset(widget, this.mContext.getZoomFactor(), rx, ry);
+        }
+
+        return {
+            widget: widget,
+            area: area
+        }
+
+    };
+
+    Layout.prototype.getFocusedWidget = function () {
+        return this.mFocusedWidget;
+    };
 
     Layout.prototype.focus = function (widget) {
         this.mFocusedWidget = widget;
-        this.mFocusMask.style.top         = widget ? this.mFocusedWidget.getTop() * this.mZoomFactor + 'px' : '0px';
-        this.mFocusMask.style.left        = widget ? this.mFocusedWidget.getLeft() * this.mZoomFactor + 'px' : '0px';
-        this.mFocusMask.style.width       = widget ? this.mFocusedWidget.getWidth() * this.mZoomFactor + 'px' : '0px';
-        this.mFocusMask.style.height      = widget ? this.mFocusedWidget.getHeight() * this.mZoomFactor + 'px' : '0px';
+        var zoomFactor = this.mContext.getZoomFactor();
+        this.mFocusMask.style.top         = widget ? this.mFocusedWidget.getTop()   * zoomFactor + 'px' : '0px';
+        this.mFocusMask.style.left        = widget ? this.mFocusedWidget.getLeft()  * zoomFactor + 'px' : '0px';
+        this.mFocusMask.style.width       = widget ? this.mFocusedWidget.getWidth() * zoomFactor + 'px' : '0px';
+        this.mFocusMask.style.height      = widget ? this.mFocusedWidget.getHeight()    * zoomFactor + 'px' : '0px';
         this.mFocusMask.style.border      = widget ? 'solid 2px #f00' : 'none';
+        this.mFocusedWidgetChangedListener && this.mFocusedWidgetChangedListener();
     };
 
     Layout.prototype.nextColor = function () {
@@ -493,37 +616,82 @@ define(function (require, exports, module) {
     };
 
     Layout.prototype.onResize = function () {
-        this.mElement.style.width = this.mWidth * this.mZoomFactor + 'px';
-        this.mElement.style.height = this.mHeight * this.mZoomFactor + 'px';
+        /*
+        var zoomFactor = this.mContext.getZoomFactor();
+        this.mElement.style.width  = this.mWidth  * zoomFactor + 'px';
+        this.mElement.style.height = this.mHeight * zoomFactor + 'px';
+        this.mContent.style.width  = (this.mWidth - this.mLeftMargin - this.mRightMargin) * zoomFactor + 'px';
+        this.mContent.style.height = (this.mHeight - this.mTopMargin - this.mBottomMargin) * zoomFactor + 'px';
+        */
+        this.mContext.onResize();
     };
 
     Layout.prototype.onDraw = function () {
-        this.mElement.style.width = this.mWidth * this.mZoomFactor + 'px';
-        this.mElement.style.height = this.mHeight * this.mZoomFactor + 'px';
-        if (this.mBackgroundColor) {
-            this.mElement.style.backgroundColor = this.mBackgroundColor;
-        }
-        if (this.mBackgroundImage && this.mBackgroundImage.Type === 'Image') {
-            this.mElement.style.backgroundImage = 'url(' + this.mBackgroundImage.URL + ')';
-        }
+        var zoomFactor = this.mContext.getZoomFactor();
+        this.mElement.style.width  = this.mWidth  * zoomFactor + 'px';
+        this.mElement.style.height = this.mHeight * zoomFactor + 'px';
+        this.mContent.style.width  = (this.mWidth - this.mLeftMargin - this.mRightMargin) * zoomFactor + 'px';
+        this.mContent.style.height = (this.mHeight - this.mTopMargin - this.mBottomMargin) * zoomFactor + 'px';
+        this.setBackgroundColor(this.mBackgroundColor);
+        this.setBackgroundImage(this.mBackgroundImage);
         this.mWidgets.forEach(function (el) {
             el.onDraw();
         });
-        this.mFocusMask.style.top         = this.mFocusedWidget ? this.mFocusedWidget.getTop() * this.mZoomFactor + 'px' : '0px';
-        this.mFocusMask.style.left        = this.mFocusedWidget ? this.mFocusedWidget.getLeft() * this.mZoomFactor + 'px' : '0px';
-        this.mFocusMask.style.width       = this.mFocusedWidget ? this.mFocusedWidget.getWidth() * this.mZoomFactor + 'px' : '0px';
-        this.mFocusMask.style.height      = this.mFocusedWidget ? this.mFocusedWidget.getHeight() * this.mZoomFactor + 'px' : '0px';
-        this.mFocusMask.style.border      = this.mFocusedWidget ? 'solid 2px #f00' : 'none';
+        this.focus(this.mFocusedWidget);
     };
 
     Layout.prototype.setWidth = function (width) {
+        if (!this.trySetWidth(width)) {
+            return false;
+        }
         this.mWidth = width;
         this.onResize();
+        return true;
+    };
+
+    Layout.prototype.getWidth = function () {
+        return this.mWidth;
+    };
+
+    Layout.prototype.getHeight = function () {
+        return this.mHeight;
+    };
+
+    Layout.prototype.trySetWidth = function (width) {
+        if (typeof width !== 'number' || width < 0) {
+            return false;
+        }
+        for ( var i = 0; i < this.mWidgets.length; i++) {
+            if (this.mWidgets[i].getLeft() + this.mWidgets[i].getWidth() > width) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    Layout.prototype.getBackgroundColor = function () {
+        return this.mBackgroundColor;
     };
 
     Layout.prototype.setHeight = function (height) {
+        if (!this.trySetHeight(height)) {
+            return false;
+        }
         this.mHeight = height;
         this.onResize();
+        return true;
+    };
+
+    Layout.prototype.trySetHeight = function (height) {
+        if (typeof height !== 'number' || height < 0) {
+            return false;
+        }
+        for ( var i = 0; i < this.mWidgets.length; i++) {
+            if (this.mWidgets[i].getTop() + this.mWidgets[i].getHeight() > height) {
+                return false;
+            }
+        }
+        return true;
     };
 
     /* Widget */
@@ -535,11 +703,12 @@ define(function (require, exports, module) {
         this.mId        = obj.id;
         this.mType      = obj.type;
         this.mTypeName  = obj.typeName;
-        this.mLayout    = null;
+        this.mContext   = obj.context;
+        this.mLayout    = obj.layout;
         this.mElement   = document.createElement('div');
     }
 
-    Widget.createByJSON = function (json) {
+    Widget.createByJSON = function (json, context, layout) {
         var obj = {
             left:   json.Left,
             top:    json.Top,
@@ -547,20 +716,50 @@ define(function (require, exports, module) {
             height: json.Height,
             id:     json.ID,
             type:   convertWidgetType(json.Type),
-            typeName:   json.Type_Name
+            typeName:   json.Type_Name,
+            context: context,
+            layout: layout
         };
-        return new Widget(obj);
+        switch (obj.type) {
+            case 'image':
+                return new ImageWidget(obj);
+            case 'html':
+                return new HTMLWidget(obj);
+            case 'clock':
+                return new ClockWidget(obj);
+            case 'audio':
+                return new AudioWidget(obj);
+            case 'video':
+                return new VideoWidget(obj);
+        }
+    };
+    
+    Widget.prototype.translateTo = function(x, y) {
+        if (x < 0 ||
+            y < 0 ||
+            x + this.mWidth > this.mLayout.mWidth - this.mLayout.mLeftMargin - this.mLayout.mRightMargin ||
+            y + this.mHeight > this.mLayout.mHeight - this.mLayout.mTopMargin - this.mLayout.mBottomMargin
+        ) {
+            return;
+        }
+        this.mLeft  = x;
+        this.mTop   = y;
+        this.onResize();
+    };
+
+    Widget.prototype.notifyDataChanged = function () {
+        this.mLayout.notifyDataChanged();
     };
 
     Widget.prototype.resize = function (obj) {
-        this.mLeft = obj.left;
-        this.mTop = obj.top;
+        this.mLeft  = obj.left;
+        this.mTop   = obj.top;
         this.mWidth = obj.width;
         this.mHeight = obj.height;
         this.onResize();
     };
 
-    Widget.prototype.exportAsJSON = function () {
+    Widget.prototype.exportToJSON = function () {
         return {
             Left: this.mLeft,
             Top: this.mTop,
@@ -572,10 +771,6 @@ define(function (require, exports, module) {
         };
     };
 
-    Widget.prototype.setLayout = function (layout) {
-        this.mLayout = layout;
-    };
-
     Widget.prototype.onResize = function () {
         this.onDraw();
     };
@@ -585,42 +780,86 @@ define(function (require, exports, module) {
             this.mElement.style.backgroundColor = this.mLayout.nextColor();
         }
         this.mElement.style.position        = 'absolute';
-        this.mElement.style.top             = this.mTop    * this.mLayout.getZoomFactor() + 'px';
-        this.mElement.style.left            = this.mLeft   * this.mLayout.getZoomFactor() + 'px';
-        this.mElement.style.width           = this.mWidth  * this.mLayout.getZoomFactor() + 'px';
-        this.mElement.style.height          = this.mHeight * this.mLayout.getZoomFactor() + 'px';
+        this.mElement.style.top             = this.mTop    * this.mContext.getZoomFactor() + 'px';
+        this.mElement.style.left            = this.mLeft   * this.mContext.getZoomFactor() + 'px';
+        this.mElement.style.width           = this.mWidth  * this.mContext.getZoomFactor() + 'px';
+        this.mElement.style.height          = this.mHeight * this.mContext.getZoomFactor() + 'px';
     };
 
     Widget.prototype.setWidth = function (width) {
+        if (!this.trySetWidth(width)) {
+            return false;
+        }
         this.mWidth = width;
         this.onResize();
+        return true;
+    };
+
+    Widget.prototype.trySetWidth = function (width) {
+        if (typeof width !== 'number' || width < 0 || width + this.mLeft > this.mLayout.getWidth()) {
+            return false;
+        }
+        return true;
     };
 
     Widget.prototype.getWidth = function () {
         return this.mWidth;
     };
 
+    Widget.prototype.trySetHeight = function (height) {
+        if (typeof height !== 'number' || height < 0 || height + this.mTop > this.mLayout.getHeight()) {
+            return false;
+        }
+        return true;
+    };
+
     Widget.prototype.setHeight = function (height) {
+        if (!this.trySetHeight(height)) {
+            return false;
+        }
         this.mHeight = height;
         this.onResize();
+        return true;
     };
 
     Widget.prototype.getHeight = function () {
         return this.mHeight;
     };
+    
+    Widget.prototype.trySetTop = function (top) {
+          if (typeof top !== 'number' || top < 0 || top + this.mHeight > this.mLayout.getHeight()) {
+              return false;
+          }
+        return true;
+    };
 
     Widget.prototype.setTop = function (top) {
+        if (!this.trySetTop(top)) {
+            return false;
+        }
         this.mTop = top;
         this.onResize();
+        return true;
     };
 
     Widget.prototype.getTop = function () {
         return this.mTop;
     };
+    
+    Widget.prototype.trySetLeft = function (left) {
+        if (typeof left !== 'number' || left < 0 || left + this.mWidth > this.mLayout.getWidth()) {
+            return false;
+        }
+        return true;
+    };
 
     Widget.prototype.setLeft = function (left) {
+        if (!this.trySetLeft(left)) {
+            return false;
+        }
         this.mLeft = left;
         this.onResize();
+        return true;
     };
 
     Widget.prototype.getLeft = function () {
@@ -628,52 +867,62 @@ define(function (require, exports, module) {
     };
 
     Widget.prototype.requestFocus = function () {
-        if (this.mLayout) {
-            this.mLayout.focus(this);
-        }
+        this.mLayout.focus(this);
     };
 
     /* ImageWidget */
     function ImageWidget() {
-        Widget.call(this);
+        Widget.apply(this, arguments);
     }
     ImageWidget.prototype = Object.create(Widget.prototype);
     ImageWidget.prototype.constructor = ImageWidget;
     ImageWidget.prototype.onDraw = function () {
-
+        Widget.prototype.onDraw.call(this);
     };
 
     /* VideoWidget */
     function VideoWidget() {
-        Widget.call(this);
+        Widget.apply(this, arguments);
     }
     VideoWidget.prototype = Object.create(Widget.prototype);
     VideoWidget.prototype.constructor = VideoWidget;
     VideoWidget.prototype.onDraw = function () {
-
+        Widget.prototype.onDraw.call(this);
     };
 
     /* AudioWidget */
     function AudioWidget() {
-        Widget.call(this);
+        Widget.apply(this, arguments);
     }
     AudioWidget.prototype = Object.create(Widget.prototype);
     AudioWidget.prototype.constructor = AudioWidget;
     AudioWidget.prototype.onDraw = function () {
-
+        Widget.prototype.onDraw.call(this);
     };
 
     /* HTMLWidget */
     function HTMLWidget() {
-        Widget.call(this);
+        Widget.apply(this, arguments);
     }
     HTMLWidget.prototype = Object.create(Widget.prototype);
     HTMLWidget.prototype.constructor = HTMLWidget;
     HTMLWidget.prototype.onDraw = function () {
-
+        Widget.prototype.onDraw.call(this);
     };
 
+    /* ClockWidget */
+    function ClockWidget() {
+        Widget.apply(this, arguments);
+    }
+    ClockWidget.prototype = Object.create(Widget.prototype);
+    ClockWidget.prototype.constructor = ClockWidget;
+    ClockWidget.prototype.onDraw = function () {
+        Widget.prototype.onDraw.call(this);
+    };
+
+    exports.LayoutEditor = LayoutEditor;
     exports.Layout = Layout;
+    exports.Widget = Widget;
 
 });
 
