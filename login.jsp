@@ -9,10 +9,10 @@
 	<link rel="stylesheet" href="resources/bootstrap/css/bootstrap.min.css">
 	<!-- Theme style -->
 	<link rel="stylesheet" href="resources/dist/css/AdminLTE.css">
+	<link rel="stylesheet" href="resources/css/common/base.css">
 	<script type='text/javascript' src="resources/plugins/jQuery/jQuery-2.2.0.min.js"></script>
 	<script type='text/javascript' src="resources/js/config.js"></script>
 	<script type='text/javascript' src="resources/js/pages/login.js"></script>
-	<script type='text/javascript' src="resources/css/common/base.css"></script>
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
