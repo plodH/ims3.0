@@ -4,7 +4,7 @@ define(function(require, exports, module) {
   var CONFIG = require("common/config.js");
   var UTIL = require("common/util.js");
   var _timerLoadTermList;
-  var _pagesize = 15;
+  var _pagesize = CONFIG.pager.pageSize;
   var _pageNO = 1;
 
 	exports.init = function(){
@@ -66,12 +66,17 @@ define(function(require, exports, module) {
           console.error("$('#term-table-pager').jqPaginator 未创建");
         }
         
-        var totalPages = Math.ceil(data.totalStatistic.totalTermNum / _pagesize);
-        totalPages = Math.max(totalPages, 1);
+        var totalCounts = Math.max(data.totalStatistic.totalTermNum, 1);
 
         $('#term-table-pager').jqPaginator({
-          totalPages: totalPages,
-          visiblePages: 10,
+          totalCounts: totalCounts,
+          pageSize: _pagesize,
+          visiblePages: CONFIG.pager.visiblePages,
+          first: CONFIG.pager.first,
+          prev: CONFIG.pager.prev,
+          next: CONFIG.pager.next,
+          last: CONFIG.pager.last,
+          page: CONFIG.pager.page,
           currentPage: _pageNO,
           onPageChange: function (num, type) {
             _pageNO = num;
