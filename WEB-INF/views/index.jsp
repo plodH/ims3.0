@@ -53,7 +53,33 @@
       </a>
 
       <div class="navbar-custom-menu">
-        <a id="dpUpl" class="glyphicon glyphicon-cloud"></a>
+        <ul class="nav navbar-nav">
+          <a id="dpUpl" class="glyphicon glyphicon-cloud"></a>
+          <!-- User Account: style can be found in dropdown.less -->
+          <li class="dropdown user user-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <img src="resources/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+              <span class="hidden-xs"><sec:authentication property="name"/></span>
+            </a>
+            <ul class="dropdown-menu">
+              <!-- User image -->
+              <li class="user-header">
+                <img src="resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+
+                <p>
+                  <sec:authentication property="name"/>
+                  <small>Member since Nov. 2012</small>
+                </p>
+              </li>
+              <!-- Menu Footer-->
+              <li class="user-footer">
+                <div class="pull-right">
+                  <a id="logout" class="btn btn-default btn-flat">登出</a>
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
       </div>
     </nav>
   </header>
@@ -73,7 +99,7 @@
           <img src="resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
         </div>
         <div class="pull-left info">
-          <p><sec:authentication property="name"/></p>
+          <p id="username"><sec:authentication property="name"/></p>
           <h6 class="gray-light">${project_name_cn}</h6>
         </div>
       </div>
