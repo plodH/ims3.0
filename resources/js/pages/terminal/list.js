@@ -44,7 +44,7 @@ define(function(require, exports, module) {
         "per_page": _pagesize,
         "page": _pageNO,
         "orderby": "",
-        "sortby": "desc",
+        "sortby": "",
         "keyword": searchKeyword
       }
     }
@@ -130,8 +130,8 @@ define(function(require, exports, module) {
                 '</div>' +
               '</td>' +
               '<td>' +
-              'ip：192.123.22.12<br />' +
-              '版本信息' +
+              'ip：'+ tl[i].IP +'<br />' +
+              '版本：' + tl[i].TermVersion + 
               '</td>' +
               '<td><a class="pointer">编辑</a> <br/><a class="pointer">截屏</a></td>' +
             '</tr>'
