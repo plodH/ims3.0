@@ -10,7 +10,8 @@ define(function(require, exports, module) {
     var requestUrl  = config.serverRoot,
         projectName = config.projectName,
         layoutId    = -1,
-        editor      = null;
+        editor      = null,
+        hasAudioOrVideoWidget = false;
 		
 	exports.init = function() {
 		layoutId = Number(util.getHashParameters().id);
@@ -48,10 +49,14 @@ define(function(require, exports, module) {
             return a.Zorder - b.Zorder;
         });
         json.Layout_ControlBoxs.forEach(function (el, idx, arr) {
+            if (el.Type === 'VideoBox' || el.Type === 'AudioBox') {
+                hasAudioOrVideoWidget = true;
+            }
             widgets.push({
                 name: el.Type_Name
             })
         });
+        checkWhetherAudioOrVideoWidgetExists();
         var layoutProperties = {
             name: json.Name,
             width: json.Width,
@@ -118,10 +123,37 @@ define(function(require, exports, module) {
         });
         editor.getLayout().onFocusedWidgetChanged(onUpdateFocusedWidget);
         editor.getLayout().onWidgetListChanged(onUpdateWidgetList);
+        $('#layout-editor-wrapper .btn-layout-editor-back').click(function () {
+            $('#edit-page-container').html('').addClass('none');
+            location.hash = '#layout/list';
+        });
+        $('#layout-editor-wrapper .btn-layout-editor-save').click(function () {
+            var data = JSON.stringify({
+                project_name: config.projectName,
+                action: 'updateCBLList',
+                data: editor.getLayout().exportToJSON()
+            });
+            util.ajax('post', requestUrl + '/backend_mgt/v1/layout', data, function (res) {
+                alert('保存成功');
+                console.log(res);
+            });
+        });
     }
     
     function onUpdateWidgetList(json) {
-        console.log(json);
+        var widgets = [];
+        hasAudioOrVideoWidget = false;
+        json.Layout_ControlBoxs.forEach(function (el, idx, arr) {
+            if (el.Type === 'VideoBox' || el.Type === 'AudioBox') {
+                hasAudioOrVideoWidget = true;
+            }
+            widgets.push({
+                name: el.Type_Name
+            });
+        });
+        checkWhetherAudioOrVideoWidgetExists();
+        $('#layout-editor-wrapper .layout-editor-widgets')
+            .html(templates.layout_edit_widgets({widgets: widgets}));
     }
 
     function onUpdateFocusedWidget() {
@@ -132,6 +164,12 @@ define(function(require, exports, module) {
         widgetProperties[2].value = focusedWidget ? Math.round(focusedWidget.mLeft) : 0;
         widgetProperties[3].value = focusedWidget ? Math.round(focusedWidget.mWidth) : 0;
         widgetProperties[4].value = focusedWidget ? Math.round(focusedWidget.mHeight) : 0;
+    }
+
+    function checkWhetherAudioOrVideoWidgetExists() {
+
+        $('#layout-editor-wrapper .btn-add-widget[data-widget-id="video"]').prop('disabled', hasAudioOrVideoWidget);
+        $('#layout-editor-wrapper .btn-add-widget[data-widget-id="audio"]').prop('disabled', hasAudioOrVideoWidget);
     }
 
     function onAddWidget(ev) {

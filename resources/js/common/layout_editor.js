@@ -255,7 +255,7 @@ define(function (require, exports, module) {
             bottomMargin:       Number(layoutJSON.BottomMargin),
             leftMargin:         Number(layoutJSON.LeftMargin),
             rightMargin:        Number(layoutJSON.RightMargin),
-            id:                 layoutJSON.layout_id,
+            id:                 layoutJSON.ID,
             name:               layoutJSON.Name,
             nameEng:            layoutJSON.Name_eng,
             widgets:            layoutJSON.Layout_ControlBoxs,
@@ -440,8 +440,8 @@ define(function (require, exports, module) {
         var widgets = [];
         var zIndexCount = 0;
         this.mWidgets.forEach(function (el) {
-            var widgetJSON = el.widget.exportToJSON();
-            widgetJSON.Zorder = zIndexCount;
+            var widgetJSON = el.exportToJSON();
+            widgetJSON.Zorder = String(zIndexCount);
             zIndexCount++;
             widgets.push(widgetJSON);
         });
@@ -449,14 +449,14 @@ define(function (require, exports, module) {
             Width:          String(this.mWidth),
             Height:         String(this.mHeight),
             BackgroundColor:this.mBackgroundColor,
-            BackgroundPic:  this.mBackgroundImage,
+            BackgroundPic:  String(this.mBackgroundImage.ID),
             TopMargin:      String(this.mTopMargin),
             BottomMargin:   String(this.mBottomMargin),
             LeftMargin:     String(this.mLeftMargin),
             RightMargin:    String(this.mRightMargin),
             Name:           this.mName,
-            Name_Eng:       this.mNameEng,
-            layout_id:      this.mId,
+            Name_eng:       this.mNameEng,
+            layout_id:      String(this.mId),
             Layout_ControlBoxs: widgets
         };
     };
@@ -515,6 +515,7 @@ define(function (require, exports, module) {
         this.mWidgets.push(widget);
         widget.onDraw();
         this.mContent.insertBefore(widget.mElement, this.mFocusMask);
+        this.notifyWidgetListChanged();
     };
 
     Layout.prototype.deleteWidget = function (widget) {
@@ -530,9 +531,13 @@ define(function (require, exports, module) {
             if (wIndex !== 0) {
                 this.mWidgets.splice(wIndex, 1);
                 this.mWidgets[wIndex - 1].requestFocus();
-            } else if (this.mWidgets.length > 1) {
+            } else {
                 this.mWidgets.splice(wIndex, 1);
-                this.mWidgets[wIndex + 1].requestFocus();
+                if (this.mWidgets.length > 1) {
+                    this.mWidgets[wIndex].requestFocus();
+                } else {
+                    this.mFocusedWidget = null;
+                }
             }
             this.notifyWidgetListChanged();
         }
@@ -797,6 +802,10 @@ define(function (require, exports, module) {
     Widget.prototype.notifyDataChanged = function () {
         this.mLayout.notifyDataChanged();
     };
+    
+    Widget.prototype.move = function (step) {
+        this.mLayout.move(this, step);
+    };
 
     Widget.prototype.resize = function (obj) {
         this.mLeft  = obj.left;
@@ -812,9 +821,10 @@ define(function (require, exports, module) {
             Top: this.mTop,
             Width: this.mWidth,
             Height: this.mHeight,
-            ID: this.mId,
-            type: convertWidgetTypeBack(this.mType),
-            typeName: this.mTypeName
+            layout_controlbox_id: String(this.mId),
+            layout_id: String(this.mLayout.mId),
+            Type: convertWidgetTypeBack(this.mType),
+            Type_Name: this.mTypeName
         };
     };
 
