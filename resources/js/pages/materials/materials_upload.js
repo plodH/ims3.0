@@ -40,13 +40,11 @@ define(function (require, exports, module) {
                             _upl_list[i].xhr.abort();
                         }
                     }
-                    //关闭上传窗口
-                    closeUpl_list();
-                    $("#dpUpl").css("display", "none");
+                    closeUpl_list();	//关闭上传窗口
+                    
                 }
             } else {
-                //关闭上传窗口
-                closeUpl_list();
+                closeUpl_list();	//关闭上传窗口
             }
         });
     }
@@ -76,8 +74,9 @@ define(function (require, exports, module) {
             })
             
             for (var a = 1, b = 0, c = 0; a < $("#Tbe_filesList tr").length; a++, b++) {
-                if ($("#upl_tr_" + a).attr("status") == null) {
+                if ($("#upl_tr_" + b).attr("status") == "") {
                     upload(b, c);
+                    c++;
                 }
             }
         }
@@ -89,6 +88,7 @@ define(function (require, exports, module) {
         $("#page_upload").html("");
         $("#page_upload").css("display", "none");
         $("#file").prop("value", "");
+        $("#dpUpl").css("display", "none");
         _upl_list.splice(0, _upl_list.length); //清空_upl_list
     }
     
@@ -160,6 +160,7 @@ define(function (require, exports, module) {
                     material["material"]["md5"] = blkRet.md5;
                     material["material"]["duration"] = blkRet.duration;
                     material["material"]["create_time"] = getNowFormatDate();
+//                    material["material"]["create_user"] = $("#username").text();
                     $.post(CONFIG.serverRoot + "/backend_mgt/v1/materials",
                         JSON.stringify(material), function (data) {
                             if (parseInt(data.rescode) == 200) {
@@ -167,9 +168,9 @@ define(function (require, exports, module) {
                                 $("#progressbar_" + num1).prop("class", "progress-bar progress-bar-success");
                                 $("#upl_speed_" + num1).html("");
                                 $("#upl_status_" + num1).html("上传成功");
-                                $("#file").prop("value", "");
                                 _upl_list[num1].status = "end";
-                                MTR.loadPage(1);
+                                var typeId = $("#mtrChoise li.active").attr("typeid");
+                                MTR.loadPage(1, Number(typeId));
                             } else {
                                 $("#upl_tr_" + num1).prop("status", "end");
                                 $("#progressbar_" + num1).prop("class", "progress-bar progress-bar-danger");
