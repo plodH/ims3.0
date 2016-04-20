@@ -23,7 +23,11 @@ define(function (require, exports, module) {
             }
 
         });
-
+        // 添加文本按钮点击
+        $('#mtr_addLive').click(function () {
+            var page = "resources/pages/materials/materials_addLive.html"
+            INDEX.coverArea(page);
+        })
         // 添加直播按钮点击
         $('#mtr_addLive').click(function () {
             var page = "resources/pages/materials/materials_addLive.html"
@@ -116,16 +120,6 @@ define(function (require, exports, module) {
             INDEX.coverArea(page);
         })
 
-        //详情
-        //$("#mtr_info").each(function () {
-        //    $(this).click(function () {
-        //        var mtrId = $(this).parent().parent().attr("mtrID");
-        //        $(this).attr("mtrid", mtrId);
-        //        var page = "resources/pages/materials/materials_edit.html"
-        //        INDEX.coverArea(page);
-        //    })
-        //})
-
         //全选和全不选
         $(".checkbox-toggle").click(function () {
             var clicks = $(this).data('clicks');
@@ -207,7 +201,12 @@ define(function (require, exports, module) {
         totalPages = Math.max(totalPages, 1);
         $('#materials-table-pager').jqPaginator({
             totalPages: totalPages,
-            visiblePages: 10,
+            visiblePages: CONFIG.pager.visiblePages,
+            first: CONFIG.pager.first,
+            prev: CONFIG.pager.prev,
+            next: CONFIG.pager.next,
+            last: CONFIG.pager.last,
+            page: CONFIG.pager.page,
             currentPage: Number(json.Pager.page),
             onPageChange: function (num, type) {
                 if (type === 'change') {
@@ -218,16 +217,27 @@ define(function (require, exports, module) {
         });
         //拼接
         if (json.Materials != undefined) {
+        	//var mtrkw = json.Pager.keyword;
+        	//if (mtrkw == ""){
+        	//	$("#mtr_count").html("总数："+json.Pager.total);
+        	//}
             var mtrData = json.Materials;
+            $("#mtrTable tbody").append('<tr>'+
+                                    '<th class="mtr_checkbox"></th>'+
+                                    '<th class="mtr_name">文件名</th>'+
+                                    '<th class="mtr_size">大小</th>'+
+                                    '<th class="mtr_time">时长</th>'+
+                                    '<th class="mtr_uploadUser">上传人</th>'+
+                                    '<th class="mtr_uploadDate">上传时间</th>'+
+                                '</tr>');
             for (var x = 0; x < mtrData.length; x++) {
                 var mtrtr = '<tr mtrID="' + mtrData[x].ID + '">' +
-                    '<td><input type="checkbox" id="mtr_cb" class="mtr_cb" mtrID="' + mtrData[x].ID + '" url="' + mtrData[x].URL + '"></td>' +
+                    '<td class="mtr_checkbox"><input type="checkbox" id="mtr_cb" class="mtr_cb" mtrID="' + mtrData[x].ID + '" url="' + mtrData[x].URL + '"></td>' +
                     '<td class="mtr_name"><a href="' + mtrData[x].URL + '" target="_blank">' + mtrData[x].Name + '</a></td>' +
-                    '<td class="mtr_size">大小：' + mtrData[x].Size + '</td>' +
-                    '<td class="mtr_time">时长：' + mtrData[x].Duration + '</td>' +
-                    '<td class="mtr_uploadUser">上传人：' + mtrData[x].CreateName + '</td>' +
-                    '<td class="mtr_uploadDate">上传时间：' + mtrData[x].CreateTime + '</td>' +
-                    '<td class="mtr_info"><a id="mtr_info" class="glyphicon glyphicon-info-sign"></a></td>' +
+                    '<td class="mtr_size">' + mtrData[x].Size + '</td>' +
+                    '<td class="mtr_time">' + mtrData[x].Duration + '</td>' +
+                    '<td class="mtr_uploadUser">' + mtrData[x].CreateName + '</td>' +
+                    '<td class="mtr_uploadDate">' + mtrData[x].CreateTime + '</td>' +
                     '</tr>';
                 $("#mtrTable tbody").append(mtrtr);
             }
@@ -240,31 +250,22 @@ define(function (require, exports, module) {
             radioClass: 'iradio_flat-blue'
         });
         //
+        $(".icheckbox_flat-blue").parent().parent().click(function () {
+            var obj = $(this).find("input");
+            if ($(this).find("input").prop("checked") == true) {
+                $(this).find("input").prop("checked", false);
+                $(this).find("div").prop("class", "icheckbox_flat-blue");
+                $(this).find("div").prop("aria-checked", "false");
+            } else {
+                $(this).find("input").prop("checked", true);
+                $(this).find("div").prop("class", "icheckbox_flat-blue checked");
+                $(this).find("div").prop("aria-checked", "true");
+            }
+            mtrCb();
+        })
+        //
         $(".icheckbox_flat-blue ins").click(function () {
-            var obj = $(this).parent().find("input");
-            $("#mtr_delete").removeAttr("disabled");
-            var Ck = $(".icheckbox_flat-blue.checked").length;	//当前选中复选框个数
-            var Uck = $(".icheckbox_flat-blue").length			//复选框总个数
-            if (Ck == 1) {
-                var dlurl = $(".icheckbox_flat-blue.checked").find("input").attr("url");
-                $("#mtr_view").removeAttr("disabled");
-                $("#mtr_download").removeAttr("disabled");
-                $("#mtr_download").parent().attr("href", dlurl);
-                $("#mtr_download").parent().attr("download", dlurl);
-                $("#mtr_edit").removeAttr("disabled");
-            } else {
-                $("#mtr_view").attr("disabled", true);
-                $("#mtr_download").attr("disabled", true);
-                $("#mtr_download").parent().removeAttr("href");
-                $("#mtr_download").parent().removeAttr("download");
-                $("#mtr_edit").attr("disabled", true);
-            }
-            //控制全选按钮全选或者不全选状态
-            if (Ck == Uck) {
-                $(".fa.fa-square-o").attr("class", "fa fa-check-square-o");
-            } else {
-                $(".fa.fa-check-square-o").attr("class", "fa fa-square-o");
-            }
+            mtrCb();
         })
     }
 
@@ -276,5 +277,34 @@ define(function (require, exports, module) {
     function mtrChoise(obj) {
         $("#mtrChoise li").attr("class", "");
         obj.parent().attr("class", "active");
+    }
+
+    function mtrCb() {
+        $("#mtr_delete").removeAttr("disabled");
+        var Ck = $(".icheckbox_flat-blue.checked").length;	//当前选中复选框个数
+        var Uck = $(".icheckbox_flat-blue").length			//复选框总个数
+        if (Ck == 1) {
+            var dlurl = $(".icheckbox_flat-blue.checked").find("input").attr("url");
+            $("#mtr_view").removeAttr("disabled");
+            $("#mtr_download").removeAttr("disabled");
+            $("#mtr_edit").removeAttr("disabled");
+            $("#mtr_download").parent().attr("href", dlurl);
+            $("#mtr_download").parent().attr("download", dlurl);
+        } else {
+        	if (Ck == 0) {
+                $("#mtr_delete").attr("disabled", true);
+            }
+            $("#mtr_view").attr("disabled", true);
+            $("#mtr_download").attr("disabled", true);
+            $("#mtr_edit").attr("disabled", true);
+            $("#mtr_download").parent().removeAttr("href");
+            $("#mtr_download").parent().removeAttr("download");
+        }
+        //控制全选按钮全选或者不全选状态
+        if (Ck == Uck) {
+            $(".fa.fa-square-o").attr("class", "fa fa-check-square-o");
+        } else {
+            $(".fa.fa-check-square-o").attr("class", "fa fa-square-o");
+        }
     }
 })

@@ -13,20 +13,19 @@
             <div class="box box-solid">
                 <div class="box-header with-border">
                     <h3 class="box-title">资源分类</h3>
-
                     <div class="box-tools">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                class="fa fa-minus"></i>
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
                         </button>
                     </div>
                 </div>
                 <div class="box-body no-padding">
                     <ul id="mtrChoise" class="nav nav-pills nav-stacked">
                         <li class="active" typeId="1"><a id="mtrVideo"><i class="fa fa-video-camera"></i> 视频
-                            <span class="label label-primary pull-right">12</span></a></li>
+                            <!--<span class="label label-primary pull-right">12</span>-->
+                        </a></li>
                         <li typeId="2"><a id="mtrImage"><i class="fa fa-image"></i> 图片</a></li>
-                        <li typeId="3"><a id="mtrAudio"><i class="fa fa-music"></i> 音频</a></li>
-                        <li typeId="4"><a id="mtrText"><i class="fa fa-font"></i> 文本</a></li>
+                        <li typeId="3"><a id="mtrAudio"><i class="fa fa-music"></i>  &nbsp;音频</a></li>
+                        <li typeId="4"><a id="mtrText"><i class="fa fa-font"></i> &nbsp;文本</a></li>
                         <li typeId="5"><a id="mtrLive"><i class="fa fa-cloud"></i> 直播</a></li>
                     </ul>
                 </div>
@@ -39,8 +38,7 @@
                     <h3 class="box-title">添加资源</h3>
 
                     <div class="box-tools">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                class="fa fa-minus"></i>
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
                         </button>
                     </div>
                 </div>
@@ -75,14 +73,16 @@
                         <!-- Check all button -->
                         <button type="button" class="btn btn-default btn-sm checkbox-toggle allCheck"><i class="fa fa-square-o"></i></button>
                         <a><button id="mtr_download" type="button" class="btn btn-default btn-sm" disabled>下载</button></a>
+                        <button id="mtr_edit" type="button" class="btn btn-default btn-sm" disabled>编辑</button>
+                        <button id="mtr_delete" type="button" class="btn btn-default btn-sm" disabled>删除</button>
                         <div class="btn-group">
-                            <button id="mtr_edit" type="button" class="btn btn-default btn-sm" disabled>编辑</button>
-                            <button id="mtr_delete" type="button" class="btn btn-default btn-sm" disabled>删除</button>
+
                         </div>
                         <!-- /.btn-group -->
                         <button id="mtr_refresh"type="button" class="btn btn-default btn-sm" title="刷新列表"><i class="fa fa-refresh"></i></button>
 
                         <div class="pull-right">
+                        	<!--<span id="mtr_count"></span>-->
                         </div>
                         <!-- /.pull-right -->
                     </div>
