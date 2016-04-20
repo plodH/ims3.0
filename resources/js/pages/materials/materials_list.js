@@ -140,14 +140,14 @@ define(function (require, exports, module) {
             }
             $(this).data("clicks", !clicks);
         });
-        
+
     }
 
     // 加载页面数据
     exports.loadPage = function (pageNum, type) {
         $("#mtrLisTitle").html("");
         $("#mtrTable tbody").html("");
-        $(".fa.fa-check-square-o").attr("class","fa fa-square-o");
+        $(".fa.fa-check-square-o").attr("class", "fa fa-square-o");
         var mtrType;
         switch (type) {
             case 1:
@@ -242,13 +242,9 @@ define(function (require, exports, module) {
         //
         $(".icheckbox_flat-blue ins").click(function () {
             var obj = $(this).parent().find("input");
-//            if (obj.prop("checked") == true){
-//            	obj.prop("checked") == false;
-//            } else {
-//            	obj.prop("checked") == true;
-//            }
-            var Ck = $(".icheckbox_flat-blue.checked").length;
-            var Uck = $(".icheckbox_flat-blue").length
+            $("#mtr_delete").removeAttr("disabled");
+            var Ck = $(".icheckbox_flat-blue.checked").length;	//当前选中复选框个数
+            var Uck = $(".icheckbox_flat-blue").length			//复选框总个数
             if (Ck == 1) {
                 var dlurl = $(".icheckbox_flat-blue.checked").find("input").attr("url");
                 $("#mtr_view").removeAttr("disabled");
@@ -265,9 +261,9 @@ define(function (require, exports, module) {
             }
             //控制全选按钮全选或者不全选状态
             if (Ck == Uck) {
-            	$(".fa.fa-square-o").attr("class","fa fa-check-square-o");
-            }else {
-                $(".fa.fa-check-square-o").attr("class","fa fa-square-o");
+                $(".fa.fa-square-o").attr("class", "fa fa-check-square-o");
+            } else {
+                $(".fa.fa-check-square-o").attr("class", "fa fa-square-o");
             }
         })
     }
