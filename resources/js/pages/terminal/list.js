@@ -258,57 +258,7 @@ define(function(require, exports, module) {
 
     if(termClassId === ''){
       //新建终端分类时, 创建空列表页
-      // set pagebar
-      try{
-        $('#term-table-pager').jqPaginator('destroy');
-      }catch(error){
-        // console.error("$('#term-table-pager').jqPaginator 未创建");
-      }
-      
-      var totalCounts = 1;
-
-      $('#term-table-pager').jqPaginator({
-        totalCounts: totalCounts,
-        pageSize: _pagesize,
-        visiblePages: CONFIG.pager.visiblePages,
-        first: CONFIG.pager.first,
-        prev: CONFIG.pager.prev,
-        next: CONFIG.pager.next,
-        last: CONFIG.pager.last,
-        page: CONFIG.pager.page,
-        currentPage: _pageNO,
-        onPageChange: function (num, type) {
-          _pageNO = num;
-          if (type === 'change') {
-           loadTermList(_pageNO);
-          }
-        }
-      });
-
-      // term_status
-      $('#term_status').html('' + 
-        ' 在线（0/0） ' +
-        ' 下载（0/0） ' +
-        '预下载（0/0）'
-      );
-    
-      // term_online_status
-      $('#term_running').html('0/0');
-      $('#term_shutdown').html('0/0');
-      $('#term_offline').html('0/0');
-
-      // 复选
-      // 复选全选按钮初始化
-      var hasCheck = $('#term-list-select-all>i').hasClass('fa-check-square-o');
-      if(hasCheck){
-        $('#term-list-select-all>i').toggleClass('fa-square-o', true);
-        $('#term-list-select-all>i').toggleClass('fa-check-square-o', false);
-      }
-
-      // 清空已选list
-      _checkList.length = 0;
-      $('#term_list').empty();
-
+      loadEmptyList();
       return;
     }
     //新建终端分类时, 创建空列表页 结束
@@ -520,6 +470,72 @@ define(function(require, exports, module) {
 
       }
     )
+
+    function loadEmptyList(){
+       // set pagebar
+      try{
+        $('#term-table-pager').jqPaginator('destroy');
+      }catch(error){
+        // console.error("$('#term-table-pager').jqPaginator 未创建");
+      }
+      
+      var totalCounts = 1;
+
+      $('#term-table-pager').jqPaginator({
+        totalCounts: totalCounts,
+        pageSize: _pagesize,
+        visiblePages: CONFIG.pager.visiblePages,
+        first: CONFIG.pager.first,
+        prev: CONFIG.pager.prev,
+        next: CONFIG.pager.next,
+        last: CONFIG.pager.last,
+        page: CONFIG.pager.page,
+        currentPage: _pageNO,
+        onPageChange: function (num, type) {
+          _pageNO = num;
+          if (type === 'change') {
+           loadTermList(_pageNO);
+          }
+        }
+      });
+
+      _termStatusCount = {
+        total : 0,
+        online : 0,
+        shutdown : 0,
+        running : 0,
+        offline : 0,
+        downloadFileNum : 0,
+        downloadAllFileNum : 0,
+        preDownloadFileNum : 0,
+        preDownloadAllFileNum : 0
+      };
+
+      // term_status
+      $('#term_status').html('' + 
+        ' 在线（0/0） ' +
+        ' 下载（0/0） ' +
+        '预下载（0/0）'
+      );
+    
+      // term_online_status
+      $('#term_running').html('0/0');
+      $('#term_shutdown').html('0/0');
+      $('#term_offline').html('0/0');
+
+      // 复选
+      // 复选全选按钮初始化
+      var hasCheck = $('#term-list-select-all>i').hasClass('fa-check-square-o');
+      if(hasCheck){
+        $('#term-list-select-all>i').toggleClass('fa-square-o', true);
+        $('#term-list-select-all>i').toggleClass('fa-check-square-o', false);
+      }
+
+      // 清空已选list
+      _checkList.length = 0;
+      $('#term_list').empty();
+
+    }
   }
 
   function initTree(){
