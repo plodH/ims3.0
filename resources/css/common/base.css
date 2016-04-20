@@ -1,3 +1,13 @@
+/*font*/
+body,h1,h2,h3,h4,h5,h6{
+  font-family: "Helvetica Neue", Helvetica, Arial, '等线','微软雅黑','黑体',sans-serif !important;
+}
+/*tips*/
+.tips{
+  color:#51a2e2;
+}
+
+
 /*font-color*/
 .gray-light{color: #999;}
 .pointer{cursor: pointer;}
@@ -139,8 +149,58 @@ a {
 }
 #edit-page-container {
     z-index: 1031;
-    background: #ffffff;
+    background-color: #ecf0f5
 }
+.header-button-left{
+  position: relative;
+  height: 100%;
+  display: inline;
+  border: none;
+  background: #3c8dbc;
+  padding-left:14px;
+  padding-right: 14px;
+  margin: 0;
+  color: white;
+  font-size: 16px;
+  top: 0;
+  font-weight: 900;
+}
+
+.header-button-left:hover{
+  background: #367fa9;
+
+}.header-button-right{
+  position: relative;
+  height: 48px;
+  display: inline;
+  border: none;
+  background: #3c8dbc;
+  padding-left:14px;
+  padding-right: 14px;
+  margin: 0;
+  color: white;
+  font-size: 16px;
+  top: 0;
+  float: right;
+}
+
+.header-button-right:hover{
+  background: #367fa9;
+}
+
+.header-title{
+  position: relative;
+  display: inline;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  font-family: inherit;
+  top: -1px;
+  padding-left: 8px;
+}
+
+
+
 /*treetree*/
 .tree-box{
   overflow: auto;
