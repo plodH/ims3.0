@@ -1,32 +1,41 @@
 <div id="channel-editor-wrapper">
-    <div class="channel-editor-nav">
+
+    <div class="channel-editor-header">
         <button class="btn-channel-editor-close">返回</button>
+        <span><%=name%></span>
         <button class="btn-channel-editor-save">保存</button>
         <button class="btn-channel-editor-publish">保存并发布</button>
     </div>
-    <div class="channel-program-list">
-        <div class="channel-program-list-timed">
-            <div>
-                <h3>定时节目</h3>
-                <button class="btn-program-delete">删除</button>
-                <button class="btn-program-new">新建</button>
+
+    <div class="channel-editor-body">
+        <div class="channel-program-list">
+            <div class="channel-program-list-timed">
+                <div>
+                    <h3>定时节目</h3>
+                    <button class="btn-program-delete" data-program-type="Timed">删除</button>
+                    <button class="btn-program-new" data-program-type="Timed">新建</button>
+                </div>
+                <ul></ul>
             </div>
-            <ul></ul>
+            <div class="channel-program-list-regular">
+                <div>
+                    <h3>常规节目</h3>
+                    <select class="channel-program-schedule-type">
+                        <option value="1">顺序</option>
+                        <option value="2">随机</option>
+                        <option value="3">比例</option>
+                    </select>
+                    <button class="btn-program-delete" data-program-type="Regular">删除</button>
+                    <button class="btn-program-new" data-program-type="Regular">新建</button>
+                </div>
+                <ul></ul>
+            </div>
         </div>
-        <div class="channel-program-list-regular">
-            <div>
-                <h3>常规节目</h3>
-                <select>
-                    <option value="1">顺序</option>
-                    <option value="2">随机</option>
-                    <option value="3">比例</option>
-                </select>
-                <button class="btn-program-delete">删除</button>
-                <button class="btn-program-new">新建</button>
-            </div>
-            <ul></ul>
+        <div class="channel-program-editor">
         </div>
     </div>
-    <div class="channel-program-editor">
+
+    <div class="channel-editor-footer">
     </div>
+
 </div>

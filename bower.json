@@ -10,5 +10,8 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "Sortable": "^1.4.2"
+  }
 }

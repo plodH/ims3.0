@@ -1,14 +1,27 @@
 define(function(require, exports, module){exports['channel_edit_main']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div id="channel-editor-wrapper"> <div class="channel-editor-nav"> <button class="btn-channel-editor-close">返回</button> <button class="btn-channel-editor-save">保存</button> <button class="btn-channel-editor-publish">保存并发布</button> </div> <div class="channel-program-list"> <div class="channel-program-list-timed"> <div> <h3>定时节目</h3> <button class="btn-program-delete">删除</button> <button class="btn-program-new">新建</button> </div> <ul></ul> </div> <div class="channel-program-list-regular"> <div> <h3>常规节目</h3> <select> <option value="1">顺序</option> <option value="2">随机</option> <option value="3">比例</option> </select> <button class="btn-program-delete">删除</button> <button class="btn-program-new">新建</button> </div> <ul></ul> </div> </div> <div class="channel-program-editor"> </div> </div>';
+__p+='<div id="channel-editor-wrapper"> <div class="channel-editor-header"> <button class="btn-channel-editor-close">返回</button> <span>'+
+((__t=(name))==null?'':__t)+
+'</span> <button class="btn-channel-editor-save">保存</button> <button class="btn-channel-editor-publish">保存并发布</button> </div> <div class="channel-editor-body"> <div class="channel-program-list"> <div class="channel-program-list-timed"> <div> <h3>定时节目</h3> <button class="btn-program-delete" data-program-type="Timed">删除</button> <button class="btn-program-new" data-program-type="Timed">新建</button> </div> <ul></ul> </div> <div class="channel-program-list-regular"> <div> <h3>常规节目</h3> <select class="channel-program-schedule-type"> <option value="1">顺序</option> <option value="2">随机</option> <option value="3">比例</option> </select> <button class="btn-program-delete" data-program-type="Regular">删除</button> <button class="btn-program-new" data-program-type="Regular">新建</button> </div> <ul></ul> </div> </div> <div class="channel-program-editor"> </div> </div> <div class="channel-editor-footer"> </div> </div>';
 }
 return __p;
 };
 exports['channel_edit_program']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="channel-program-nav"> </div>';
+__p+='<div class="channel-program-header"> </div>';
+}
+return __p;
+};
+exports['channel_edit_program_list_item']=function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='<li data-id="'+
+((__t=(id))==null?'':__t)+
+'"> <div>'+
+((__t=(name))==null?'':__t)+
+'</div> </li>';
 }
 return __p;
 };
