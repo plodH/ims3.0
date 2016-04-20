@@ -2,8 +2,50 @@
 
 define(function (require, exports, module) {
 
-    // http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
-    // http://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
+    /**
+     *
+     * @type {{NONE: number, CONTENT: number, TOP: number, BOTTOM: number, LEFT_TOP: number, LEFT: number, LEFT_BOTTOM: number, RIGHT_TOP: number, RIGHT: number, RIGHT_BOTTOM: number}}
+     */
+    var WIDGET_AREA = {
+        NONE: 0,
+        CONTENT: 1,
+        TOP: 2,
+        BOTTOM: 3,
+        LEFT_TOP: 4,
+        LEFT: 5,
+        LEFT_BOTTOM: 6,
+        RIGHT_TOP: 7,
+        RIGHT: 8,
+        RIGHT_BOTTOM: 9
+    };
+    /**
+     *
+     * @type {number} widget边界模糊判断的半径
+     */
+    var WIDGET_BORDER_TOLERATE = 5;
+    /**
+     *
+     * @type {number} widget的alpha值
+     */
+    var WIDGET_ALPHA = 0.9;
+    /**
+     *
+     * @type {number} 标尺宽度
+     */
+    var RULER_WIDTH = 0;
+    /**
+     *
+     * @type {number} 初始画布时，layout占屏幕的最大比例
+     */
+    var MIN_CANVAS_SCALE = 0.9;
+
+    /**
+     * 生成一个颜色迭代器，能够确保色相尽量分散
+     * 参考:
+     * http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
+     * http://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
+     * @returns {Function}
+     */
     function createColorIterator() {
 
         /* accepts parameters
@@ -36,7 +78,7 @@ define(function (require, exports, module) {
             };
         }
 
-        var h = 0.8, s = 0.5, v = 0.95, a = 0.9;
+        var h = 0.8, s = 0.5, v = 0.95, a = WIDGET_ALPHA;
 
         return function () {
             h += 0.618033988749895;
@@ -47,88 +89,93 @@ define(function (require, exports, module) {
 
     }
 
-    function convertWidgetType(type) {
-        return {
-            ClockBox: 'clock',
-            VideoBox: 'video',
-            WebBox: 'html',
-            ImageBox: 'image',
-            AudioBox: 'audio'
-        }[type];
-    }
-
-    function convertWidgetTypeBack(type) {
-        return {
-            clock: 'ClockBox',
-            video: 'VideoBox',
-            html: 'WebBox',
-            image: 'ImageBox',
-            audio: 'AudioBox'
-        }[type];
-    }
-
-    function onResize(widget, resizeType, zoomFactor, resizePoint, currentPoint) {
-        var rx = currentPoint.x,
-            ry = currentPoint.y,
-            nx = resizePoint.x,
-            ny = resizePoint.y,
-            t = widget.getTop() * zoomFactor,
-            l = widget.getLeft() * zoomFactor,
-            w = widget.getWidth() * zoomFactor,
-            h = widget.getHeight() * zoomFactor;
-        switch (resizeType) {
+    /**
+     * 根据拖动事件，更新widget大小和位置
+     * @param widget, 被拖动的widget
+     * @param area, 初始拖动区域
+     * @param reference, 参考点,对于拖动角而言，表示对角坐标；对于拖动边而言，表示对边的坐标
+     * @param current，当前点的坐标
+     */
+    function onDragWidget(widget, area, reference, current) {
+        var cx  = current.x,
+            cy  = current.y,
+            rx  = reference.x,
+            ry  = reference.y,
+            zf  = widget.mContext.mZoomFactor,
+            t   = widget.mTop * widget.mContext.mZoomFactor,
+            l   = widget.mLeft * widget.mContext.mZoomFactor,
+            w   = widget.mWidth * widget.mContext.mZoomFactor,
+            h   = widget.mHeight * widget.mContext.mZoomFactor,
+            offsetX, offsetY;
+        switch (area) {
+            case WIDGET_AREA.CONTENT:
+                offsetX = (cx - rx) / zf;
+                offsetY = (cy - ry) / zf;
+                reference.x = cx;
+                reference.y = cy;
+                widget.translateTo(
+                    Math.round(widget.mLeft + offsetX),
+                    Math.round(widget.mTop + offsetY)
+                );
+                widget.requestFocus();
+                return;
             case WIDGET_AREA.TOP:
             case WIDGET_AREA.BOTTOM:
-                if (ry < ny) {
-                    t = ry;
-                    h = ny - ry;
+                if (cy < ry) {
+                    t = cy;
+                    h = ry - cy;
                 } else {
-                    t = ny;
-                    h = ry - ny;
+                    t = ry;
+                    h = cy - ry;
                 }
                 break;
             case WIDGET_AREA.RIGHT:
             case WIDGET_AREA.LEFT:
-                if (rx < nx) {
-                    l = rx;
-                    w = nx - rx;
+                if (cx < rx) {
+                    l = cx;
+                    w = rx - cx;
                 } else {
-                    l = nx;
-                    w = rx - nx;
+                    l = rx;
+                    w = cx - rx;
                 }
                 break;
             case WIDGET_AREA.LEFT_TOP:
             case WIDGET_AREA.LEFT_BOTTOM:
             case WIDGET_AREA.RIGHT_TOP:
             case WIDGET_AREA.RIGHT_BOTTOM:
-                if (nx < rx) {
-                    l = nx;
-                    w = rx - nx;
-                } else {
+                if (rx < cx) {
                     l = rx;
-                    w = nx - rx;
-                }
-                if (ny < ry) {
-                    t = ny;
-                    h = ry - ny;
+                    w = cx - rx;
                 } else {
+                    l = cx;
+                    w = rx - cx;
+                }
+                if (ry < cy) {
                     t = ry;
-                    h = ny - ry;
+                    h = cy - ry;
+                } else {
+                    t = cy;
+                    h = ry - cy;
                 }
                 break;
             default:
                 return;
         }
         widget.resize({
-            top: t / zoomFactor,
-            left: l / zoomFactor,
-            width: w / zoomFactor,
-            height: h / zoomFactor
+            top:    Math.round(t / zf),
+            left:   Math.round(l / zf),
+            width:  Math.round(w / zf),
+            height: Math.round(h / zf)
         });
-        widget.notifyDataChanged();
+        widget.notifyDragEvent();
     }
 
-    function updateCursor(area) {
+    /**
+     * 将鼠标位置映射为指针样式
+     * @param area
+     * @returns {*}
+     */
+    function mapArea2Cursor(area) {
         var cursorStyle;
         switch (area) {
             case WIDGET_AREA.LEFT:
@@ -164,18 +211,28 @@ define(function (require, exports, module) {
         return cursorStyle;
     }
 
-    function beginResize(widget, area, zoomFactor) {
-        var t = widget.getTop(),
-            l = widget.getLeft(),
-            w = widget.getWidth(),
-            h = widget.getHeight(),
+    /**
+     * 根据widget和区域确定参考点坐标
+     * @param widget
+     * @param area
+     * @returns {{x: number, y: number}}
+     */
+    function getReferencePoint(widget, area) {
+        var t = widget.mTop,
+            l = widget.mLeft,
+            w = widget.mWidth,
+            h = widget.mHeight,
+            zf = widget.mContext.mZoomFactor,
             x, y;
         switch (area) {
             case WIDGET_AREA.LEFT:
+            case WIDGET_AREA.LEFT_BOTTOM:
                 x = l + w;
                 y = t;
                 break;
             case WIDGET_AREA.RIGHT:
+            case WIDGET_AREA.BOTTOM:
+            case WIDGET_AREA.RIGHT_BOTTOM:
                 x = l;
                 y = t;
                 break;
@@ -184,49 +241,46 @@ define(function (require, exports, module) {
                 y = t + h;
                 break;
             case WIDGET_AREA.TOP:
-                x = l;
-                y = t + h;
-                break;
             case WIDGET_AREA.RIGHT_TOP:
                 x = l;
                 y = t + h;
                 break;
-            case WIDGET_AREA.LEFT_BOTTOM:
-                x = l + w;
-                y = t;
-                break;
-            case WIDGET_AREA.BOTTOM:
-                x = l;
-                y = t;
-                break;
-            case WIDGET_AREA.RIGHT_BOTTOM:
-                x = l;
-                y = t;
-                break;
         }
         return {
-            x: x * zoomFactor,
-            y: y * zoomFactor
+            x: x * zf,
+            y: y * zf
         };
     }
 
-    var WIDGET_AREA = {
-        NONE: 0,
-        CONTENT: 1,
-        TOP: 2,
-        BOTTOM: 3,
-        LEFT_TOP: 4,
-        LEFT: 5,
-        LEFT_BOTTOM: 6,
-        RIGHT_TOP: 7,
-        RIGHT: 8,
-        RIGHT_BOTTOM: 9
-    };
-    var RULER_WIDTH = 0;
-    var MIN_CANVAS_SCALE = 0.9;
-    var WIDGET_BORDER_TOLERATE = 5;
-
-    function LayoutEditor(layoutJSON, viewWidth, viewHeight) {
+    /**
+     * LayoutEditor的构造函数
+     * @param obj 适配过的配置参数
+     * @param viewWidth 容器宽度
+     * @param viewHeight 容器高度
+     * {
+     *   width: <number>,
+     *   height: <number>,
+     *   name: <string>,
+     *   nameEng: <string>,
+     *   id: <number>,
+     *   leftMargin: <number>,
+     *   rightMargin: <number>,
+     *   topMargin: <number>,
+     *   bottomMargin: <number>,
+     *   backgroundColor: <string>,
+     *   backgroundImage: {
+     *      url: <string>,
+     *      id: <number>
+     *   },
+     *   widgets: [
+     *      {
+     *          ,
+     *      }
+     *   ]
+     * }
+     * @constructor
+     */
+    function LayoutEditor(obj, viewWidth, viewHeight) {
 
         this.mTopRuler          = document.createElement('div');
         this.mLeftRuler         = document.createElement('div');
@@ -237,38 +291,38 @@ define(function (require, exports, module) {
         this.mElement.appendChild(this.mTopRuler);
         this.mElement.appendChild(this.mLeftRuler);
         this.mElement.appendChild(this.mCanvasContainer);
-        
-        var lw          = Number(layoutJSON.Width);
-        var lh          = Number(layoutJSON.Height);
-        var zx          = (viewWidth - RULER_WIDTH) / lw;
-        var zy          = (viewHeight - RULER_WIDTH) / lh;
+
+        var zx          = (viewWidth - RULER_WIDTH) / obj.width;
+        var zy          = (viewHeight - RULER_WIDTH) / obj.height;
         var zoomFactor  = Math.min(zx, zy) * MIN_CANVAS_SCALE;
-        var ccvw        = viewWidth - RULER_WIDTH;
-        var ccvh        = viewHeight - RULER_WIDTH;
+        var wWidth      = viewWidth - RULER_WIDTH;
+        var wHeight     = viewHeight - RULER_WIDTH;
         
         var layout = new Layout({
-            width:              lw,
-            height:             lh,
-            backgroundColor:    layoutJSON.BackgroundColor,
-            backgroundImage:    layoutJSON.BackgroundPic,
-            topMargin:          Number(layoutJSON.TopMargin),
-            bottomMargin:       Number(layoutJSON.BottomMargin),
-            leftMargin:         Number(layoutJSON.LeftMargin),
-            rightMargin:        Number(layoutJSON.RightMargin),
-            id:                 layoutJSON.ID,
-            name:               layoutJSON.Name,
-            nameEng:            layoutJSON.Name_eng,
-            widgets:            layoutJSON.Layout_ControlBoxs,
+            width:              obj.width,
+            height:             obj.height,
+            backgroundColor:    obj.backgroundColor,
+            backgroundImage:    obj.backgroundImage,
+            topMargin:          obj.topMargin,
+            bottomMargin:       obj.bottomMargin,
+            leftMargin:         obj.leftMargin,
+            rightMargin:        obj.rightMargin,
+            id:                 obj.id,
+            name:               obj.name,
+            nameEng:            obj.nameEng,
+            widgets:            obj.widgets,
             element:            this.mCanvas,
             context:            this
         });
 
-        this.mCcvw          = ccvw;
-        this.mCcvh          = ccvh;
-        this.mViewWidth      = viewWidth;
-        this.mViewHeight     = viewHeight;
+        this.mWindowWidth   = wWidth;
+        this.mWindowHeight  = wHeight;
+        this.mViewWidth     = viewWidth;
+        this.mViewHeight    = viewHeight;
         this.mLayout        = layout;
         this.mZoomFactor    = zoomFactor;
+        this.mWidgetsChangedListener = null;
+        this.mFocusChangedListener = null;
 
         this.mTopRuler.style.height =
             this.mLeftRuler.style.width =
@@ -279,36 +333,31 @@ define(function (require, exports, module) {
         this.mCanvasContainer.style.overflow = 'auto';
         this.mCanvas.style.position = 'absolute';
 
-        var resizeType, resizeWidget, resizePoint, isResizing = false, self = this;
+        this.registerEventListeners();
+
+    }
+
+    LayoutEditor.prototype.registerEventListeners = function () {
+
+        var dragArea, dragWidget, referencePoint, isDragging = false, self = this;
 
         $(this.mCanvas).mouseenter(function (ev) {
             $(this).on('mousemove', function (evt) {
                 var offset = $(this).offset(),
-                    rx = evt.pageX - offset.left,
-                    ry = evt.pageY - offset.top;
-                var result = self.mLayout.findWidgetAndAreaByOffset(rx, ry);
-                if (isResizing) {
-                    if (resizeType === WIDGET_AREA.CONTENT) {
-                        var offsetX = (rx - resizePoint.x) / self.mZoomFactor,
-                            offsetY = (ry - resizePoint.y) / self.mZoomFactor;
-                        resizePoint.x = rx;
-                        resizePoint.y = ry;
-                        resizeWidget.translateTo(
-                            resizeWidget.getLeft() + offsetX,
-                            resizeWidget.getTop() + offsetY
-                        );
-                    } else {
-                        onResize(resizeWidget, resizeType, self.mZoomFactor, resizePoint, {x: rx, y: ry});
-                    }
-                    resizeWidget.requestFocus();
+                    offsetX = evt.pageX - offset.left,
+                    offsetY = evt.pageY - offset.top,
+                    currentPoint = {x: offsetX, y: offsetY},
+                    result = self.mLayout.determineWidgetByOffset(offsetX, offsetY);
+                if (isDragging) {
+                    onDragWidget(dragWidget, dragArea, referencePoint, currentPoint);
                 }
-                this.style.cursor = updateCursor(result.area);
+                this.style.cursor = mapArea2Cursor(result.area);
                 this.lastChild.title = (result.widget && result.widget.mTypeName) || '';
                 return false;
             });
             $(this).one('mouseleave', function (evt) {
                 $(this).off('mousemove');
-                isResizing = false;
+                isDragging = false;
                 return false;
             });
             return false;
@@ -316,83 +365,143 @@ define(function (require, exports, module) {
 
         $(this.mCanvas).mousedown(function (ev) {
             var offset = $(this).offset(),
-                rx = ev.pageX - offset.left,
-                ry = ev.pageY - offset.top;
-            var result = self.mLayout.findWidgetAndAreaByOffset(rx, ry);
-            resizeType = result.area;
-            if (resizeType === WIDGET_AREA.CONTENT) {
-                resizePoint = {x: rx, y: ry};
-                resizeWidget = result.widget;
-                resizeWidget.requestFocus();
-                isResizing = true;
-            } else if (resizeType !== WIDGET_AREA.NONE) {
-                resizeWidget = result.widget;
-                resizePoint = beginResize(resizeWidget, resizeType, self.mZoomFactor);
-                resizeWidget.requestFocus();
-                isResizing = true;
+                offsetX = ev.pageX - offset.left,
+                offsetY = ev.pageY - offset.top,
+                result = self.mLayout.determineWidgetByOffset(offsetX, offsetY);
+            dragArea = result.area;
+            if (result.area === WIDGET_AREA.CONTENT) {
+                referencePoint = {x: offsetX, y: offsetY};
+                dragWidget = result.widget;
+                dragWidget.requestFocus();
+                isDragging = true;
+            } else if (result.area !== WIDGET_AREA.NONE) {
+                dragWidget = result.widget;
+                referencePoint = getReferencePoint(dragWidget, result.area);
+                dragWidget.requestFocus();
+                isDragging = true;
             }
             $(this).one('mouseup', function (evt) {
-                isResizing = false;
+                isDragging = false;
                 return false;
             });
             return false;
         });
 
-    }
-    
+    };
+
+    /**
+     * 绘制LayoutEditor
+     */
     LayoutEditor.prototype.onDraw = function () {
+
         this.mElement.style.width = this.mViewWidth + 'px';
         this.mElement.style.height = this.mViewHeight + 'px';
         this.mTopRuler.style.width = this.mViewWidth + 'px';
         this.mLeftRuler.style.height = this.mViewHeight - RULER_WIDTH + 'px';
-        this.mCanvasContainer.style.height = this.mCcvh + 'px';
-        this.mCanvasContainer.style.width = this.mCcvw + 'px';
-        this.mCanvas.style.top = (this.mCcvh - this.mLayout.mHeight * this.mZoomFactor) / 2 + 'px';
-        this.mCanvas.style.left = (this.mCcvw - this.mLayout.mWidth * this.mZoomFactor) / 2 + 'px';
+        this.mCanvasContainer.style.height = this.mWindowHeight + 'px';
+        this.mCanvasContainer.style.width = this.mWindowWidth + 'px';
+        this.mCanvas.style.top = (this.mWindowHeight - this.mLayout.mHeight * this.mZoomFactor) / 2 + 'px';
+        this.mCanvas.style.left = (this.mWindowWidth - this.mLayout.mWidth * this.mZoomFactor) / 2 + 'px';
 
         this.mLayout.onDraw();
+
     };
 
+    /**
+     * 改变LayoutEditor容器的大小
+     * @param viewWidth
+     * @param viewHeight
+     */
     LayoutEditor.prototype.resize = function (viewWidth, viewHeight) {
         var zx          = (viewWidth - RULER_WIDTH) / this.mLayout.mWidth;
         var zy          = (viewHeight - RULER_WIDTH) / this.mLayout.mHeight;
-        this.mZoomFactor= Math.min(zx, zy) * MIN_CANVAS_SCALE;
-        this.mCcvw      = viewWidth - RULER_WIDTH;
-        this.mCcvh      = viewHeight - RULER_WIDTH;
+        this.mZoomFactor = Math.min(zx, zy) * MIN_CANVAS_SCALE;
+        this.mWindowWidth      = viewWidth - RULER_WIDTH;
+        this.mWindowHeight     = viewHeight - RULER_WIDTH;
+        this.onResize();
     };
 
+    /**
+     * LayoutEditor的Resize回调
+     */
     LayoutEditor.prototype.onResize = function () {
-
         this.onDraw();
     };
-    
+
+    /**
+     * 缩放LayoutEditor
+     * @param zoomFactor
+     */
     LayoutEditor.prototype.zoom = function (zoomFactor) {
-        // var x = zoomFactor * this.mLayout.mWidth / this.mCcvw,
-        //     y = zoomFactor * this.mLayout.mHeight / this.mCcvh;
-        // if (Math.max(x, y) < MIN_CANVAS_SCALE) {
-        //     return false;
-        // }
-        var t = zoomFactor / this.mZoomFactor;
-        this.mCcvw *= t;
-        this.mCcvh *= t;
+        var temp = zoomFactor / this.mZoomFactor;
+        this.mWindowWidth *= temp;
+        this.mWindowHeight *= temp;
         this.mZoomFactor = zoomFactor;
         this.onDraw();
     };
-    
+
+    /**
+     * 将LayoutEditor附着在DOM元素上
+     * @param el
+     */
     LayoutEditor.prototype.attachToDOM  = function (el) {
         this.onDraw();
         el.appendChild(this.mElement);
     };
-    
+
+    /**
+     * 返回LayoutEditor的layout
+     * @returns {Layout|*}
+     */
     LayoutEditor.prototype.getLayout = function () {
         return this.mLayout;
     };
-    
+
+    /**
+     * 返回当前的缩放比例
+     * @returns {number|*}
+     */
     LayoutEditor.prototype.getZoomFactor = function () {
         return this.mZoomFactor;  
     };
 
+    /**
+     * 设置聚焦widget改变的回调函数
+     * @param listener
+     */
+    LayoutEditor.prototype.onFocusChanged = function (listener) {
+        this.mFocusChangedListener = listener;
+    };
+
+    /**
+     * 通知焦点改变的事件
+     */
+    LayoutEditor.prototype.notifyFocusChanged = function () {
+        this.mFocusChangedListener && this.mFocusChangedListener();
+    };
+
+    /**
+     * 设置layout包含widget改变回调函数
+     * @param listener
+     */
+    LayoutEditor.prototype.onWidgetsChanged = function (listener) {
+        this.mWidgetsChangedListener = listener;
+    };
+
+    /**
+     * 通知layout包含widget改变的事件
+     */
+    LayoutEditor.prototype.notifyWidgetsChanged = function () {
+        this.mWidgetsChangedListener && this.mWidgetsChangedListener(this);
+    };
+
+    /**
+     * Layout类的构造函数
+     * @param obj
+     * @constructor
+     */
     function Layout(obj) {
+
         this.mWidth             = obj.width;
         this.mHeight            = obj.height;
         this.mBackgroundColor   = obj.backgroundColor;
@@ -420,14 +529,11 @@ define(function (require, exports, module) {
         this.mContent.style.backgroundSize  = 'contain';
         this.mElement.appendChild(this.mContent);
         this.mElement.style.boxShadow = '0 5px 10px 0 rgba(0, 0, 0, 0.26)';
-        this.mDataChangedListener = null;
-        this.mWidgetListChangedListener = null;
-        this.mFocusedWidgetChangedListener = null;
 
         /************* focus on last widget ***************/
         var lastWidget  = null, self = this;
         obj.widgets.forEach(function (el) {
-            var widget  = Widget.createByJSON(el, self.mContext, self);
+            var widget  = Widget.create(el, self);
             self.addWidget(widget);
             lastWidget  = widget;
         });
@@ -436,88 +542,124 @@ define(function (require, exports, module) {
         
     }
 
-    Layout.prototype.exportToJSON = function () {
+    Layout.prototype.toJSON = function () {
         var widgets = [];
-        var zIndexCount = 0;
-        this.mWidgets.forEach(function (el) {
-            var widgetJSON = el.exportToJSON();
-            widgetJSON.Zorder = String(zIndexCount);
-            zIndexCount++;
-            widgets.push(widgetJSON);
+        this.mWidgets.forEach(function (el, idx, arr) {
+            widgets.push({
+                top: el.mTop,
+                left: el.mLeft,
+                width: el.mWidth,
+                height: el.mHeight,
+                id: el.mId,
+                type: el.mType,
+                typeName: el.mTypeName
+            });
         });
         return {
-            Width:          String(this.mWidth),
-            Height:         String(this.mHeight),
-            BackgroundColor:this.mBackgroundColor,
-            BackgroundPic:  String(this.mBackgroundImage.ID),
-            TopMargin:      String(this.mTopMargin),
-            BottomMargin:   String(this.mBottomMargin),
-            LeftMargin:     String(this.mLeftMargin),
-            RightMargin:    String(this.mRightMargin),
-            Name:           this.mName,
-            Name_eng:       this.mNameEng,
-            layout_id:      String(this.mId),
-            Layout_ControlBoxs: widgets
+            id: this.mId,
+            name: this.mName,
+            nameEng: this.mNameEng,
+            width: this.mWidth,
+            height: this.mHeight,
+            topMargin: this.mTopMargin,
+            leftMargin: this.mLeftMargin,
+            rightMargin: this.mRightMargin,
+            bottomMargin: this.mBottomMargin,
+            backgroundImage: {
+                url: this.mBackgroundImage.url,
+                id: this.mBackgroundImage.id,
+                type: this.mBackgroundImage.type
+            },
+            backgroundColor: this.mBackgroundColor,
+            widgets: widgets
         };
     };
 
-    Layout.prototype.onFocusedWidgetChanged = function (listener) {
-        this.mFocusedWidgetChangedListener = listener;
-    };
-
+    /**
+     * 设置layout的名字
+     * @param name
+     */
     Layout.prototype.setName = function (name) {
         this.mName = name;
     };
 
+    /**
+     * 获取layout的名字
+     * @returns {*}
+     */
     Layout.prototype.getName = function () {
         return this.mName;
     };
 
+    /**
+     * 设置英文名
+     * @param nameEng
+     */
     Layout.prototype.setNameEng = function (nameEng) {
         this.mNameEng = nameEng;
     };
 
+    /**
+     * 获取英文名
+     * @returns {*}
+     */
     Layout.prototype.getNameEng = function () {
         return this.mNameEng;
     };
 
+    /**
+     * 设置id
+     * @param id
+     */
     Layout.prototype.setId = function (id) {
         this.mId = id;
     };
 
+    /**
+     * 获取id
+     * @returns {paths.ID|{path, name}|*|RegExp}
+     */
     Layout.prototype.getId = function () {
         return this.mId;
     };
 
+    /**
+     * 设置背景色
+     * @param backgroundColor
+     */
     Layout.prototype.setBackgroundColor = function (backgroundColor) {
         this.mBackgroundColor = backgroundColor;
         this.mContent.style.backgroundColor = backgroundColor;
     };
 
+    /**
+     * 设置背景图片
+     * @param backgroundImage
+     */
     Layout.prototype.setBackgroundImage = function (backgroundImage) {
         this.mBackgroundImage = backgroundImage;
-        if (this.mBackgroundImage && this.mBackgroundImage.Type === 'Image') {
-            this.mContent.style.backgroundImage = 'url(' + this.mBackgroundImage.URL + ')';
+        if (this.mBackgroundImage && this.mBackgroundImage.type === 'image') {
+            this.mContent.style.backgroundImage = 'url(' + this.mBackgroundImage.url + ')';
         } else {
             this.mContent.style.backgroundImage = 'none';
         }
     };
 
-    Layout.prototype.notifyDataChanged = function () {
-        this.mDataChangedListener && this.mDataChangedListener(this);
-    };
-
-    Layout.prototype.onDataChanged = function (dataChangedListener) {
-        this.mDataChangedListener = dataChangedListener;
-    };
-
+    /**
+     * 添加widget
+     * @param widget
+     */
     Layout.prototype.addWidget = function (widget) {
         this.mWidgets.push(widget);
         widget.onDraw();
         this.mContent.insertBefore(widget.mElement, this.mFocusMask);
-        this.notifyWidgetListChanged();
+        this.mContext.notifyWidgetsChanged();
     };
 
+    /**
+     * 删除widget
+     * @param widget
+     */
     Layout.prototype.deleteWidget = function (widget) {
         var wIndex = -1;
         for (var i = 0; i < this.mWidgets.length; i++) {
@@ -533,16 +675,22 @@ define(function (require, exports, module) {
                 this.mWidgets[wIndex - 1].requestFocus();
             } else {
                 this.mWidgets.splice(wIndex, 1);
-                if (this.mWidgets.length > 1) {
+                if (this.mWidgets.length > 0) {
                     this.mWidgets[wIndex].requestFocus();
                 } else {
                     this.mFocusedWidget = null;
+                    this.focus(null);
                 }
             }
-            this.notifyWidgetListChanged();
+            this.mContext.notifyWidgetsChanged();
         }
     };
 
+    /**
+     * 移动一个widget
+     * @param widget
+     * @param step
+     */
     Layout.prototype.move = function (widget, step) {
         var wIndex = -1;
         for (var i = 0; i < this.mWidgets.length; i++) {
@@ -557,39 +705,28 @@ define(function (require, exports, module) {
             var el = this.mContent.childNodes[wIndex];
             this.mContent.removeChild(el);
             this.mContent.insertBefore(el, this.mContent.childNodes[wIndex + step]);
+            this.mContext.notifyWidgetsChanged();
         }
     };
 
-    Layout.prototype.onWidgetListChanged = function (listener) {
-        this.mWidgetListChangedListener = listener;
-    };
-
-    Layout.prototype.notifyWidgetListChanged = function () {
-        this.mWidgetListChangedListener && this.mWidgetListChangedListener(this.exportToJSON());
-    };
-
-    Layout.prototype.findWidgetById = function (id) {
-        var widget = null;
-        this.mWidgets.forEach(function (el) {
-            if (el.getId() === id) {
-                widget = el;
-            }
-        });
-        return widget;
-    };
-    
-    Layout.prototype.findWidgetAndAreaByOffset = function (rx, ry) {
+    /**
+     * 判断当前hover的widget和位置
+     * @param rx
+     * @param ry
+     * @returns {*}
+     */
+    Layout.prototype.determineWidgetByOffset = function (rx, ry) {
 
         function findAreaByOffset(widget, zoomFactor, rx, ry) {
             var l1, l2, t1, t2, r1, r2, b1, b2;
-            l1 = widget.getLeft()   * zoomFactor - WIDGET_BORDER_TOLERATE;
-            l2 = widget.getLeft()   * zoomFactor + WIDGET_BORDER_TOLERATE;
-            t1 = widget.getTop()    * zoomFactor - WIDGET_BORDER_TOLERATE;
-            t2 = widget.getTop()    * zoomFactor + WIDGET_BORDER_TOLERATE;
-            r1 = (widget.getLeft()  + widget.getWidth())    * zoomFactor - WIDGET_BORDER_TOLERATE;
-            r2 = (widget.getLeft()  + widget.getWidth())    * zoomFactor + WIDGET_BORDER_TOLERATE;
-            b1 = (widget.getTop()   + widget.getHeight())   * zoomFactor - WIDGET_BORDER_TOLERATE;
-            b2 = (widget.getTop()   + widget.getHeight())   * zoomFactor + WIDGET_BORDER_TOLERATE;
+            l1 = widget.mLeft * zoomFactor - WIDGET_BORDER_TOLERATE;
+            l2 = widget.mLeft * zoomFactor + WIDGET_BORDER_TOLERATE;
+            t1 = widget.mTop * zoomFactor - WIDGET_BORDER_TOLERATE;
+            t2 = widget.mTop * zoomFactor + WIDGET_BORDER_TOLERATE;
+            r1 = (widget.mLeft  + widget.mWidth)    * zoomFactor - WIDGET_BORDER_TOLERATE;
+            r2 = (widget.mLeft  + widget.mWidth)    * zoomFactor + WIDGET_BORDER_TOLERATE;
+            b1 = (widget.mTop   + widget.mHeight)   * zoomFactor - WIDGET_BORDER_TOLERATE;
+            b2 = (widget.mTop   + widget.mHeight)   * zoomFactor + WIDGET_BORDER_TOLERATE;
             if (ry < b2 && ry > t1) {
                 if (rx < r1 && rx > l2) {
                     if (ry > t2) {
@@ -632,54 +769,64 @@ define(function (require, exports, module) {
                 area: WIDGET_AREA.NONE
             }
         }
-        var widget = this.mFocusedWidget, area = findAreaByOffset(this.mFocusedWidget, this.mContext.getZoomFactor(), rx, ry);
+        var widget = this.mFocusedWidget, area = findAreaByOffset(this.mFocusedWidget, this.mContext.mZoomFactor, rx, ry);
         for (var i = this.mWidgets.length - 1; i >= 0 && area === WIDGET_AREA.NONE; i--) {
             widget = this.mWidgets[i];
             if (this.mFocusedWidget === widget) {
                 continue;
             }
-            area = findAreaByOffset(widget, this.mContext.getZoomFactor(), rx, ry);
+            area = findAreaByOffset(widget, this.mContext.mZoomFactor, rx, ry);
         }
 
         return {
             widget: widget,
             area: area
         }
-
     };
 
+    /**
+     * 获取当前focus的widget
+     * @returns {*|null}
+     */
     Layout.prototype.getFocusedWidget = function () {
         return this.mFocusedWidget;
     };
 
+    /**
+     * 聚焦到某个元素，当widget 为null时，不显示
+     * @param widget
+     */
     Layout.prototype.focus = function (widget) {
         this.mFocusedWidget = widget;
-        var zoomFactor = this.mContext.getZoomFactor();
-        this.mFocusMask.style.top         = widget ? this.mFocusedWidget.getTop()   * zoomFactor + 'px' : '0px';
-        this.mFocusMask.style.left        = widget ? this.mFocusedWidget.getLeft()  * zoomFactor + 'px' : '0px';
-        this.mFocusMask.style.width       = widget ? this.mFocusedWidget.getWidth() * zoomFactor + 'px' : '0px';
-        this.mFocusMask.style.height      = widget ? this.mFocusedWidget.getHeight()    * zoomFactor + 'px' : '0px';
+        var zoomFactor = this.mContext.mZoomFactor;
+        this.mFocusMask.style.top         = widget ? this.mFocusedWidget.mTop   * zoomFactor + 'px' : '0px';
+        this.mFocusMask.style.left        = widget ? this.mFocusedWidget.mLeft  * zoomFactor + 'px' : '0px';
+        this.mFocusMask.style.width       = widget ? this.mFocusedWidget.mWidth * zoomFactor + 'px' : '0px';
+        this.mFocusMask.style.height      = widget ? this.mFocusedWidget.mHeight    * zoomFactor + 'px' : '0px';
         this.mFocusMask.style.border      = widget ? 'solid 2px #f00' : 'none';
-        this.mFocusedWidgetChangedListener && this.mFocusedWidgetChangedListener();
+        this.mContext.notifyFocusChanged();
     };
 
+    /**
+     * 通过颜色迭代器产生下一个颜色
+     * @returns {*}
+     */
     Layout.prototype.nextColor = function () {
         return this.mColorIterator();
     };
 
+    /**
+     * 重新绘制的回调函数
+     */
     Layout.prototype.onResize = function () {
-        /*
-        var zoomFactor = this.mContext.getZoomFactor();
-        this.mElement.style.width  = this.mWidth  * zoomFactor + 'px';
-        this.mElement.style.height = this.mHeight * zoomFactor + 'px';
-        this.mContent.style.width  = (this.mWidth - this.mLeftMargin - this.mRightMargin) * zoomFactor + 'px';
-        this.mContent.style.height = (this.mHeight - this.mTopMargin - this.mBottomMargin) * zoomFactor + 'px';
-        */
         this.mContext.onResize();
     };
 
+    /**
+     * 绘制Layout
+     */
     Layout.prototype.onDraw = function () {
-        var zoomFactor = this.mContext.getZoomFactor();
+        var zoomFactor = this.mContext.mZoomFactor;
         this.mElement.style.width  = this.mWidth  * zoomFactor + 'px';
         this.mElement.style.height = this.mHeight * zoomFactor + 'px';
         this.mContent.style.width  = (this.mWidth - this.mLeftMargin - this.mRightMargin) * zoomFactor + 'px';
@@ -692,8 +839,13 @@ define(function (require, exports, module) {
         this.focus(this.mFocusedWidget);
     };
 
+    /**
+     * 设置width，失败返回false
+     * @param width
+     * @returns {boolean}
+     */
     Layout.prototype.setWidth = function (width) {
-        if (!this.trySetWidth(width)) {
+        if (!this.testWidth(width)) {
             return false;
         }
         this.mWidth = width;
@@ -701,15 +853,20 @@ define(function (require, exports, module) {
         return true;
     };
 
+    /**
+     * 获取width
+     * @returns {*}
+     */
     Layout.prototype.getWidth = function () {
         return this.mWidth;
     };
 
-    Layout.prototype.getHeight = function () {
-        return this.mHeight;
-    };
-
-    Layout.prototype.trySetWidth = function (width) {
+    /**
+     * 测试宽度
+     * @param width
+     * @returns {boolean}
+     */
+    Layout.prototype.testWidth = function (width) {
         if (typeof width !== 'number' || width < 0) {
             return false;
         }
@@ -721,12 +878,13 @@ define(function (require, exports, module) {
         return true;
     };
 
-    Layout.prototype.getBackgroundColor = function () {
-        return this.mBackgroundColor;
-    };
-
+    /**
+     * 设置高度，失败返回false
+     * @param height
+     * @returns {boolean}
+     */
     Layout.prototype.setHeight = function (height) {
-        if (!this.trySetHeight(height)) {
+        if (!this.testHeight(height)) {
             return false;
         }
         this.mHeight = height;
@@ -734,7 +892,20 @@ define(function (require, exports, module) {
         return true;
     };
 
-    Layout.prototype.trySetHeight = function (height) {
+    /**
+     * 获取高度
+     * @returns {*}
+     */
+    Layout.prototype.getHeight = function () {
+        return this.mHeight;
+    };
+
+    /**
+     * 测试高度
+     * @param height
+     * @returns {boolean}
+     */
+    Layout.prototype.testHeight = function (height) {
         if (typeof height !== 'number' || height < 0) {
             return false;
         }
@@ -746,8 +917,13 @@ define(function (require, exports, module) {
         return true;
     };
 
-    /* Widget */
-    function Widget(obj) {
+    /**
+     * Widget类的构造函数
+     * @param obj
+     * @param layout
+     * @constructor
+     */
+    function Widget(obj, layout) {
         this.mLeft      = obj.left;
         this.mTop       = obj.top;
         this.mWidth     = obj.width;
@@ -755,58 +931,64 @@ define(function (require, exports, module) {
         this.mId        = obj.id;
         this.mType      = obj.type;
         this.mTypeName  = obj.typeName;
-        this.mContext   = obj.context;
-        this.mLayout    = obj.layout;
+        this.mLayout    = layout;
+        this.mContext   = layout.mContext;
         this.mElement   = document.createElement('div');
     }
 
-    Widget.createByJSON = function (json, context, layout) {
-        var obj = {
-            left:   json.Left,
-            top:    json.Top,
-            width:  json.Width,
-            height: json.Height,
-            id:     json.ID,
-            type:   convertWidgetType(json.Type),
-            typeName:   json.Type_Name,
-            context: context,
-            layout: layout
-        };
+    /**
+     * Widget工厂函数
+     * @param json
+     * @param layout
+     * @returns {*}
+     */
+    Widget.create = function (obj, layout) {
         switch (obj.type) {
-            case 'image':
-                return new ImageWidget(obj);
-            case 'html':
-                return new HTMLWidget(obj);
-            case 'clock':
-                return new ClockWidget(obj);
-            case 'audio':
-                return new AudioWidget(obj);
-            case 'video':
-                return new VideoWidget(obj);
+            case 'ImageBox':
+                return new ImageWidget(obj, layout);
+            case 'WebBox':
+                return new HTMLWidget(obj, layout);
+            case 'ClockBox':
+                return new ClockWidget(obj, layout);
+            case 'AudioBox':
+                return new AudioWidget(obj, layout);
+            case 'VideoBox':
+                return new VideoWidget(obj, layout);
         }
     };
-    
+
+    /**
+     * 移动widget，失败返回false
+     * @param x
+     * @param y
+     * @return {boolean}
+     */
     Widget.prototype.translateTo = function(x, y) {
         if (x < 0 ||
             y < 0 ||
             x + this.mWidth > this.mLayout.mWidth - this.mLayout.mLeftMargin - this.mLayout.mRightMargin ||
             y + this.mHeight > this.mLayout.mHeight - this.mLayout.mTopMargin - this.mLayout.mBottomMargin
         ) {
-            return;
+            return false;
         }
         this.mLeft  = x;
         this.mTop   = y;
         this.onResize();
+        return true;
     };
 
-    Widget.prototype.notifyDataChanged = function () {
-        this.mLayout.notifyDataChanged();
-    };
-    
+    /**
+     * 移动widget
+     * @param step
+     */
     Widget.prototype.move = function (step) {
         this.mLayout.move(this, step);
     };
 
+    /**
+     * resize widget
+     * @param obj
+     */
     Widget.prototype.resize = function (obj) {
         this.mLeft  = obj.left;
         this.mTop   = obj.top;
@@ -815,23 +997,16 @@ define(function (require, exports, module) {
         this.onResize();
     };
 
-    Widget.prototype.exportToJSON = function () {
-        return {
-            Left: this.mLeft,
-            Top: this.mTop,
-            Width: this.mWidth,
-            Height: this.mHeight,
-            layout_controlbox_id: String(this.mId),
-            layout_id: String(this.mLayout.mId),
-            Type: convertWidgetTypeBack(this.mType),
-            Type_Name: this.mTypeName
-        };
-    };
-
+    /**
+     * 当widget大小，位置改变的回调函数
+     */
     Widget.prototype.onResize = function () {
         this.onDraw();
     };
 
+    /**
+     * 绘制widget
+     */
     Widget.prototype.onDraw = function () {
         if (!this.mElement.style.backgroundColor) {
             this.mElement.style.backgroundColor = this.mLayout.nextColor();
@@ -843,8 +1018,13 @@ define(function (require, exports, module) {
         this.mElement.style.height          = this.mHeight * this.mContext.getZoomFactor() + 'px';
     };
 
+    /**
+     * 设置width，失败返回false
+     * @param width
+     * @returns {boolean}
+     */
     Widget.prototype.setWidth = function (width) {
-        if (!this.trySetWidth(width)) {
+        if (!this.testWidth(width)) {
             return false;
         }
         this.mWidth = width;
@@ -852,26 +1032,33 @@ define(function (require, exports, module) {
         return true;
     };
 
-    Widget.prototype.trySetWidth = function (width) {
+    /**
+     * 获取width
+     * @returns {*}
+     */
+    Widget.prototype.getWidth = function () {
+        return this.mWidth;
+    };
+
+    /**
+     * 测试width
+     * @param width
+     * @returns {boolean}
+     */
+    Widget.prototype.testWidth = function (width) {
         if (typeof width !== 'number' || width < 0 || width + this.mLeft > this.mLayout.getWidth()) {
             return false;
         }
         return true;
     };
 
-    Widget.prototype.getWidth = function () {
-        return this.mWidth;
-    };
-
-    Widget.prototype.trySetHeight = function (height) {
-        if (typeof height !== 'number' || height < 0 || height + this.mTop > this.mLayout.getHeight()) {
-            return false;
-        }
-        return true;
-    };
-
+    /**
+     * 设置高度，失败返回false
+     * @param height
+     * @returns {boolean}
+     */
     Widget.prototype.setHeight = function (height) {
-        if (!this.trySetHeight(height)) {
+        if (!this.testHeight(height)) {
             return false;
         }
         this.mHeight = height;
@@ -879,19 +1066,33 @@ define(function (require, exports, module) {
         return true;
     };
 
+    /**
+     * 获取高度
+     * @returns {*}
+     */
     Widget.prototype.getHeight = function () {
         return this.mHeight;
     };
-    
-    Widget.prototype.trySetTop = function (top) {
-          if (typeof top !== 'number' || top < 0 || top + this.mHeight > this.mLayout.getHeight()) {
-              return false;
-          }
+
+    /**
+     *
+     * @param height
+     * @returns {boolean}
+     */
+    Widget.prototype.testHeight = function (height) {
+        if (typeof height !== 'number' || height < 0 || height + this.mTop > this.mLayout.getHeight()) {
+            return false;
+        }
         return true;
     };
 
+    /**
+     * 设置top,失败返回false
+     * @param top
+     * @returns {boolean}
+     */
     Widget.prototype.setTop = function (top) {
-        if (!this.trySetTop(top)) {
+        if (!this.testTop(top)) {
             return false;
         }
         this.mTop = top;
@@ -899,19 +1100,33 @@ define(function (require, exports, module) {
         return true;
     };
 
+    /**
+     * 获取top
+     * @returns {*}
+     */
     Widget.prototype.getTop = function () {
         return this.mTop;
     };
-    
-    Widget.prototype.trySetLeft = function (left) {
-        if (typeof left !== 'number' || left < 0 || left + this.mWidth > this.mLayout.getWidth()) {
+
+    /**
+     * 测试top
+     * @param top
+     * @returns {boolean}
+     */
+    Widget.prototype.testTop = function (top) {
+        if (typeof top !== 'number' || top < 0 || top + this.mHeight > this.mLayout.getHeight()) {
             return false;
         }
         return true;
     };
 
+    /**
+     * 设置left，失败返回false
+     * @param left
+     * @returns {boolean}
+     */
     Widget.prototype.setLeft = function (left) {
-        if (!this.trySetLeft(left)) {
+        if (!this.testLeft(left)) {
             return false;
         }
         this.mLeft = left;
@@ -919,15 +1134,44 @@ define(function (require, exports, module) {
         return true;
     };
 
+    /**
+     * 获取left
+     * @returns {*}
+     */
     Widget.prototype.getLeft = function () {
         return this.mLeft;
     };
 
+    /**
+     * 测试左边距
+     * @param left
+     * @returns {boolean}
+     */
+    Widget.prototype.testLeft = function (left) {
+        if (typeof left !== 'number' || left < 0 || left + this.mWidth > this.mLayout.getWidth()) {
+            return false;
+        }
+        return true;
+    };
+
+    /**
+     * 聚焦到该widget
+     */
     Widget.prototype.requestFocus = function () {
         this.mLayout.focus(this);
     };
 
-    /* ImageWidget */
+    Widget.prototype.notifyDragEvent = function () {
+        //if (this === this.mLayout.mFocusedWidget) {
+        this.requestFocus();
+        this.mContext.notifyFocusChanged();
+        //}
+    };
+
+    /**
+     * 图片控件
+     * @constructor
+     */
     function ImageWidget() {
         Widget.apply(this, arguments);
     }
@@ -937,7 +1181,10 @@ define(function (require, exports, module) {
         Widget.prototype.onDraw.call(this);
     };
 
-    /* VideoWidget */
+    /**
+     * 视频控件
+     * @constructor
+     */
     function VideoWidget() {
         Widget.apply(this, arguments);
     }
@@ -947,7 +1194,10 @@ define(function (require, exports, module) {
         Widget.prototype.onDraw.call(this);
     };
 
-    /* AudioWidget */
+    /**
+     * 音频控件
+     * @constructor
+     */
     function AudioWidget() {
         Widget.apply(this, arguments);
     }
@@ -957,7 +1207,10 @@ define(function (require, exports, module) {
         Widget.prototype.onDraw.call(this);
     };
 
-    /* HTMLWidget */
+    /**
+     * Web文本控件
+     * @constructor
+     */
     function HTMLWidget() {
         Widget.apply(this, arguments);
     }
@@ -967,7 +1220,10 @@ define(function (require, exports, module) {
         Widget.prototype.onDraw.call(this);
     };
 
-    /* ClockWidget */
+    /**
+     * 时钟控件
+     * @constructor
+     */
     function ClockWidget() {
         Widget.apply(this, arguments);
     }
