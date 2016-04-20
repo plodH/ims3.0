@@ -20,14 +20,14 @@ return __p;
 exports['layout_edit_main']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div id="layout-editor-wrapper"> <div class="layout-editor-header"> <button type="button">返回</button> <div> <button type="button">保存</button> </div> </div> <div class="layout-editor-body"> <div class="layout-editor-toolbar"> <ul> <li><button data-widget-id="image">图片控件</button></li> <li><button data-widget-id="video">视频控件</button></li> <li><button data-widget-id="html">Web文本控件</button></li> <li><button data-widget-id="clock">时钟控件</button></li> </ul> <ul class="layout-editor-properties"> </ul> </div> <div class="layout-editor-canvas"></div> <div class="layout-editor-widget"> <ul class="layout-editor-widget-properties"> </ul> <div class="layout-editor-widgets"></div> </div> </div> <div class="layout-editor-footer row"></div> </div>';
+__p+='<div id="layout-editor-wrapper"> <div class="layout-editor-header"> <button type="button" class="header-button-left glyphicon glyphicon-chevron-left"></button> <h1 class="header-title">编辑模板</h1><!-- <button type="button" class="header-button-right glyphicon glyphicon-floppy-disk">保存</button> --> </div> <div class="layout-editor-body"> <div class="row" style="height: 100%"> <div class="col-md-12" style="height: 100%"> <div class="box" style="height: 100%"><!-- header --> <div class="box-header with-border"> <i class="glyphicon glyphicon-th-large"></i> <h3 class="box-title">模板</h3> <small class="tips">tips:点击左边的控件按钮按钮，然后再画布上拖拽画出需要的大小</small> </div><!--edit--> <ul class="layout-editor-properties"> </ul><!-- toolbar --> <div class="layout-editor-toolbar"> <div class="btn-group-vertical"> <button data-widget-id="video" class="btn btn-default"> <i class="glyphicon glyphicon glyphicon-film"></i>&nbsp&nbsp视频 </button> <button data-widget-id="image" class="btn btn-default"> <i class="glyphicon glyphicon-picture"></i>&nbsp&nbsp图片 </button> <button data-widget-id="html" class="btn btn-default"> <i class="glyphicon glyphicon-font"></i>&nbsp&nbsp文本 </button> <button data-widget-id="clock" class="btn btn-default"> <i class="glyphicon glyphicon-time"></i>&nbsp&nbsp时钟 </button> <button data-widget-id="clock" class="btn btn-default"> <i class="glyphicon glyphicon-music"></i>&nbsp&nbsp音乐 </button> </div> <div class="btn-group-vertical" style="margin-top: 15px"> <button data-widget-id="clock" class="btn btn-default"> <i class="glyphicon glyphicon-trash"></i>&nbsp&nbsp删除 </button> </div> </div><!-- canvas --> <div class="layout-editor-canvas col-md-8"></div><!-- widget --> <div class="layout-editor-widget"> <ul class="layout-editor-widget-properties"> </ul> <div class="layout-editor-widgets"></div> </div> </div> </div> </div> </div> <div class="layout-editor-footer row"></div> </div>';
 }
 return __p;
 };
 exports['layout_edit_property']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<li> <label>布局名称:</label> <input type="text" value="'+
+__p+='<li> <label>名称:</label> <input type="text" value="'+
 ((__t=(name))==null?'':__t)+
 '"> </li> <li> <label>宽:</label> <input type="number" value="'+
 ((__t=(width))==null?'':__t)+
@@ -57,7 +57,7 @@ return __p;
 exports['layout_edit_widget_property']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<li> <label>控件类型:</label> <select> ';
+__p+='<!-- <li>\r\n    <label>控件类型:</label>\r\n    <select> ';
  if (type !== 'image') { 
 __p+=' <option value="image">图片控件</option> ';
  } else { 
@@ -81,17 +81,17 @@ __p+=' <option value="clock">时钟控件</option> ';
  } else { 
 __p+=' <option value="clock" selected="selected">时钟控件</option> ';
  } 
-__p+=' </select> </li> <li> <label>上边距:</label> <input type="number" value="'+
+__p+=' </select>\r\n</li> --><!-- <label>\r\n        <i class="glyphicon glyphicon glyphicon-film"></i>&nbsp视频控件\r\n    </label>\r\n  --> <div class="input-group"> <span class="input-group-addon">上边距</span> <input type="number" value="'+
 ((__t=(top))==null?'':__t)+
-'"> </li> <li> <label>左边距:</label> <input type="text" value="'+
+'" class="form-control"> <span class="input-group-addon">像素</span> </div> <br> <div class="input-group"> <span class="input-group-addon">左边距</span> <input type="number" value="'+
 ((__t=(left))==null?'':__t)+
-'"> </li> <li> <label>宽:</label> <input type="number" value="'+
+'" class="form-control"> <span class="input-group-addon">像素</span> </div> <br> <div class="input-group"> <span class="input-group-addon" style="letter-spacing: 7px">宽度</span> <input type="number" value="'+
 ((__t=(width))==null?'':__t)+
-'"> </li> <li> <label>高:</label> <input type="text" value="'+
+'" class="form-control"> <span class="input-group-addon">像素</span> </div> <br> <div class="input-group"> <span class="input-group-addon" style="letter-spacing: 7px">高度</span> <input type="number" value="'+
 ((__t=(height))==null?'':__t)+
-'"> </li> <li> <label>层级顺序:</label> <input type="number" value="'+
+'" class="form-control"> <span class="input-group-addon">像素</span> </div> <br> <div class="input-group"> <span class="input-group-addon" style="letter-spacing: 7px">顺序</span> <input type="number" value="'+
 ((__t=(zIndex))==null?'':__t)+
-'"> </li>';
+'" class="form-control"> <span class="input-group-addon">层</span> </div>';
 }
 return __p;
 };

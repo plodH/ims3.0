@@ -1,4 +1,4 @@
-<li>
+<!-- <li>
     <label>控件类型:</label>
     <select>
         <% if (type !== 'image') { %>
@@ -22,24 +22,37 @@
         <option value="clock" selected="selected">时钟控件</option>
         <% } %>
     </select>
-</li>
-<li>
-    <label>上边距:</label>
-    <input type="number" value="<%=top%>">
-</li>
-<li>
-    <label>左边距:</label>
-    <input type="text" value="<%=left%>">
-</li>
-<li>
-    <label>宽:</label>
-    <input type="number" value="<%=width%>">
-</li>
-<li>
-    <label>高:</label>
-    <input type="text" value="<%=height%>">
-</li>
-<li>
-    <label>层级顺序:</label>
-    <input type="number" value="<%=zIndex%>">
-</li>
+</li> -->
+    <!-- <label>
+        <i class="glyphicon glyphicon glyphicon-film"></i>&nbsp视频控件
+    </label>
+  -->   
+    <div class="input-group">
+        <span class="input-group-addon">上边距</span>
+        <input type="number" value="<%=top%>" class="form-control">
+        <span class="input-group-addon">像素</span>
+    </div>
+    <br>
+    <div class="input-group">
+        <span class="input-group-addon">左边距</span>
+        <input type="number" value="<%=left%>" class="form-control">
+        <span class="input-group-addon">像素</span>
+    </div>
+    <br>
+    <div class="input-group">
+        <span class="input-group-addon" style="letter-spacing: 7px">宽度</span>
+        <input type="number" value="<%=width%>" class="form-control">
+        <span class="input-group-addon">像素</span>
+    </div>
+    <br>
+    <div class="input-group">
+        <span class="input-group-addon" style="letter-spacing: 7px">高度</span>
+        <input type="number" value="<%=height%>" class="form-control">
+        <span class="input-group-addon">像素</span>
+    </div>
+    <br>
+    <div class="input-group">
+        <span class="input-group-addon" style="letter-spacing: 7px">顺序</span>
+        <input type="number" value="<%=zIndex%>" class="form-control">
+        <span class="input-group-addon">层</span>
+    </div>

@@ -1,12 +1,18 @@
 
+
+
+
 #layout-editor-wrapper {
+    margin-left: 
     width: 100%;
     height: 100%;
+    overflow: hidden;    
 }
 
+
 #layout-editor-wrapper .layout-editor-header {
-    height: 60px;
-    padding: 13px 44px;
+    height: 50px;
+    background: #3c8dbc;
 }
 
 #layout-editor-wrapper .btn-complete-layout {
@@ -16,15 +22,24 @@
 }
 
 #layout-editor-wrapper .layout-editor-body {
-    height: calc(100% - 100px);
+    height: calc(100% - 80px);
     position: relative;
     width: 100%;
+    padding-left: 30px;
+    padding-top: 15px;
+    padding-right: 30px;
 }
 
-#layout-editor-wrapper .layout-editor-toolbar {
+/*#layout-editor-wrapper .layout-editor-toolbar {
     position: absolute;
     width: 220px;
     height: 100%;
+}*/
+
+.layout-editor-toolbar{
+    padding-top: 60px;
+    padding-left: 15px;
+    width: 10%;
 }
 
 #layout-editor-wrapper .layout-editor-toolbar ul {
@@ -54,17 +69,18 @@
 
 #layout-editor-wrapper .layout-editor-canvas {
     position: absolute;
-    left: 220px;
-    width: calc(100% - 440px);
-    height: 100%;
+    left: 105px;
+    width: calc(100% - 120px);
+    height: calc(100% - 120px);
     border: 1px solid #cccccc;
     overflow: auto;
+    top: 105px;
 }
 
 #layout-editor-wrapper .layout-editor-widget {
-    position: absolute;
+    /*position: absolute;
     right: 0;
-    width: 220px;
+    width: 220px;*/
 }
 
 #layout-editor-wrapper .layout-editor-widget ul {
