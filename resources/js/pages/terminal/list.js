@@ -255,7 +255,7 @@ define(function(require, exports, module) {
         try{
           $('#term-table-pager').jqPaginator('destroy');
         }catch(error){
-          console.error("$('#term-table-pager').jqPaginator 未创建");
+          // console.error("$('#term-table-pager').jqPaginator 未创建");
         }
         
         var totalCounts = Math.max(data.totalStatistic.totalTermNum, 1);
@@ -282,7 +282,13 @@ define(function(require, exports, module) {
         $('#term_download_status').html(' 下载（' + data.totalStatistic.downloadFileNum + '/' + data.totalStatistic.downloadAllFileNum + '） 预下载（' + data.totalStatistic.preDownloadFileNum + '/' + data.totalStatistic.preDownloadAllFileNum + '）');
       
         // term_online_status
-        $('#term_online_1').html(data.totalStatistic.onlineTermNum + '/' + data.totalStatistic.totalTermNum);
+        var total = data.totalStatistic.totalTermNum;
+        var online = data.totalStatistic.onlineTermNum;
+        var shutdown = data.totalStatistic.shutdownTermNum;
+        var offline = total-online-shutdown;
+        $('#term_online').html(online + '/' + total);
+        $('#term_shutdown').html(shutdown + '/' + total);
+        $('#term_offline').html(offline + '/' + total);
 
         // term_list
         var tl = data.termList.terms;
@@ -302,7 +308,7 @@ define(function(require, exports, module) {
           $('#term_list').append('' +
             '<tr tid="'+ tl[i].ID +'" online="' + tl[i].Online + '">' +
               '<td><input type="checkbox"></td>' +
-              '<td>'+ tl[i].Name +'<br />'+ tl[i].Description +'<br />'+ status +'</td>' +
+              '<td>'+ tl[i].Name +'<br />'+ status +'</td>' +
               '<td>当前频道：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ChannelName) +'<br />当前节目：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ProgramName) +'<br />当前视频：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ProgramPlayInfo) +
               '</td>' +
               '<td>' +

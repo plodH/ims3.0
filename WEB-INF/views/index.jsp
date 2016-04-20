@@ -54,10 +54,10 @@
 
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
-          <li><a id="dpUpl" class="glyphicon glyphicon-cloud"></a></li>
+          <li><a id="dpUpl" title="点击打开上传页面"><i class="glyphicon glyphicon-cloud"></i></a></li>
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown">
               <img src="resources/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
               <span class="hidden-xs"><sec:authentication property="name"/></span>
             </a>

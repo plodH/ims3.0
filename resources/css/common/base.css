@@ -61,12 +61,45 @@ a {
 
 /*资源列表页面*/
 #dpUpl {
-	color: #000;
+	color: #FFF;
     display: none;
 }
 
 #mtr_title {
     padding: 0px 10px;
+}
+
+#mtr_count {
+	margin-right: 5px;
+    line-height: 30px;
+}
+
+.mtr_checkbox {
+	width: 3%;
+}
+
+.mtr_name {
+	width: 37%;
+}
+
+.mtr_size {
+	width: 10%;
+    text-align: center;
+}
+
+.mtr_time {
+	width: 15%;
+    text-align: center;
+}
+
+.mtr_uploadUser {
+	width: 10%;
+    text-align: center;
+}
+
+.mtr_uploadDate {
+	width: 20%;
+    text-align: center;
 }
 
 /*资源上传页面*/
