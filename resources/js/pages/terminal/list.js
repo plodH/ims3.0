@@ -7,6 +7,7 @@ define(function(require, exports, module) {
   var _pagesize = CONFIG.pager.pageSize;
   var _pageNO = 1;
   var _checkList = [];
+  var _snapTermID;
 
 	exports.init = function(){
     initTree();
@@ -304,6 +305,7 @@ define(function(require, exports, module) {
           preloadStatus = preloadStatus.DownloadFiles/preloadStatus.AllFiles*100;
 
           var status = ((tl[i].Online === 0)?'离线':((tl[i].Status === 'Running')?'运行':'休眠'));
+          var snap = (tl[i].Online === 0)?'':'<a class="pointer">截屏</a>';
 
           $('#term_list').append('' +
             '<tr tid="'+ tl[i].ID +'" online="' + tl[i].Online + '">' +
@@ -330,10 +332,11 @@ define(function(require, exports, module) {
                 '</div>' +
               '</td>' +
               '<td>' +
-              'ip：'+ tl[i].IP +'<br />' +
+              'IP：'+ tl[i].IP +'<br />' +
+              'MAC：'+ tl[i].MAC +'<br />' +
               '版本：' + tl[i].TermVersion + 
               '</td>' +
-              '<td><a class="pointer">编辑</a> <br/><a class="pointer">截屏</a></td>' +
+              '<td><a class="pointer">编辑</a> <br/>'+snap+'</td>' +
             '</tr>'
           )
         }
@@ -365,12 +368,43 @@ define(function(require, exports, module) {
            setBatchBtn();
         });
 
-        // 整行点击
+        // 点击
         $('#term_list tr').each(function(i,e){
+
+          // 点击整行
           $(e).click(function(){
             var input = $(e).find('input[type="checkbox"]');
             var check = !input.parent().hasClass('checked');
             input.iCheck((check?'check':'uncheck'));
+          })
+
+          // 编辑
+
+          // 截屏
+          $(this).find('a:nth(1)').click(function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            _snapTermID = Number($(this).parent().parent().attr("tid"));
+            var data = {
+              "project_name": CONFIG.projectName,
+              "action": "termSnapshot",
+              "ID": _snapTermID,
+              "uploadURL": CONFIG.Resource_UploadURL
+            }
+            UTIL.ajax(
+              'POST', 
+              CONFIG.serverRoot + '/backend_mgt/v2/term', 
+              JSON.stringify(data), 
+              function(data){
+                if(data.rescode !== '200'){
+                  alert('截屏失败，请重试');
+                }else{
+                  var snap = require('pages/terminal/snap.js');
+                  snap.termID = _snapTermID;
+                  UTIL.cover.load('resources/pages/terminal/snap.html');
+                }
+              }
+            )
           })
         })
 

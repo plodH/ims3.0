@@ -4,6 +4,18 @@ define(function(require, exports, module) {
 		ajax(type, url, data, successFn);
 	};
 
+	exports.cover = {
+		'load': function(url){
+			$('#cover_area').load(url);
+			$('#cover_area').css('display','flex');
+		},
+		'close': function(){
+			$('#cover_area').empty();
+			$('#cover_area').css('display','none');
+		}
+	}
+
+
 	exports.getHashParameters = function () {
 		var queryString = window.location.hash.match(/\?(.*)/);
 		if (queryString === null) {
