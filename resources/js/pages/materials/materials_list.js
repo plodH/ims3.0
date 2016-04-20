@@ -218,9 +218,9 @@ define(function (require, exports, module) {
         //拼接
         if (json.Materials != undefined) {
         	//var mtrkw = json.Pager.keyword;
-        	//if (mtrkw == ""){
-        	//	$("#mtr_count").html("总数："+json.Pager.total);
-        	//}
+            //if (mtrkw == ""){
+            //	$("#mtr_count").html("总数："+json.Pager.total);
+            //}
             var mtrData = json.Materials;
             $("#mtrTable tbody").append('<tr>'+
                                     '<th class="mtr_checkbox"></th>'+
