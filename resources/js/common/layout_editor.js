@@ -280,7 +280,7 @@ define(function (require, exports, module) {
      * }
      * @constructor
      */
-    function LayoutEditor(obj, viewWidth, viewHeight) {
+    function LayoutEditor(obj, viewWidth, viewHeight, editable) {
 
         this.mTopRuler          = document.createElement('div');
         this.mLeftRuler         = document.createElement('div');
@@ -333,11 +333,11 @@ define(function (require, exports, module) {
         this.mCanvasContainer.style.overflow = 'auto';
         this.mCanvas.style.position = 'absolute';
 
-        this.registerEventListeners();
+        this.registerEventListeners(editable);
 
     }
 
-    LayoutEditor.prototype.registerEventListeners = function () {
+    LayoutEditor.prototype.registerEventListeners = function (editable) {
 
         var dragArea, dragWidget, referencePoint, isDragging = false, self = this;
 
@@ -352,7 +352,6 @@ define(function (require, exports, module) {
                     onDragWidget(dragWidget, dragArea, referencePoint, currentPoint);
                 }
                 this.style.cursor = mapArea2Cursor(result.area);
-                this.lastChild.title = (result.widget && result.widget.mTypeName) || '';
                 return false;
             });
             $(this).one('mouseleave', function (evt) {
@@ -368,22 +367,29 @@ define(function (require, exports, module) {
                 offsetX = ev.pageX - offset.left,
                 offsetY = ev.pageY - offset.top,
                 result = self.mLayout.determineWidgetByOffset(offsetX, offsetY);
-            dragArea = result.area;
-            if (result.area === WIDGET_AREA.CONTENT) {
-                referencePoint = {x: offsetX, y: offsetY};
-                dragWidget = result.widget;
-                dragWidget.requestFocus();
-                isDragging = true;
-            } else if (result.area !== WIDGET_AREA.NONE) {
-                dragWidget = result.widget;
-                referencePoint = getReferencePoint(dragWidget, result.area);
-                dragWidget.requestFocus();
-                isDragging = true;
+            if (editable) {
+                dragArea = result.area;
+                if (result.area === WIDGET_AREA.CONTENT) {
+                    referencePoint = {x: offsetX, y: offsetY};
+                    dragWidget = result.widget;
+                    dragWidget.requestFocus();
+                    isDragging = true;
+                } else if (result.area !== WIDGET_AREA.NONE) {
+                    dragWidget = result.widget;
+                    referencePoint = getReferencePoint(dragWidget, result.area);
+                    dragWidget.requestFocus();
+                    isDragging = true;
+                }
+                $(this).one('mouseup', function (evt) {
+                    isDragging = false;
+                    return false;
+                });
+            } else {
+                if (result.widget) {
+                    result.widget.requestFocus();
+                }
             }
-            $(this).one('mouseup', function (evt) {
-                isDragging = false;
-                return false;
-            });
+
             return false;
         });
 
@@ -552,7 +558,8 @@ define(function (require, exports, module) {
                 height: el.mHeight,
                 id: el.mId,
                 type: el.mType,
-                typeName: el.mTypeName
+                typeName: el.mTypeName,
+                widget: el
             });
         });
         return {
@@ -571,7 +578,8 @@ define(function (require, exports, module) {
                 type: this.mBackgroundImage.type
             },
             backgroundColor: this.mBackgroundColor,
-            widgets: widgets
+            widgets: widgets,
+            layout: this
         };
     };
 
@@ -819,7 +827,7 @@ define(function (require, exports, module) {
      * 重新绘制的回调函数
      */
     Layout.prototype.onResize = function () {
-        this.mContext.onResize();
+        this.mContext.resize(this.mContext.mWindowWidth + RULER_WIDTH, this.mContext.mWindowHeight + RULER_WIDTH);
     };
 
     /**
@@ -934,6 +942,12 @@ define(function (require, exports, module) {
         this.mLayout    = layout;
         this.mContext   = layout.mContext;
         this.mElement   = document.createElement('div');
+        this.mBackgroundColor = layout.nextColor();
+        this.mElement.style.textAlign       = 'center';
+        this.mElement.style.position        = 'absolute';
+        this.mElement.style.verticalAlign   = 'middle';
+        this.mElement.style.color           = '#ffffff';
+        this.mElement.innerText             = obj.typeName;
     }
 
     /**
@@ -1001,6 +1015,9 @@ define(function (require, exports, module) {
      * 当widget大小，位置改变的回调函数
      */
     Widget.prototype.onResize = function () {
+        if (this === this.mLayout.mFocusedWidget) {
+            this.requestFocus();
+        }
         this.onDraw();
     };
 
@@ -1008,14 +1025,13 @@ define(function (require, exports, module) {
      * 绘制widget
      */
     Widget.prototype.onDraw = function () {
-        if (!this.mElement.style.backgroundColor) {
-            this.mElement.style.backgroundColor = this.mLayout.nextColor();
-        }
-        this.mElement.style.position        = 'absolute';
+        this.mElement.style.backgroundColor = this.mBackgroundColor;
         this.mElement.style.top             = this.mTop    * this.mContext.getZoomFactor() + 'px';
         this.mElement.style.left            = this.mLeft   * this.mContext.getZoomFactor() + 'px';
         this.mElement.style.width           = this.mWidth  * this.mContext.getZoomFactor() + 'px';
-        this.mElement.style.height          = this.mHeight * this.mContext.getZoomFactor() + 'px';
+        this.mElement.style.lineHeight =
+            this.mElement.style.height =
+                this.mHeight * this.mContext.getZoomFactor() + 'px';
     };
 
     /**
@@ -1163,8 +1179,8 @@ define(function (require, exports, module) {
 
     Widget.prototype.notifyDragEvent = function () {
         //if (this === this.mLayout.mFocusedWidget) {
-        this.requestFocus();
-        this.mContext.notifyFocusChanged();
+        //this.requestFocus();
+        //this.mContext.notifyFocusChanged();
         //}
     };
 

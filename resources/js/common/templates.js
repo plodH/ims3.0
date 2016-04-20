@@ -1,4 +1,18 @@
-define(function(require, exports, module){exports['channel_table_row']=function(obj){
+define(function(require, exports, module){exports['channel_edit_main']=function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='<div id="channel-editor-wrapper"> <div class="channel-editor-nav"> <button class="btn-channel-editor-close">返回</button> <button class="btn-channel-editor-save">保存</button> <button class="btn-channel-editor-publish">保存并发布</button> </div> <div class="channel-program-list"> <div class="channel-program-list-timed"> <div> <h3>定时节目</h3> <button class="btn-program-delete">删除</button> <button class="btn-program-new">新建</button> </div> <ul></ul> </div> <div class="channel-program-list-regular"> <div> <h3>常规节目</h3> <select> <option value="1">顺序</option> <option value="2">随机</option> <option value="3">比例</option> </select> <button class="btn-program-delete">删除</button> <button class="btn-program-new">新建</button> </div> <ul></ul> </div> </div> <div class="channel-program-editor"> </div> </div>';
+}
+return __p;
+};
+exports['channel_edit_program']=function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='<div class="channel-program-nav"> </div>';
+}
+return __p;
+};
+exports['channel_table_row']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<tr data-channel-id="'+
@@ -42,18 +56,26 @@ return __p;
 exports['layout_edit_widgets']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='';
- if (widgets.length == 0) 
-__p+=' <ul class="no-widget"> 没有控件! ';
- else { 
-__p+=' <ul></ul> ';
- } 
+__p+='<ul> ';
+ for (var i = widgets.length - 1; i >= 0; i--) { var el = widgets[i]; 
 __p+=' ';
- widgets.forEach(function(el, idx, arr) { 
-__p+=' <li> <div>'+
+ if (el.focused) { 
+__p+=' <li style="background-color: '+
+((__t=(el.background_color))==null?'':__t)+
+'" data-widget-index="'+
+((__t=(i))==null?'':__t)+
+'" class="focused"> ';
+ } else { 
+__p+=' </li><li style="background-color: '+
+((__t=(el.background_color))==null?'':__t)+
+'" data-widget-index="'+
+((__t=(i))==null?'':__t)+
+'"> ';
+ } 
+__p+=' <div>'+
 ((__t=(el.name))==null?'':__t)+
 '</div> </li> ';
- });  
+ }  
 __p+=' </ul>';
 }
 return __p;

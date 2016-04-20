@@ -18,7 +18,7 @@ define(function(require, exports, module) {
         projectName = config.projectName,
         layoutId    = -1,
         editor      = null,
-        oldWidgetIds = [];
+        savedWidgetIds = [];
 
     /**
      * 页面初始化
@@ -72,7 +72,7 @@ define(function(require, exports, module) {
                 typeName: el.Type_Name
             });
             if (el.ID !== -1) {
-                oldWidgetIds.push(el.ID);
+                savedWidgetIds.push(el.ID);
             }
         });
         var data = {
@@ -120,21 +120,11 @@ define(function(require, exports, module) {
         $('#layout-editor-wrapper .layout-editor-properties')
             .html(templates.layout_edit_property(properties));
 
-        /*************** widget list *****************/
-        var widgets = [];
-        data.widgets.forEach(function (el) {
-            widgets.push({
-                name: el.name
-            });
-        });
-        $('#layout-editor-wrapper .layout-editor-widgets')
-            .html(templates.layout_edit_widgets({widgets: widgets}));
-
         /*************** editor *******************/
         var canvas = $('#layout-editor-wrapper .layout-editor-canvas'),
             canvasHeight = canvas.height(),
             canvasWidth = canvas.width();
-        editor = new layoutEditor.LayoutEditor(data, canvasWidth, canvasHeight);
+        editor = new layoutEditor.LayoutEditor(data, canvasWidth, canvasHeight, true);
         editor.attachToDOM(canvas[0]);
 
         /**************** widget properties *********************/
@@ -150,9 +140,6 @@ define(function(require, exports, module) {
         };
         $('#layout-editor-wrapper .layout-editor-widget-properties')
             .html(templates.layout_edit_widget_property(widgetProperty));
-        if (!widget) {
-            $('#layout-editor-wrapper .layout-editor-widget-properties').addClass('none');
-        }
 
     }
 
@@ -181,6 +168,10 @@ define(function(require, exports, module) {
             location.hash = '#layout/list';
         });
         $('#layout-editor-wrapper .btn-layout-editor-save').click(onSaveLayout);
+        $('#layout-editor-wrapper .layout-editor-widgets').delegate('li', 'click', function (ev) {
+            var index = Number(this.getAttribute('data-widget-index'));
+            editor.mLayout.mWidgets[index].requestFocus();
+        });
 
     }
 
@@ -188,11 +179,46 @@ define(function(require, exports, module) {
      * 保存布局数据
      */
     function onSaveLayout() {
-        /********** 保存布局数据 ***********/
-        /********** 新增布局数据 **************/
-        var json = editor.getLayout().toJSON(), data;
-        data = {
-            project_name: config.projectName,
+
+        var json = editor.getLayout().toJSON();
+
+        httpCheckLayoutExists(json, function (err) {
+            if (err) { console.error(err); return; }
+            console.log('布局添加成功!');
+            httpUpdateLayout(json, function (err) {
+                if (err) { console.error(err); return; }
+                console.log('布局更新成功');
+                httpDeleteWidgets(json, function (err) {
+                    if (err) { console.error(err); return; }
+                    console.log('布局删除成功!');
+                    httpAddWidgets(json, function (err) {
+                        if (err) { console.error(err); return; }
+                        console.log('控件添加成功!');
+                        httpUpdateWidgets(json, function (err) {
+                            if (err) { console.error(err); return; }
+                            console.log('控件更新成功!');
+                            alert('保存成功!');
+                        });
+                    });
+                });
+            });
+        });
+
+    }
+
+    /**
+     * 检查layout是否存在，不存在则添加
+     * @param json
+     * @param cb
+     */
+    function httpCheckLayoutExists(json, cb) {
+        if (json.id !== -1) {
+            cb();
+            return;
+        }
+        var data = JSON.stringify({
+            project_name: projectName,
+            action: 'add',
             data: {
                 layout_id: String(json.id),
                 Name: json.name,
@@ -206,143 +232,195 @@ define(function(require, exports, module) {
                 LeftMargin: String(json.leftMargin),
                 BottomMargin: String(json.bottomMargin)
             }
-        };
-        data.action = data.id !== -1 ? 'update' : 'add';
-        util.ajax('post', requestUrl + '/backend_mgt/v1/layout', JSON.stringify(data), function (res) {
-            console.log(res);
-            /************** 新建控件时返回id ******************/
-            if (res.ID) {
-                json.id = res.ID;
-            }
-            /************* 删除控件*****************/
-            var removed = [];
-            oldWidgetIds.forEach(function (id) {
-                var contain = false;
-                json.widgets.forEach(function (el) {
-                    if (el.id === id) {
-                        contain = true;
-                    }
-                });
-                if (!contain) {
-                    removed.push(id);
-                }
-            });
-            oldWidgetIds = [];
-            json.widgets.forEach(function (el) {
-                oldWidgetIds.push(el.id);
-            });
-            var successCount = 0;
-            removed.forEach(function (el) {
-                util.ajax('post', requestUrl + '/backend_mgt/v1/layout', JSON.stringify({project_name: projectName, action: 'deleteLCB', data: {layout_controlbox_id: String(el)}}), function (res) {
-                    console.log(res);
-                    successCount++;
-                    if (successCount === removed.length) {
-                        update();
-                    }
-                });
-            });
-            if (removed.length === 0) {
-                update();
-            }
-            
-            function update() {
-                /************* 新增控件 ****************/
-                var newWidgets = [],
-                    oldWidgets = [],
-                    zIndex = 0,
-                    newWidgetsCount;
-                json.widgets.forEach(function (el) {
-                    if (el.id === -1) {
-                        newWidgets.push({
-                            Left: String(el.left),
-                            Width: String(el.width),
-                            Top: String(el.top),
-                            Height: String(el.height),
-                            layout_id: String(json.id),
-                            layout_controlbox_id: String(el.id),
-                            Type: String(el.type),
-                            Zorder: String(zIndex)
-                        });
-                    } else {
-                        oldWidgets.push({
-                            Left: el.left,
-                            Width: el.width,
-                            Top: el.top,
-                            Height: el.height,
-                            layout_id: String(json.id),
-                            layout_controlbox_id: String(el.id),
-                            Type: String(el.type),
-                            Zorder: String(zIndex)
-                        });
-                    }
-                    zIndex++;
-                });
-                newWidgetsCount = newWidgets.length;
-                if (newWidgetsCount === 0) {
-                    var data = {
-                        project_name: config.projectName,
-                        action: 'updateCBLList',
-                        data: {
-                            layout_id: String(json.id),
-                            Name: json.name,
-                            Name_eng: json.nameEng,
-                            Width: String(json.width),
-                            Height: String(json.height),
-                            BackgroundPic: String(json.backgroundImage.id),
-                            BackgroundColor: json.backgroundColor,
-                            TopMargin: json.topMargin,
-                            LeftMargin: json.leftMargin,
-                            RightMargin: json.rightMargin,
-                            BottomMargin: json.bottomMargin,
-                            Layout_ControlBoxs: oldWidgets
-                        }
-                    };
-                    util.ajax('post', requestUrl + '/backend_mgt/v1/layout', JSON.stringify(data), function (res) {
-                        alert('保存成功');
-                        console.log(res);
-                    });
-                } else {
-                    newWidgets.forEach(function (el) {
-                        var data = {
-                            project_name: config.projectName,
-                            action: 'addLCB',
-                            data: el
-                        };
-                        util.ajax('post', requestUrl + '/backend_mgt/v1/layout', JSON.stringify(data), function (res) {
-                            console.log(res);
-                            newWidgetsCount--;
-                            if (newWidgetsCount === 0) {
-                                var data = {
-                                    project_name: config.projectName,
-                                    action: 'updateCBLList',
-                                    data: {
-                                        layout_id: String(json.id),
-                                        Name: json.name,
-                                        Name_eng: json.nameEng,
-                                        Width: String(json.width),
-                                        Height: String(json.height),
-                                        BackgroundPic: String(json.backgroundImage.id),
-                                        BackgroundColor: json.backgroundColor,
-                                        TopMargin: json.topMargin,
-                                        LeftMargin: json.leftMargin,
-                                        RightMargin: json.rightMargin,
-                                        BottomMargin: json.bottomMargin,
-                                        Layout_ControlBoxs: oldWidgets
-                                    }
-                                };
-                                util.ajax('post', requestUrl + '/backend_mgt/v1/layout', JSON.stringify(data), function (res) {
-                                    alert('保存成功');
-                                    console.log(res);
-                                });
-                            }
-                        });
-                    });
-                }
-            }
-            
-
         });
+        util.ajax('post', requestUrl + '/backend_mgt/v1/layout', data, function (res) {
+            if (Number(res.rescode) !== 200) {
+                cb(res);
+                return;
+            }
+            json.id = json.layout.mId = res.ID;
+            cb();
+        });
+    }
 
+    /**
+     * 更新layout信息
+     * @param json
+     * @param cb
+     */
+    function httpUpdateLayout(json, cb) {
+        var data = JSON.stringify({
+            project_name: projectName,
+            action: 'update',
+            data: {
+                layout_id: String(json.id),
+                Name: json.name,
+                Name_eng: json.nameEng,
+                Width: String(json.width),
+                Height: String(json.height),
+                BackgroundPic: String(json.backgroundImage.id === -1 ? 0: json.backgroundImage.id),
+                BackgroundColor: json.backgroundColor,
+                TopMargin: String(json.topMargin),
+                RightMargin: String(json.rightMargin),
+                LeftMargin: String(json.leftMargin),
+                BottomMargin: String(json.bottomMargin)
+            }
+        });
+        util.ajax('post', requestUrl + '/backend_mgt/v1/layout', data, function (res) {
+            if (Number(res.rescode) !== 200) {
+                cb(res);
+                return;
+            }
+            cb();
+        });
+    }
+
+    /**
+     * 删除widget
+     * @param json
+     * @param cb
+     */
+    function httpDeleteWidgets(json, cb) {
+        var widgetsNeedDelete = [];
+        savedWidgetIds.forEach(function (id) {
+            var contain = false;
+            json.widgets.forEach(function (el) {
+                if (el.id === id) {
+                    contain = true;
+                }
+            });
+            if (!contain) {
+                widgetsNeedDelete.push(id);
+            }
+        });
+        savedWidgetIds = [];
+        json.widgets.forEach(function (el) {
+            savedWidgetIds.push(el.id);
+        });
+        if (widgetsNeedDelete.length === 0) {
+            cb();
+        }
+        var successCount = 0, failed = false;
+        widgetsNeedDelete.forEach(function (el) {
+            var data = JSON.stringify({
+                project_name: projectName,
+                action: 'deleteLCB',
+                data: {
+                    layout_controlbox_id: String(el)
+                }
+            });
+            util.ajax('post', requestUrl + '/backend_mgt/v1/layout', data, function (res) {
+                if (!failed && Number(res.rescode) !== 200) {
+                    cb(res);
+                    failed = true;
+                    return;
+                }
+                successCount++;
+                if (successCount === widgetsNeedDelete.length) {
+                    cb();
+                }
+            });
+        });
+    }
+
+    /**
+     * 添加widget
+     * @param json
+     * @param cb
+     */
+    function httpAddWidgets(json, cb) {
+        var widgetsNeedAdd = [], zIndexes = [];
+        var zIndex = 0;
+        json.widgets.forEach(function (el) {
+            if (el.id === -1) {
+                widgetsNeedAdd.push(el);
+                zIndexes.push(zIndex);
+            }
+            zIndex++;
+        });
+        if (widgetsNeedAdd.length === 0) {
+            cb();
+            return;
+        }
+        var successCount = 0, failed = false;
+        widgetsNeedAdd.forEach(function (el, idx) {
+            var data = JSON.stringify({
+                project_name: projectName,
+                action: 'addLCB',
+                data: {
+                    Left: String(el.left),
+                    Width: String(el.width),
+                    Top: String(el.top),
+                    Height: String(el.height),
+                    layout_id: String(json.id),
+                    layout_controlbox_id: String(el.id),
+                    Type: String(el.type),
+                    Zorder: String(zIndexes[idx])
+                }
+            });
+            util.ajax('post', requestUrl + '/backend_mgt/v1/layout', data, function (res) {
+                if (!failed && Number(res.rescode) !== 200) {
+                    cb(res);
+                    failed = true;
+                    return;
+                }
+                successCount++;
+                el.id = el.widget.mId = res.ID;
+                if (successCount === widgetsNeedAdd.length) {
+                    cb();
+                }
+            });
+        });
+    }
+
+    /**
+     * 批量更新
+     * @param json
+     * @param cb
+     */
+    function httpUpdateWidgets(json, cb) {
+        var widgetsNeedUpdate = [];
+        var zIndex = 0;
+        json.widgets.forEach(function (el) {
+            if (el.id !== -1) {
+                widgetsNeedUpdate.push({
+                    Left: el.left,
+                    Width: el.width,
+                    Top: el.top,
+                    Height: el.height,
+                    layout_id: String(json.id),
+                    layout_controlbox_id: String(el.id),
+                    Type: String(el.type),
+                    Zorder: String(zIndex)
+                });
+            }
+            zIndex++;
+        });
+        var data = JSON.stringify({
+            project_name: config.projectName,
+            action: 'updateCBLList',
+            data: {
+                layout_id: String(json.id),
+                Name: json.name,
+                Name_eng: json.nameEng,
+                Width: String(json.width),
+                Height: String(json.height),
+                BackgroundPic: String(json.backgroundImage.id),
+                BackgroundColor: json.backgroundColor,
+                TopMargin: json.topMargin,
+                LeftMargin: json.leftMargin,
+                RightMargin: json.rightMargin,
+                BottomMargin: json.bottomMargin,
+                Layout_ControlBoxs: widgetsNeedUpdate
+            }
+        });
+        util.ajax('post', requestUrl + '/backend_mgt/v1/layout', data, function (res) {
+            if (Number(res.rescode) !== 200) {
+                cb(res);
+                return;
+            }
+            cb();
+        });
     }
 
     /**
@@ -356,7 +434,9 @@ define(function(require, exports, module) {
                 videoOrAudioWidgetExists = true;
             }
             widgets.push({
-                name: el.mTypeName
+                name: el.mTypeName,
+                background_color: el.mBackgroundColor,
+                focused: el === editor.mLayout.mFocusedWidget
             });
         });
         $('#layout-editor-wrapper .btn-add-widget[data-widget-id="video"]').prop('disabled', videoOrAudioWidgetExists);
@@ -371,6 +451,7 @@ define(function(require, exports, module) {
     function onFocusedWidgetChanged() {
         var widgetProperties = $('#layout-editor-wrapper .layout-editor-widget-properties input'),
             focusedWidget = editor.getLayout().getFocusedWidget();
+        //$('#layout-editor-wrapper .layout-editor-widget-properties').toggleClass('none', !focusedWidget);
         widgetProperties[0].value = focusedWidget ? focusedWidget.mTypeName : '';
         widgetProperties[1].value = focusedWidget ? focusedWidget.mTop: 0;
         widgetProperties[2].value = focusedWidget ? focusedWidget.mLeft : 0;
