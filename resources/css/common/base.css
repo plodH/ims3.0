@@ -48,6 +48,17 @@ a {
     width: 1920px;
 }
 
+/*全屏弹窗*/
+#cover_area {
+    z-index: 2008;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    top: 0px;
+}
+
 /*资源列表页面*/
 #dpUpl {
 	color: #000;
@@ -69,10 +80,10 @@ a {
     top: 0px;
 }
 
-#upload_box {
+#upload_box, #mtrEdit_box, #mtrUplLive_box{
 	width: 600px;
-    margin: 10% auto;
-    height: 560px;
+    margin: auto;
+    max-height: 560px;
 }
 
 #box_fileList{
