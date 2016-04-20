@@ -1,6 +1,11 @@
 /*font-color*/
 .gray-light{color: #999;}
 .pointer{cursor: pointer;}
+
+a {
+    cursor: pointer;
+}
+
 /*login页面*/
 #error_m {
     display: block;
@@ -35,63 +40,33 @@
 }
 
 #l_version {
+    text-align: center;
     bottom: 20px;
     position: absolute;
-    width: 100px;
     left: 50%;
-    margin-left: -40px;
+    margin-left: -960px;
+    width: 1920px;
+}
+
+/*全屏弹窗*/
+#cover_area {
+    z-index: 2008;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    top: 0px;
 }
 
 /*资源列表页面*/
+#dpUpl {
+	color: #000;
+    display: none;
+}
+
 #mtr_title {
     padding: 0px 10px;
-}
-
-#mtrT_name {
-    margin-left: 15px;
-}
-
-.mtrList {
-    padding: 0px 10px;
-}
-
-.materils li {
-    list-style-type: none;
-}
-
-.materils span {
-    display: inline-flex;
-    height: 36px;
-    line-height: 36px;
-}
-
-.mtr_cb{
-    width: 15px;
-    height: 15px;
-}
-
-.mtr_name {
-    width: 30%;
-    text-align: left;
-    padding-left: 10px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-
-}
-
-.mtr_size {
-    width: 10%;
-    text-align: center;
-}
-
-.mtr_time {
-    width: 10%;
-    text-align: center;
-}
-
-.mtr_uploadDate {
-    width: 15%;
-    text-align: center;
 }
 
 /*资源上传页面*/
@@ -102,11 +77,13 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     display: none;
+    top: 0px;
 }
 
-#upload_box {
+#upload_box, #mtrEdit_box, #mtrUplLive_box{
 	width: 600px;
-    margin: 10%auto;
+    margin: auto;
+    max-height: 560px;
 }
 
 #box_fileList{
@@ -114,7 +91,7 @@
     max-height: 450px;
 }
 #file {
-    /*display: none;*/
+    display: none;
 }
 /*layout edit*/
 .full-screen {

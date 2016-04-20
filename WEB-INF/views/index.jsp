@@ -21,6 +21,7 @@
        folder instead of downloading all of them to reduce the load. -->
   <link rel="stylesheet" href="resources/dist/css/skins/_all-skins.min.css">
   <link rel="stylesheet" href="resources/css/common/base.css">
+  <link rel="stylesheet" href="resources/plugins/iCheck/all.css"/>
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -35,7 +36,7 @@
 
   <header class="main-header">
     <!-- Logo -->
-    <a href="index2.html" class="logo">
+    <a class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini"><b>IMS</b></span>
       <!-- logo for regular state and mobile devices -->
@@ -53,6 +54,7 @@
 
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
+          <li><a id="dpUpl" class="glyphicon glyphicon-cloud"></a></li>
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -65,14 +67,14 @@
                 <img src="resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
 
                 <p>
-                	<sec:authentication property="name"/>
-                	<small>${project_name_cn}</small>
+                  <sec:authentication property="name"/>
+                  <small>Member since Nov. 2012</small>
                 </p>
               </li>
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-right">
-                  <a id="logout" class="btn btn-default btn-flat">退出</a>
+                  <a id="logout" class="btn btn-default btn-flat">登出</a>
                 </div>
               </li>
             </ul>
@@ -84,6 +86,9 @@
 
   <!-- 资源上传弹层区域 -->
   <section id="page_upload"></section>
+
+  <!-- 全屏弹层区域 -->
+  <section id="cover_area"></section>
 
   <!-- =============================================== -->
 
@@ -97,7 +102,7 @@
           <img src="resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
         </div>
         <div class="pull-left info">
-          <p><sec:authentication property="name"/></p>
+          <p id="username"><sec:authentication property="name"/></p>
           <h6 class="gray-light">${project_name_cn}</h6>
         </div>
       </div>
@@ -194,6 +199,8 @@
 <script src="resources/dist/js/app.min.js"></script>
 <!-- Sea.js 3.0.0 -->
 <script src="resources/js/common/sea.js"></script>
+<script src="resources/plugins/iCheck/icheck.min.js"></script>
+<script src="resources/plugins/jqPaginator/jqPaginator.min.js"></script>
 <script>
 	seajs.config({
 	  base: "./resources/js/"

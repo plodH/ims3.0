@@ -4,14 +4,201 @@ define(function(require, exports, module) {
   var CONFIG = require("common/config.js");
   var UTIL = require("common/util.js");
   var _timerLoadTermList;
-  var _pagesize = 15;
+  var _pagesize = CONFIG.pager.pageSize;
   var _pageNO = 1;
+  var _checkList = [];
 
 	exports.init = function(){
     initTree();
+    initEvent();
 	}
 
-  function loadTermList(){
+  function setBatchBtn(){
+    if(_checkList.length === 0){
+      $('#term_batch_move').addClass('disabled');
+      $('#term_batch_delete').addClass('disabled');
+      $('#term_batch_start').addClass('disabled');
+      $('#term_batch_stop').addClass('disabled');
+    }
+    else{
+      $('#term_batch_move').removeClass('disabled');
+      $('#term_batch_delete').removeClass('disabled');
+
+      if(_checkList.hasOffline){
+        $('#term_batch_start').addClass('disabled');
+        $('#term_batch_stop').addClass('disabled');
+      }else{
+        $('#term_batch_start').removeClass('disabled');
+        $('#term_batch_stop').removeClass('disabled');
+      }
+    }
+  }
+
+  function initEvent(){
+
+    // serach
+    $('#term_search').click(function(){
+      loadTermList(_pageNO);
+    })
+    .change(function(){
+      loadTermList(_pageNO);
+    })
+
+    // 筛选终端
+    $('#term-status button').each(function(i,e){
+      $(this).click(function(){
+        $(this).siblings().removeClass('btn-primary');
+        $(this).siblings().addClass('btn-defalut');
+
+        var isFocus = $(this).hasClass('btn-primary');
+        $(this).removeClass(isFocus?'btn-primary':'btn-defalut');
+        $(this).addClass(isFocus?'btn-defalut':'btn-primary');
+        loadTermList(_pageNO);
+      })
+    })
+
+    // 全选，不全选
+    $('#term-list-select-all').click(function(){
+      var check = $('#term-list-select-all>i').hasClass('fa-square-o');
+      $('#term-list-select-all>i').toggleClass('fa-square-o', !check);
+      $('#term-list-select-all>i').toggleClass('fa-check-square-o', check);
+      $('#term_list tr input[type="checkbox"]').iCheck((check?'check':'uncheck'));
+    })
+    setBatchBtn();
+
+    // 批量删除
+    $('#term_batch_delete').click(function(){
+
+      if($(this).hasClass('disabled')){
+        return;
+      }
+
+      if(confirm('确定删除所选终端？')){
+        var data = {
+        "project_name": CONFIG.projectName,
+        "action": "deleteTerms",
+        "termList":_checkList
+        }
+
+        UTIL.ajax(
+          'POST',
+          CONFIG.serverRoot + '/backend_mgt/v2/term', 
+          JSON.stringify(data),
+          function(data){
+            if(data.rescode === '200'){
+              loadTermList();
+            }else{
+              alert('删除终端失败'+data.errInfo);
+            }
+          }
+        )
+      }
+
+    })
+
+    // 批量唤醒
+    $('#term_batch_start').click(function(){
+      
+      if($(this).hasClass('disabled')){
+        return;
+      }
+
+      if(confirm('确定唤醒所选终端？')){
+        var data = {
+        "project_name": CONFIG.projectName,
+        "action": "termPowerOnMulti",
+        "termList":_checkList
+        }
+
+        UTIL.ajax(
+          'POST',
+          CONFIG.serverRoot + '/backend_mgt/v2/term', 
+          JSON.stringify(data),
+          function(data){
+            if(data.rescode === '200'){
+              loadTermList();
+            }else{
+              alert('唤醒终端失败'+data.errInfo);
+            }
+          }
+        )
+      }
+
+    })
+
+    // 批量休眠
+    $('#term_batch_stop').click(function(){
+
+      if($(this).hasClass('disabled')){
+        return;
+      }
+
+      if(confirm('确定休眠所选终端？')){
+        var data = {
+        "project_name": CONFIG.projectName,
+        "action": "termPowerOffMulti",
+        "termList":_checkList
+        }
+
+        UTIL.ajax(
+          'POST',
+          CONFIG.serverRoot + '/backend_mgt/v2/term', 
+          JSON.stringify(data),
+          function(data){
+            if(data.rescode === '200'){
+              loadTermList();
+            }else{
+              alert('休眠终端失败'+data.errInfo);
+            }
+          }
+        )
+      }
+
+    })
+
+    // 批量移动
+
+  }
+
+  _checkList.add = function(id, online){
+    _checkList.push({'termID': id, 'online': online});
+  }
+
+  _checkList.delete = function(id){
+    for(var i = 0; i < _checkList.length; i++){
+      if(_checkList[i].termID === id){
+        _checkList.splice(i,1);
+        return;
+      }
+    }
+  }
+
+  _checkList.hasOffline = function(){
+    var boolean = false;
+    for(var i = 0; i < _checkList.length; i++){
+      if(_checkList[i].online === '0'){
+        boolean = true;
+        break;
+      }
+    }
+    return boolean;
+  }
+
+  function onCheckBoxChange(){
+    
+    // 设置是否全选
+    var ifSelAll = ($('#term_list tr').length === _checkList.length);
+    $('#term-list-select-all>i').toggleClass('fa-square-o', !ifSelAll);
+    $('#term-list-select-all>i').toggleClass('fa-check-square-o', ifSelAll);
+  }
+
+  function loadTermList(pageNum){
+
+    if(pageNum !== undefined){
+      _pageNO = pageNum;
+    }else{
+      _pageNO = 1;
+    }
     
     if(_timerLoadTermList){
       clearInterval(_timerLoadTermList);
@@ -34,6 +221,10 @@ define(function(require, exports, module) {
     }
 
     var termClassId = $('#termclass-tree').find('.focus').attr('node-id');
+    var status = '';
+    if($('#term-status button.btn-primary').length > 0){
+      status = $('#term-status button.btn-primary').attr('value');
+    }
 
     var data = {
       "project_name": CONFIG.projectName,
@@ -44,8 +235,9 @@ define(function(require, exports, module) {
         "per_page": _pagesize,
         "page": _pageNO,
         "orderby": "",
-        "sortby": "desc",
-        "keyword": searchKeyword
+        "sortby": "",
+        "keyword": searchKeyword,
+        "status": status
       }
     }
 
@@ -66,17 +258,22 @@ define(function(require, exports, module) {
           console.error("$('#term-table-pager').jqPaginator 未创建");
         }
         
-        var totalPages = Math.ceil(data.totalStatistic.totalTermNum / _pagesize);
-        totalPages = Math.max(totalPages, 1);
+        var totalCounts = Math.max(data.totalStatistic.totalTermNum, 1);
 
         $('#term-table-pager').jqPaginator({
-          totalPages: totalPages,
-          visiblePages: 10,
+          totalCounts: totalCounts,
+          pageSize: _pagesize,
+          visiblePages: CONFIG.pager.visiblePages,
+          first: CONFIG.pager.first,
+          prev: CONFIG.pager.prev,
+          next: CONFIG.pager.next,
+          last: CONFIG.pager.last,
+          page: CONFIG.pager.page,
           currentPage: _pageNO,
           onPageChange: function (num, type) {
             _pageNO = num;
             if (type === 'change') {
-             loadTermList();
+             loadTermList(_pageNO);
             }
           }
         });
@@ -100,10 +297,12 @@ define(function(require, exports, module) {
           var preloadNum = preloadStatus.DownloadFiles +'/' + preloadStatus.AllFiles;
           preloadStatus = preloadStatus.DownloadFiles/preloadStatus.AllFiles*100;
 
+          var status = ((tl[i].Online === 0)?'离线':((tl[i].Status === 'Running')?'运行':'休眠'));
+
           $('#term_list').append('' +
-            '<tr tid='+ tl[i].ID +'>' +
+            '<tr tid="'+ tl[i].ID +'" online="' + tl[i].Online + '">' +
               '<td><input type="checkbox"></td>' +
-              '<td>'+ tl[i].Name +'<br />'+ tl[i].Description +'<br />'+ tl[i].Status +'</td>' +
+              '<td>'+ tl[i].Name +'<br />'+ tl[i].Description +'<br />'+ status +'</td>' +
               '<td>当前频道：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ChannelName) +'<br />当前节目：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ProgramName) +'<br />当前视频：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ProgramPlayInfo) +
               '</td>' +
               '<td>' +
@@ -125,13 +324,53 @@ define(function(require, exports, module) {
                 '</div>' +
               '</td>' +
               '<td>' +
-              'ip：192.123.22.12<br />' +
-              '版本信息' +
+              'ip：'+ tl[i].IP +'<br />' +
+              '版本：' + tl[i].TermVersion + 
               '</td>' +
               '<td><a class="pointer">编辑</a> <br/><a class="pointer">截屏</a></td>' +
             '</tr>'
           )
-        }  
+        }
+
+        // 复选
+        // 复选全选按钮初始化
+        var hasCheck = $('#term-list-select-all>i').hasClass('fa-check-square-o');
+        if(hasCheck){
+          $('#term-list-select-all>i').toggleClass('fa-square-o', true);
+          $('#term-list-select-all>i').toggleClass('fa-check-square-o', false);
+        }
+
+        // 清空已选list
+        _checkList.length = 0;
+
+        // 列表选择按钮添加icheck，单击
+        $('#term_list tr input[type="checkbox"]').iCheck({
+          checkboxClass: 'icheckbox_flat-blue',
+          radioClass: 'iradio_flat-blue'
+        })
+        .on('ifChecked', function(event){
+           _checkList.add($(this).parent().parent().parent().attr('tid'),$(this).parent().parent().parent().attr('online'));
+           onCheckBoxChange();
+           setBatchBtn();
+        })
+        .on('ifUnchecked', function(event){
+           _checkList.delete($(this).parent().parent().parent().attr('tid'));
+           onCheckBoxChange();
+           setBatchBtn();
+        });
+
+        // 整行点击
+        $('#term_list tr').each(function(i,e){
+          $(e).click(function(){
+            var input = $(e).find('input[type="checkbox"]');
+            var check = !input.parent().hasClass('checked');
+            input.iCheck((check?'check':'uncheck'));
+          })
+        })
+
+        // 设置批量按钮
+        setBatchBtn();
+
       }
     )
   }
@@ -169,7 +408,7 @@ define(function(require, exports, module) {
           $('#tct_add').click(function(){
             var li = $('#termclass-tree').find('.focus');
 
-            // 如果正在有添加中，不相应
+            // 如果正在有添加中，不响应
             if(li.children('a').find('div input').length > 0){
               return;
             }
