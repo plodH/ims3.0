@@ -11,10 +11,16 @@ define(function (require, exports, module) {
         }
 
     };
-
+    //上传弹层页面
     exports.upl = function(){
         $("#page_upload").load('resources/pages/materials/materials_upload.html');
         $("#page_upload").css("display","flex");
+    }
+    //全屏弹层页面
+    exports.coverArea = function(page){
+        //$("#cover_area").load('resources/pages/materials/materials_edit.html');
+        $("#cover_area").load(page);
+        $("#cover_area").css("display","flex");
     }
 
     function loadPage() {

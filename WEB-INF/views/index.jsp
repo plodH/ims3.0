@@ -54,7 +54,7 @@
 
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
-          <a id="dpUpl" class="glyphicon glyphicon-cloud"></a>
+          <li><a id="dpUpl" class="glyphicon glyphicon-cloud"></a></li>
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -86,6 +86,9 @@
 
   <!-- 资源上传弹层区域 -->
   <section id="page_upload"></section>
+
+  <!-- 全屏弹层区域 -->
+  <section id="cover_area"></section>
 
   <!-- =============================================== -->
 
