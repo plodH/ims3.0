@@ -46,7 +46,7 @@ define(function(require, exports, module) {
 
 	function ajax(type, url, data, successFn){
 
-		$.ajax({
+		var ajax = $.ajax({
 		  type: type,
 		  url: url,
 		  dataType: 'json',
@@ -58,6 +58,7 @@ define(function(require, exports, module) {
 		  error: function(XMLHttpRequest, textStatus, errorThrown){
 		  	// XMLHttpRequest.status
 		    alert('连接服务器出错 ' + textStatus + errorThrown);
+		    ajax.abort();
 		  }
 		})
 
