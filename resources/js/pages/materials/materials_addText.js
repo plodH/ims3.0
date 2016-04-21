@@ -7,17 +7,17 @@ define(function (require, exports, module) {
     exports.init = function () {
     	
         loadPage();
+        
+        //销毁
+        try{
+        	var editor = CKEDITOR.instances['editor1'];
+            if (editor) { editor.destroy(true); }
+        }catch(e){}
         CKEDITOR.replace('editor1');
         //关闭窗口
         $("#Tmtr_back").click(function () {
             back();
         });
-        
-        //清空按钮
-        $("#Tmtr_reset").click(function () {
-            $("#editor1").html("");
-        });
-        
     }
 
     function loadPage() {

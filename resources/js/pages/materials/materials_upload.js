@@ -70,7 +70,7 @@ define(function (require, exports, module) {
             var trLeng = $("#Tbe_filesList tr").length - 1;
             for (var x = trLeng, y = trLeng + 1, z = 0; x < $("#file")[0].files.length + trLeng; x++, y++, z++) {
                 var file = $("#file")[0].files[z];
-                var tr = '<tr id="upl_tr_' + x + '" status><td>' + y + '</td><td>' + file.name + '</td>' +
+                var tr = '<tr id="upl_tr_' + x + '" status><td>' + y + '</td><td id="upl_mtrName">' + file.name + '</td>' +
                     '<td><div class="progress progress-xs progress-striped active">' +
                     '<div id="progressbar_' + x + '" class="progress-bar progress-bar-primary" style="width: 0%"></div></div></td>' +
                     '<td id="upl_speed_' + x + '"></td>' +
