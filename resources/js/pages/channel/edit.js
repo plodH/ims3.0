@@ -104,7 +104,7 @@ define(function(require, exports, module) {
     }
 
     function onNewProgram(type) {
-        console.log(type);
+
     }
 
     function onProgramOrderChanged(value) {
@@ -144,8 +144,8 @@ define(function(require, exports, module) {
         };
     };
 
-    var g_RegularProgramIdQueue,
-        g_TimedProgramIdQueue,
+    var g_RegularSortable,
+        g_TimedSortable,
         g_ProgramList,
         g_CurrentProgramId;
 	function renderProgramList(json) {
@@ -158,16 +158,12 @@ define(function(require, exports, module) {
 		var regularPrograms = [],
 			timedPrograms = [],
 			selectedProgram = null;
-        g_RegularProgramIdQueue = [];
-        g_TimedProgramIdQueue = [];
         g_ProgramList = json.programs;
 		json.programs.forEach(function (el, idx, arr) {
 			if (el.scheduleType === 'Regular') {
 				regularPrograms.push(el);
-                g_RegularProgramIdQueue.push(el.id);
 			} else {
 				timedPrograms.push(el);
-                g_TimedProgramIdQueue.push(el.id);
 			}
 		});
 		if (regularPrograms.length > 0) {
@@ -193,11 +189,7 @@ define(function(require, exports, module) {
 			};
 			ul.append(templates.channel_edit_program_list_item(data));
 		});
-        var sortable = Sortable.create(ul[0], {
-            onEnd: function (ev) {
-                g_RegularProgramIdQueue = sortable.toArray().map(parseInt);
-            }
-        });
+        g_RegularSortable = Sortable.create(ul[0], {});
 	}
 	
 	function renderTimedProgramList(programs) {
@@ -210,11 +202,7 @@ define(function(require, exports, module) {
 			};
 			ul.append(templates.channel_edit_program_list_item(data));
 		});
-        var sortable = Sortable.create(ul[0], {
-            onEnd: function (ev) {
-                g_TimedProgramIdQueue = sortable.toArray().map(parseInt);
-            }
-        });
+		g_TimedSortable = Sortable.create(ul[0], {});
 	}
 
 	function loadProgram(program) {
