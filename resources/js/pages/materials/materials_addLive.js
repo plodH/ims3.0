@@ -113,8 +113,7 @@ define(function (require, exports, module) {
     		var url = CONFIG.serverRoot + '/backend_mgt/v1/materials';
             UTIL.ajax('post', url, data, function(msg){
                 if(msg.rescode == 200){
-                    var typeId = $("#mtrChoise li.active").attr("typeid");
-                    MTR.loadPage(1, Number(typeId));
+                    MTR.loadPage(1, 5);
                     close();
                     alert("添加成功");
                 }else{
