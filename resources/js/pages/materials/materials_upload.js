@@ -6,7 +6,22 @@ define(function (require, exports, module) {
     var _upl_list = new Array(); //记录上传xhr, status(success, uploading);
 
     exports.init = function () {
-        loadPage();
+        
+        
+        var DispClose = false;
+        $(window).bind('beforeunload',function(){ 
+            $("#Tbe_filesList tr").each(function(){
+            	if ($(this).attr("status") == "uploading") {
+            		DispClose = true;
+                }
+            })
+    	    if (DispClose)
+    	    {
+    	    	return "当前正在上传文件，是否离开当前页面?";
+    	    }
+    	})
+    	
+    	loadPage();
     }
 
     function loadPage() {
@@ -55,7 +70,7 @@ define(function (require, exports, module) {
             var trLeng = $("#Tbe_filesList tr").length - 1;
             for (var x = trLeng, y = trLeng + 1, z = 0; x < $("#file")[0].files.length + trLeng; x++, y++, z++) {
                 var file = $("#file")[0].files[z];
-                var tr = '<tr id="upl_tr_' + x + '" status style=""><td>' + y + '</td><td>' + file.name + '</td>' +
+                var tr = '<tr id="upl_tr_' + x + '" status><td>' + y + '</td><td>' + file.name + '</td>' +
                     '<td><div class="progress progress-xs progress-striped active">' +
                     '<div id="progressbar_' + x + '" class="progress-bar progress-bar-primary" style="width: 0%"></div></div></td>' +
                     '<td id="upl_speed_' + x + '"></td>' +
@@ -72,6 +87,8 @@ define(function (require, exports, module) {
                 $("#upl_status_" + i).html("已取消");
                 _upl_list[i].status = 'end';
             })
+            
+            $("#box_fileList").attr("status", "uploading");
             
             for (var a = 1, b = 0, c = 0; a < $("#Tbe_filesList tr").length; a++, b++) {
                 if ($("#upl_tr_" + b).attr("status") == "") {
@@ -171,10 +188,12 @@ define(function (require, exports, module) {
                                 $("#upl_status_" + num1).html("上传成功");
                                 _upl_list[num1].status = "end";
                                 if(num2 == fileCount-1){
+                                	$("#box_fileList").attr("status", "end");
                                 	var typeId = $("#mtrChoise li.active").attr("typeid");
                                 	if(typeId == "1" || typeId == "2" || typeId == "3"){
                                 		MTR.loadPage(1, Number(typeId));
                                 	}
+                                	
                                 }
                             } else {
                                 $("#upl_tr_" + num1).prop("status", "end");

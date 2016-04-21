@@ -29,7 +29,7 @@
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 </head>
-<body class="hold-transition skin-blue sidebar-mini">
+<body class="hold-transition skin-blue sidebar-mini" >
 <c:url value="/j_spring_security_logout" var="logoutUrl"/>
 <!-- Site wrapper -->
 <div class="wrapper">
@@ -187,6 +187,9 @@
 <div class="full-screen none" id="edit-page-container"></div>
 <!-- /.full-screen -->
 
+<!-- upload按钮-->
+<input id="file" name="file" type="file" multiple="multiple" accept="image/*, audio/*, video/*"/>
+
 <!-- jQuery 2.2.0 -->
 <script src="resources/plugins/jQuery/jQuery-2.2.0.min.js"></script>
 <!-- Bootstrap 3.3.6 -->
@@ -203,6 +206,8 @@
 <script src="resources/plugins/jqPaginator/jqPaginator.min.js"></script>
 <!-- RubaXa/Sortable -->
 <script src="resources/plugins/Sortable/Sortable.min.js"></script>
+
+
 <script>
 	seajs.config({
 	  base: "./resources/js/"
