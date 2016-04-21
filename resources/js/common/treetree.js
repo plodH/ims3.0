@@ -42,14 +42,31 @@ define(function(require, exports, module) {
             
             // check click事件
             $(this).children('a').find('input[type$="checkbox"]').click(function(e){
-              e.preventDefault();
               e.stopPropagation();
-              tree.onSelect($(this).parent().parent());
+              if($(this).get(0).checked){
+                tree.setMultipleFocus($(this).parent().parent());
+              }else{
+                tree.cancelFocus($(this).parent().parent());
+              }
             })
 
             // 整行点击
             $(this).children('a').click(function(e){
-              tree.onSelect($(this).parent());
+              
+              var dom = $(this).parent();
+              if(tree.check === 'single'){
+                tree.setFocus(dom);
+              }
+              else if(tree.check === 'multiple'){
+                if(!$(this).find('input[type$="checkbox"]').get(0).checked){
+                  tree.setMultipleFocus($(this).parent());
+                  $(this).find('input[type$="checkbox"]').get(0).checked = true;
+                }else{
+                  tree.cancelFocus($(this).parent());
+                  $(this).find('input[type$="checkbox"]').get(0).checked = false;
+                }
+              }
+
             })
           })
         }
@@ -57,22 +74,15 @@ define(function(require, exports, module) {
 
       tree.getSelectedNodeID = function(){
         var data = [];
-        $('#'+tree.domId + ' li.focus').each(function(i,e){
-          data.push({nodeId : Number($(e).attr('node-id'))})
-        })
-        return data;
-      }
-
-      tree.onSelect = function(dom){
-      /*
-        var $d = dom.children('a').find('input[type$="checkbox"]');
-        var checked = $d.get(0).checked;
-      */
-
         if(tree.check === 'single'){
-          tree.setFocus(dom);
-        }
+          $('#'+tree.domId + ' li.focus').each(function(i,e){
+            data.push({nodeId : Number($(e).attr('node-id'))})
+          })
+        }else if(tree.check === 'multiple'){
 
+        }
+        
+        return data;
       }
 
       tree.getFocusName = function(dom){
@@ -146,6 +156,14 @@ define(function(require, exports, module) {
 	    	$('#'+tree.domId).find('.focus').removeClass('focus');
         dom.addClass('focus');
 	    }
+
+      tree.cancelFocus = function(dom){
+        dom.removeClass('focus');
+      }
+
+      tree.setMultipleFocus = function(dom){
+        dom.addClass('focus');
+      }
 
 	    tree.createNode = function(dom, data){
 

@@ -5,24 +5,21 @@ define(function(require, exports, module) {
       TREE = require("common/treetree.js"),
       _tree;
 
-  exports.getSelectedID;
+  exports.getSelectedTerm;
 
   exports.init = function() {
     initTree();
 
     // 关闭
-    $('#move-term-class-close').click(function(){
+    $('#term_sel_cancel').click(function(){
       UTIL.cover.close();
     })
 
     // 保存
     $('#move-term-class-move').click(function(){
-      var data = _tree.getSelectedNodeID();
-      if(data.length === 0){
-        alert('请选择分类');
-      }else{
-        exports.getSelectedID(data[0].nodeId);
-      }
+      var categoryList = _tree.getSelectedNodeID();
+      // alert('请选择终端分类或终端');
+      // exports.getSelectedTerm(data);
     })
   }
 
@@ -39,7 +36,7 @@ define(function(require, exports, module) {
       function(data){
         if(data.rescode === '200'){
           data = data.TermTree.children;
-          _tree = {domId: 'move-termclass-tree', check: 'single'};
+          _tree = {domId: 'select-termclass-tree', check: 'multiple'};
           _tree = TREE.new(_tree);
           _tree.createTree($('#'+_tree.domId), data);
           // 选中、打开第一个结点
