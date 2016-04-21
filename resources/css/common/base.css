@@ -139,6 +139,13 @@ a {
 #file {
     display: none;
 }
+
+#upl_mtrName {
+	max-width: 240px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 /*layout edit*/
 .full-screen {
     position: absolute;
