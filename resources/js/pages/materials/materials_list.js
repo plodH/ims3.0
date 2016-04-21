@@ -277,6 +277,7 @@ define(function (require, exports, module) {
         });
         //
         $(".icheckbox_flat-blue").parent().parent().click(function () {
+        	$(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
             var obj = $(this).find("input");
             if ($(this).find("input").prop("checked") == true) {
                 $(this).find("input").prop("checked", false);
