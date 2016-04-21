@@ -1,7 +1,20 @@
-<div id="snap_box" class="modal-content" style="margin: auto;">
-
+<div class="modal-content" style="margin: auto; width: 600px; max-height: 560px;">
+    <div class="modal-header">
+        <button id="move-term-class-close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title">移动到...</h4>
+    </div>
+    <div class="modal-body" style="height:400px; overflow:auto;">
+        <div class="form-group">   
+            <ul id="move-termclass-tree" class="tree-menu">
+            </ul>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="move-term-class-move" type="button" class="btn btn-primary pull-right">保存</button>
+    </div>
 </div>
-
 <script>
     seajs.use("pages/terminal/move.js", function (term_move) {
         term_move.init();

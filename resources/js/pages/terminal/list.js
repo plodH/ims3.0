@@ -3,6 +3,7 @@ define(function(require, exports, module) {
   var TREE = require("common/treetree.js"),
       CONFIG = require("common/config.js"),
       UTIL = require("common/util.js"),
+      MOVE = require("pages/terminal/move.js"),
       _tree,
       _timerLoadTermList,
       _pagesize = CONFIG.pager.pageSize,
@@ -128,6 +129,7 @@ define(function(require, exports, module) {
           JSON.stringify(data),
           function(data){
             if(data.rescode === '200'){
+              alert('唤醒命令已发送');
               loadTermList();
             }else{
               alert('唤醒终端失败'+data.errInfo);
@@ -158,6 +160,7 @@ define(function(require, exports, module) {
           JSON.stringify(data),
           function(data){
             if(data.rescode === '200'){
+              alert('休眠命令已发送');
               loadTermList();
             }else{
               alert('休眠终端失败'+data.errInfo);
@@ -169,7 +172,37 @@ define(function(require, exports, module) {
     })
 
     // 批量移动
+    $('#term_batch_move').click(function(){
 
+      if($(this).hasClass('disabled')){
+        return;
+      }
+
+      MOVE.getSelectedID = function(id){
+
+        var data = {
+          "project_name" : CONFIG.projectName,
+          "action" : "changeTermsCategory",
+          "categoryID" : id,
+          "termList" : _checkList
+        }
+
+        UTIL.ajax('POST', 
+          CONFIG.serverRoot + '/backend_mgt/v2/termcategory',
+          JSON.stringify(data), 
+          function(data){
+            if(data.rescode !== '200'){
+              alert('移动终端失败')
+            }else{
+              UTIL.cover.close();
+              loadTermList(_pageNO);
+            }
+          }
+        )
+      }
+      UTIL.cover.load('resources/pages/terminal/move.html');
+
+    })
   }
 
   _checkList.add = function(id, status){
@@ -309,12 +342,6 @@ define(function(require, exports, module) {
         }
 
         // set pagebar
-        try{
-          $('#term-table-pager').jqPaginator('destroy');
-        }catch(error){
-          // console.error("$('#term-table-pager').jqPaginator 未创建");
-        }
-        
         var totalCounts = Math.max(data.totalStatistic.totalTermNum, 1);
 
         $('#term-table-pager').jqPaginator({
@@ -330,7 +357,8 @@ define(function(require, exports, module) {
           onPageChange: function (num, type) {
             _pageNO = num;
             if (type === 'change') {
-             loadTermList(_pageNO);
+              $('#term-table-pager').jqPaginator('destroy');
+              loadTermList(_pageNO);
             }
           }
         });
@@ -552,9 +580,15 @@ define(function(require, exports, module) {
       function(data){
         if(data.rescode === '200'){
           data = data.TermTree.children;
-          _tree = {domId: 'termclass-tree', canCheck: false};
+          _tree = {domId: 'termclass-tree', check: '0'};
           _tree = TREE.new(_tree);
           _tree.createTree($('#'+_tree.domId), data);
+
+          // 选中、打开第一个结点
+          var li = $('#'+_tree.domId).find('li:nth(0)');
+          _tree.setFocus(li);
+          _tree.openNode(li);
+
           // alert('loadtermlist: '+$('#termclass-tree').find('.focus').attr('node-id'))
           loadTermList();
 

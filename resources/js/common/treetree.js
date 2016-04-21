@@ -9,7 +9,7 @@ define(function(require, exports, module) {
 
 	    var tree = {};
 	    tree.domId = t.domId;
-	    tree.canCheck = t.canCheck;
+	    tree.check = t.check;
 
 	    tree.createTree = function(dom, data){
 
@@ -19,12 +19,6 @@ define(function(require, exports, module) {
 
 	      // 创建树
 	      tree.createNode(dom, data);
-
-	      //focus第一个结点
-	      var li = dom.find('li:nth(0)');
-	      li.addClass('open');
-	      li.addClass('focus');
-	      li.children('a').find('i.fa-folder-o').removeClass('fa-folder-o').addClass('fa-folder-open-o');
 
 	      // 树的展开收起
 	      $('#'+ tree.domId +' li .fa-angle-right').each(function(i, e){
@@ -39,7 +33,47 @@ define(function(require, exports, module) {
 						}
 	        })
 	      })
+
+        // 树的选中和取消选中事件
+        if(tree.check !== '0'){
+          
+          // 整行点击
+          $('#'+ tree.domId +' li').each(function(i, e){
+            
+            // check click事件
+            $(this).children('a').find('input[type$="checkbox"]').click(function(e){
+              e.preventDefault();
+              e.stopPropagation();
+              tree.onSelect($(this).parent().parent());
+            })
+
+            // 整行点击
+            $(this).children('a').click(function(e){
+              tree.onSelect($(this).parent());
+            })
+          })
+        }
 	    }
+
+      tree.getSelectedNodeID = function(){
+        var data = [];
+        $('#'+tree.domId + ' li.focus').each(function(i,e){
+          data.push({nodeId : Number($(e).attr('node-id'))})
+        })
+        return data;
+      }
+
+      tree.onSelect = function(dom){
+      /*
+        var $d = dom.children('a').find('input[type$="checkbox"]');
+        var checked = $d.get(0).checked;
+      */
+
+        if(tree.check === 'single'){
+          tree.setFocus(dom);
+        }
+
+      }
 
       tree.getFocusName = function(dom){
         return dom.children('a').find('span').html();
@@ -117,7 +151,7 @@ define(function(require, exports, module) {
 
         // 是否可选中
         var checkbox = '';
-        if(tree.canCheck === true){
+        if(tree.check === 'multiple'){
           checkbox = '<input type="checkbox">';
         }
 
