@@ -606,6 +606,11 @@ define(function(require, exports, module) {
             })
           })
 
+          // 终端配置按钮点击
+          $('#tct_config').click(function(){
+            UTIL.cover.load('resources/pages/terminal/selectTerm.html');
+          })
+
           // 添加终端分类按钮点击
           $('#tct_add').click(function(){
             var li = $('#termclass-tree').find('.focus');
