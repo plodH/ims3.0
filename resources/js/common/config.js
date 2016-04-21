@@ -5,6 +5,8 @@ define(function (require, exports, module) {
     exports.Resource_UploadURL = "http://imsresource.cleartv.cn/upload";
     exports.projectName = UTIL.getCookie('project_name');
     exports.termListLoadInterval = 60 * 1000;
+    exports.termSnapInterval = 1 * 1000;
+    exports.termSnapWait = 30 * 1000;
     exports.pager = {
         pageSize: 15,
         visiblePages: 10,

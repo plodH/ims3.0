@@ -1,13 +1,13 @@
-<% if (widgets.length == 0) %>
-<ul class="no-widget">
-    没有控件!
-    <% else { %>
-    <ul></ul>
-    <% } %>
-    <% widgets.forEach(function(el, idx, arr) { %>
-    <li>
+<ul>
+
+    <% for (var i = widgets.length - 1; i >= 0; i--) { var el = widgets[i]; %>
+    <% if (el.focused) { %>
+    <li style="background-color: <%=el.background_color%>;" data-widget-index="<%=i%>" class="focused">
+        <% } else { %>
+    <li style="background-color: <%=el.background_color%>;" data-widget-index="<%=i%>">
+        <% } %>
         <div><%=el.name%></div>
     </li>
-    <% });  %>
+    <% }  %>
 
 </ul>

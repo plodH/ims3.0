@@ -41,6 +41,10 @@ define(function(require, exports, module) {
 	      })
 	    }
 
+      tree.getFocusName = function(dom){
+        return dom.children('a').find('span').html();
+      }
+
 	    tree.addParentCss = function(dom){
 	    	dom.addClass('treeview');
         var a = dom.children('a');

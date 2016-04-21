@@ -68,8 +68,9 @@
     <div class="col-md-9">
       <div class="box box-primary">
         <div class="box-header with-border">
-          <h3 class="box-title">终端分类名称
-            <small id="term_download_status" style="padding-left: 20px;"></small>
+          <h3 class="box-title">
+            <span id="termlist-title"></span>
+            <small id="term_status" style="padding-left: 20px;"></small>
           </h3>
 
           <div class="box-tools">
@@ -93,9 +94,9 @@
               <button  id="term_batch_stop" type="button" class="btn btn-default btn-sm">休眠</button>
             </div>
             <div id="term-status" class="btn-group pull-right">
-              <button type="button" class="btn btn-default btn-sm" value="online">在线（<span id="term_online_1"></span>）</button>
-              <button type="button" class="btn btn-default btn-sm" value="shutdown">休眠（98/100）</button>
-              <button type="button" class="btn btn-default btn-sm" value="offline">离线（98/100）</button>
+              <button type="button" class="btn btn-default btn-sm" value="running">运行（<span id="term_running"></span>）</button>
+              <button type="button" class="btn btn-default btn-sm" value="shutdown">休眠（<span id="term_shutdown"></span>）</button>
+              <button type="button" class="btn btn-default btn-sm" value="offline">离线（<span id="term_offline"></span>）</button>
             </div>
           </div>
           <div class="table-responsive mailbox-messages">

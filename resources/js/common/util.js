@@ -4,6 +4,18 @@ define(function(require, exports, module) {
 		ajax(type, url, data, successFn);
 	};
 
+	exports.cover = {
+		'load': function(url){
+			$('#cover_area').load(url);
+			$('#cover_area').css('display','flex');
+		},
+		'close': function(){
+			$('#cover_area').empty();
+			$('#cover_area').css('display','none');
+		}
+	}
+
+
 	exports.getHashParameters = function () {
 		var queryString = window.location.hash.match(/\?(.*)/);
 		if (queryString === null) {
@@ -46,7 +58,7 @@ define(function(require, exports, module) {
 
 	function ajax(type, url, data, successFn){
 
-		$.ajax({
+		var ajax = $.ajax({
 		  type: type,
 		  url: url,
 		  dataType: 'json',
@@ -58,6 +70,7 @@ define(function(require, exports, module) {
 		  error: function(XMLHttpRequest, textStatus, errorThrown){
 		  	// XMLHttpRequest.status
 		    alert('连接服务器出错 ' + textStatus + errorThrown);
+		    ajax.abort();
 		  }
 		})
 

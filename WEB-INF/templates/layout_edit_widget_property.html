@@ -1,24 +1,35 @@
-
+<!-- <label>
+        <i class="glyphicon glyphicon glyphicon-film"></i>&nbsp视频控件
+    </label>
+--> 
 <li>
     <label>控件类型:</label>
     <input type="text" readonly="readonly" value="<%=type%>">
 </li>
-<li>
-    <label>上边距:</label>
-    <input type="number" value="<%=top%>" data-property-id="widget-top">
-</li>
-<li>
-    <label>左边距:</label>
-    <input type="text" value="<%=left%>" data-property-id="widget-left">
-</li>
-<li>
-    <label>宽:</label>
-    <input type="number" value="<%=width%>" data-property-id="widget-width">
-</li>
-<li>
-    <label>高:</label>
-    <input type="text" value="<%=height%>" data-property-id="widget-height">
-</li>
+    <div class="input-group">
+        <span class="input-group-addon">上边距</span>
+        <input type="number" value="<%=top%>" class="form-control"  data-property-id="widget-top">
+        <span class="input-group-addon">像素</span>
+    </div>
+    <br>
+    <div class="input-group">
+        <span class="input-group-addon">左边距</span>
+        <input type="number" value="<%=left%>" class="form-control" data-property-id="widget-top">
+        <span class="input-group-addon">像素</span>
+    </div>
+    <br>
+    <div class="input-group">
+        <span class="input-group-addon" style="letter-spacing: 7px">宽度</span>
+        <input type="number" value="<%=width%>" class="form-control" data-property-id="widget-left">
+        <span class="input-group-addon">像素</span>
+    </div>
+    <br>
+    <div class="input-group">
+        <span class="input-group-addon" style="letter-spacing: 7px">高度</span>
+        <input type="number" value="<%=height%>" class="form-control" data-property-id="widget-width">
+        <span class="input-group-addon">像素</span>
+    </div>
+    <br>
 <li>
     <button class="btn-layout-editor-zindex-increase">上移一层</button>
     <button class="btn-layout-editor-zindex-decrease">下移一层</button>
