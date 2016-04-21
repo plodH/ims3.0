@@ -1,8 +1,12 @@
 define(function(require, exports, module){exports['channel_edit_main']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div id="channel-editor-wrapper"> <div class="channel-editor-header"> <button class="btn-channel-editor-close">返回</button> <span>'+
+__p+='<div id="channel-editor-wrapper"> <div class="channel-editor-header"> <button class="btn-channel-editor-close">返回</button> <span class="editable-span" data-key="name">'+
 ((__t=(name))==null?'':__t)+
+'</span> <span class="editable-span" data-key="overall-schedule-params">'+
+((__t=(overall_schedule_params))==null?'':__t)+
+'</span> <span class="editable-span" data-key="overall-schedule-type">'+
+((__t=(overall_schedule_type))==null?'':__t)+
 '</span> <button class="btn-channel-editor-save">保存</button> <button class="btn-channel-editor-publish">保存并发布</button> </div> <div class="channel-editor-body"> <div class="channel-program-list"> <div class="channel-program-list-timed"> <div> <h3>定时节目</h3> <button class="btn-program-delete" data-program-type="Timed">删除</button> <button class="btn-program-new" data-program-type="Timed">新建</button> </div> <ul></ul> </div> <div class="channel-program-list-regular"> <div> <h3>常规节目</h3> <select class="channel-program-schedule-type"> <option value="1">顺序</option> <option value="2">随机</option> <option value="3">比例</option> </select> <button class="btn-program-delete" data-program-type="Regular">删除</button> <button class="btn-program-new" data-program-type="Regular">新建</button> </div> <ul></ul> </div> </div> <div class="channel-program-editor"> </div> </div> <div class="channel-editor-footer"> </div> </div>';
 }
 return __p;
@@ -107,6 +111,24 @@ __p+='<!-- <label>\r\n        <i class="glyphicon glyphicon glyphicon-film"></i>
 '" class="form-control" data-property-id="widget-left"> <span class="input-group-addon">像素</span> </div> <br> <div class="input-group"> <span class="input-group-addon" style="letter-spacing: 7px">高度</span> <input type="number" value="'+
 ((__t=(height))==null?'':__t)+
 '" class="form-control" data-property-id="widget-width"> <span class="input-group-addon">像素</span> </div> <br> <li> <button class="btn-layout-editor-zindex-increase">上移一层</button> <button class="btn-layout-editor-zindex-decrease">下移一层</button> </li> <li> <button class="btn-layout-editor-delete-widget">删除控件</button> </li>';
+}
+return __p;
+};
+exports['layout_list_dialog']=function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='<div id="layout-list-dialog" class="modal-content"> <div class="modal-header"> <button type="button" class="btn btn-close close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">×</span> </button> <h3 class="modal-title">选择布局</h3> </div> <div class="modal-header-body"> <div class="has-feedback box-tools pull-right"> <input type="text" class="layout-list-search form-control input-sm" placeholder="搜索布局"> <span class="glyphicon glyphicon-search form-control-feedback"> </span> </div> <ul class="layout-list"> </ul> </div> <div class="text-center modal-footer"> <ul class="pagination layout-list-pager"> </ul> </div> </div>';
+}
+return __p;
+};
+exports['layout_list_dialog_item']=function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='<li data-layout-id="'+
+((__t=(id))==null?'':__t)+
+'"> <div>'+
+((__t=(name))==null?'':__t)+
+'</div> </li>';
 }
 return __p;
 };
