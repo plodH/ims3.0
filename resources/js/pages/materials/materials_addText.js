@@ -1,0 +1,116 @@
+define(function (require, exports, module) {
+    var CONFIG = require("common/config.js");
+    var UTIL = require("common/util.js");
+    var MTR = require("pages/materials/materials_list.js");
+
+
+    exports.init = function () {
+    	
+        loadPage();
+        CKEDITOR.replace('editor1');
+        //关闭窗口
+        $("#Tmtr_back").click(function () {
+            back();
+        });
+        
+        //清空按钮
+        $("#Tmtr_reset").click(function () {
+            $("#editor1").html("");
+        });
+        
+    }
+
+    function loadPage() {
+    	//修改
+    	if ($("#mtr_edit").attr("edit_type") == "文本"){
+    		var mtrId;
+            for (var x = 0; x < $(".mtr_cb").length; x++) {
+                if ($(".mtr_cb:eq(" + x + ")").get(0).checked) {
+                    mtrId = $(".mtr_cb:eq(" + x + ")").attr("mtrID");
+                }
+            }
+
+            jsons ={};
+            jsons["Action"] = "Get";
+            jsons["Project"] = UTIL.getCookie("project_name");
+            $.post(
+                CONFIG.serverRoot + "/backend_mgt/v1/webmaterials/"+mtrId,
+                JSON.stringify(jsons),
+                function(data1){
+                    var json = JSON.parse(data1);
+                    $("#Tmtr_name").val(json.Materials[0].Name);
+                },
+                "text"
+            );
+
+            jsons1 ={};
+            jsons1["Action"] = "GetText";
+            jsons1["Project"] = UTIL.getCookie("project_name");
+            $.post(
+                CONFIG.serverRoot + "/backend_mgt/v1/webmaterials/"+mtrId,
+                JSON.stringify(jsons1),
+                function(data1){
+                    CKEDITOR.instances['editor1'].setData(data1)
+                },
+                "text"
+            );
+            //保存
+            $("#Tmtr_submit").click(function () {
+                onSubmit(mtrId);
+            })
+    	}else {
+    		$("#Tmtr_submit").click(function () {
+                onSubmit();
+            })
+    	}
+    }
+
+    //返回
+    function back() {
+        $("#addtext_box").html("");
+        $("#mtr_edit").removeAttr("edit_type");
+        $("#list_box").css("display", "block");
+        var editor = CKEDITOR.instances['editor1'];
+        if (editor) { editor.destroy(true); }
+    }
+
+    function onSubmit(mtrId) {
+    	var action;
+    	var editor_data = CKEDITOR.instances.editor1.getData();
+    	if(mtrId == null){
+            $.ajax({
+                url: CONFIG.serverRoot + "/backend_mgt/v1/webmaterials?project=" + UTIL.getCookie("project_name") + "&action=Post&name=" + encodeURIComponent($("#Tmtr_name").val()),
+                type: "POST",
+                data: editor_data,
+                dataType: "json",
+                success: function (data, textStatus) {
+                    if (parseInt(data.rescode) == 200) {
+                        alert("添加成功");
+                        $("#mtrText").trigger("click");
+                        back();
+                    } else {
+                        alert("添加失败");
+                    }
+                }
+            });
+    	}else {
+    	    $.ajax({
+    	        url: CONFIG.serverRoot + "/backend_mgt/v1/channels?project="+ UTIL.getCookie("project_name") +"&action=UpdateWebMaterial&ID="+ mtrId +"&name="+encodeURIComponent($("#Tmtr_name").val()),
+    	        type: "POST",
+    	        data: editor_data,
+    	        dataType: "json",
+    	        success:function (data, textStatus){
+    	            if (parseInt(data.rescode) == 200){
+    	                alert("修改成功");
+                        var pageNum = $("#materials-table-pager li.active").find("a").text();
+                        MTR.loadPage(pageNum, 4);
+                        back();
+    	            }else{
+    	                alert("修改失败");
+    	            }
+    	        }
+    	    });
+    	}
+        
+    }
+})
