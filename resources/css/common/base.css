@@ -80,6 +80,9 @@ a {
 
 .mtr_name {
 	width: 37%;
+	max-width: 431px;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .mtr_size {
