@@ -141,7 +141,8 @@ define(function (require, exports, module) {
             //入库
             xhr.onreadystatechange = function (response) {
                 var fileName = $("#file")[0].files[num2].name;
-
+                var fileCount = $("#file")[0].files.length;
+                
                 if (xhr.readyState == 4 && xhr.status == 200
                     && xhr.responseText != "") {
                     var blkRet = JSON.parse(xhr.responseText);
@@ -169,8 +170,10 @@ define(function (require, exports, module) {
                                 $("#upl_speed_" + num1).html("");
                                 $("#upl_status_" + num1).html("上传成功");
                                 _upl_list[num1].status = "end";
-                                var typeId = $("#mtrChoise li.active").attr("typeid");
-                                MTR.loadPage(1, Number(typeId));
+                                if(num2 == fileCount-1){
+                                	var typeId = $("#mtrChoise li.active").attr("typeid");
+                                    MTR.loadPage(1, Number(typeId));
+                                }
                             } else {
                                 $("#upl_tr_" + num1).prop("status", "end");
                                 $("#progressbar_" + num1).prop("class", "progress-bar progress-bar-danger");

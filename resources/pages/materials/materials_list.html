@@ -7,7 +7,7 @@
 </section>
 
 <!-- Main content -->
-<section class="content">
+<div class="content">
     <div class="row">
         <div class="col-md-3">
             <div class="box box-solid">
@@ -54,7 +54,7 @@
             <!-- /.box -->
         </div>
         <!-- /.col -->
-        <div class="col-md-9">
+        <div id="list_box" class="col-md-9">
             <div class="box box-primary">
                 <div class="box-header with-border">
                     <h3 id="mtrLisTitle" class="box-title"></h3>
@@ -106,6 +106,8 @@
             </div>
             <!-- /. box -->
         </div>
+
+        <section id="addtext_box" class="col-md-9"></section>
         <!-- /.col -->
     </div>
     <!-- /.row -->
@@ -114,6 +116,9 @@
     <input id="file" name="file" type="file" multiple="multiple" accept="image/*, audio/*, video/*"/>
 </section>
 <!-- /.content -->
+<!-- CK Editor -->
+<script src="resources/plugins/ckeditor/ckeditor.js"></script>
+
 <script>
     seajs.use("pages/materials/materials_list.js", function (resourceList) {
         resourceList.init()
