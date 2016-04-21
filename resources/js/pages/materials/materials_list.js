@@ -149,7 +149,9 @@ define(function (require, exports, module) {
     exports.loadPage = function (pageNum, type) {
         $("#mtrLisTitle").html("");
         $("#mtrTable tbody").html("");
+        $(".checkbox-toggle").data("clicks", false)
         $(".fa.fa-check-square-o").attr("class", "fa fa-square-o");
+        mtrCb();
         var mtrType;
         switch (type) {
             case 1:
@@ -238,30 +240,32 @@ define(function (require, exports, module) {
                                     '<th class="mtr_uploadUser">上传人</th>'+
                                     '<th class="mtr_uploadDate">上传时间</th>'+
                                 '</tr>');
-            var material_type = mtrData[0].Type_Name;
-            if (material_type == "文本" || material_type == "Live"){		//文本和直播无预览效果
-            	for (var x = 0; x < mtrData.length; x++) {
-                    var mtrtr = '<tr mtrID="' + mtrData[x].ID + '">' +
-                        '<td class="mtr_checkbox"><input type="checkbox" id="mtr_cb" class="mtr_cb" mtrID="' + mtrData[x].ID + '" url="' + mtrData[x].URL + '"></td>' +
-                        '<td class="mtr_name">' + mtrData[x].Name + '</td>' +
-                        '<td class="mtr_size">' + mtrData[x].Size + '</td>' +
-                        '<td class="mtr_time">' + mtrData[x].Duration + '</td>' +
-                        '<td class="mtr_uploadUser">' + mtrData[x].CreateName + '</td>' +
-                        '<td class="mtr_uploadDate">' + mtrData[x].CreateTime + '</td>' +
-                        '</tr>';
-                    $("#mtrTable tbody").append(mtrtr);
-                }
-            }else {
-            	for (var x = 0; x < mtrData.length; x++) {
-                    var mtrtr = '<tr mtrID="' + mtrData[x].ID + '">' +
-                        '<td class="mtr_checkbox"><input type="checkbox" id="mtr_cb" class="mtr_cb" mtrID="' + mtrData[x].ID + '" url="' + mtrData[x].URL + '"></td>' +
-                        '<td class="mtr_name"><a href="' + mtrData[x].URL + '" target="_blank">' + mtrData[x].Name + '</a></td>' +
-                        '<td class="mtr_size">' + mtrData[x].Size + '</td>' +
-                        '<td class="mtr_time">' + mtrData[x].Duration + '</td>' +
-                        '<td class="mtr_uploadUser">' + mtrData[x].CreateName + '</td>' +
-                        '<td class="mtr_uploadDate">' + mtrData[x].CreateTime + '</td>' +
-                        '</tr>';
-                    $("#mtrTable tbody").append(mtrtr);
+            if (mtrData.length != 0){
+            	var material_type = mtrData[0].Type_Name;
+                if (material_type == "文本" || material_type == "Live"){		//文本和直播无预览效果
+                	for (var x = 0; x < mtrData.length; x++) {
+                        var mtrtr = '<tr mtrID="' + mtrData[x].ID + '">' +
+                            '<td class="mtr_checkbox"><input type="checkbox" id="mtr_cb" class="mtr_cb" mtrID="' + mtrData[x].ID + '" url="' + mtrData[x].URL + '"></td>' +
+                            '<td class="mtr_name">' + mtrData[x].Name + '</td>' +
+                            '<td class="mtr_size">' + mtrData[x].Size + '</td>' +
+                            '<td class="mtr_time">' + mtrData[x].Duration + '</td>' +
+                            '<td class="mtr_uploadUser">' + mtrData[x].CreateName + '</td>' +
+                            '<td class="mtr_uploadDate">' + mtrData[x].CreateTime + '</td>' +
+                            '</tr>';
+                        $("#mtrTable tbody").append(mtrtr);
+                    }
+                }else {
+                	for (var x = 0; x < mtrData.length; x++) {
+                        var mtrtr = '<tr mtrID="' + mtrData[x].ID + '">' +
+                            '<td class="mtr_checkbox"><input type="checkbox" id="mtr_cb" class="mtr_cb" mtrID="' + mtrData[x].ID + '" url="' + mtrData[x].URL + '"></td>' +
+                            '<td class="mtr_name"><a href="' + mtrData[x].URL + '" target="_blank">' + mtrData[x].Name + '</a></td>' +
+                            '<td class="mtr_size">' + mtrData[x].Size + '</td>' +
+                            '<td class="mtr_time">' + mtrData[x].Duration + '</td>' +
+                            '<td class="mtr_uploadUser">' + mtrData[x].CreateName + '</td>' +
+                            '<td class="mtr_uploadDate">' + mtrData[x].CreateTime + '</td>' +
+                            '</tr>';
+                        $("#mtrTable tbody").append(mtrtr);
+                    }
                 }
             }
         }
@@ -327,11 +331,14 @@ define(function (require, exports, module) {
             $("#mtr_download").parent().removeAttr("download");
         }
         //控制全选按钮全选或者不全选状态
-        if (Ck == Uck) {
-            $(".fa.fa-square-o").attr("class", "fa fa-check-square-o");
-        } else {
-            $(".fa.fa-check-square-o").attr("class", "fa fa-square-o");
+        if (Uck != 0){
+        	if (Ck == Uck) {
+                $(".fa.fa-square-o").attr("class", "fa fa-check-square-o");
+            } else {
+                $(".fa.fa-check-square-o").attr("class", "fa fa-square-o");
+            }
         }
+        
     }
     
     //打开直播编辑窗口

@@ -172,7 +172,9 @@ define(function (require, exports, module) {
                                 _upl_list[num1].status = "end";
                                 if(num2 == fileCount-1){
                                 	var typeId = $("#mtrChoise li.active").attr("typeid");
-                                    MTR.loadPage(1, Number(typeId));
+                                	if(typeId == "1" || typeId == "2" || typeId == "3"){
+                                		MTR.loadPage(1, Number(typeId));
+                                	}
                                 }
                             } else {
                                 $("#upl_tr_" + num1).prop("status", "end");
