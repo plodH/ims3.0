@@ -8,39 +8,7 @@ define(function (require, exports, module) {
         loadPage();
 
         //保存
-        $("#ULmtr_add").click(function () {
-        	var mtrName = $("#ULmtr_name").val();
-            var mtrUrl = $("#ULmtr_address").val();
-            var material = {
-                name: mtrName,
-                name_eng: '',
-                url_name: mtrUrl,
-                description: '',
-                is_live: '1',
-                Download_Auth_Type: 'None',
-                Download_Auth_Paras: '',
-                size: '0',
-                md5: '',
-                duration: '0',
-                create_time: getNowFormatDate()
-            };
-            var data = JSON.stringify({
-                action: 'Post',
-                project_name: UTIL.getCookie("project_name"),
-                material: material,
-            });
-            var url = CONFIG.serverRoot + '/backend_mgt/v1/materials';
-            UTIL.ajax('post', url, data, function(msg){
-                if(msg.rescode == 200){
-                    var typeId = $("#mtrChoise li.active").attr("typeid");
-                    MTR.loadPage(1, Number(typeId));
-                    close();
-                    alert("添加成功");
-                }else{
-                    alert("添加失败");
-                }
-            });
-        })
+        
     }
 
     function loadPage() {
@@ -48,6 +16,37 @@ define(function (require, exports, module) {
         $(".CA_close").click(function () {
             close();
         });
+        
+        if ($("#mtr_edit").attr("edit_type") == "直播"){
+	        var mtrId;
+	        for (var x = 0; x < $(".mtr_cb").length; x++) {
+	            if ($(".mtr_cb:eq(" + x + ")").get(0).checked) {
+	                mtrId = $(".mtr_cb:eq(" + x + ")").attr("mtrID");
+	            }
+	        }
+	        //修改
+	        var data = JSON.stringify({
+	            action: 'GetOne',
+	            project_name: UTIL.getCookie("project_name"),
+	        });
+	        var url = CONFIG.serverRoot + '/backend_mgt/v1/materials/' + mtrId;
+	        UTIL.ajax('post', url, data, function(msg){
+	        	var mtrName = msg.Material[0].Name
+//	            var name = mtrName.substring(0, mtrName.indexOf('.'));
+	        	var url = msg.Material[0].URL;
+	            $("#ULmtr_name").val(mtrName);
+	            $("#ULmtr_name").attr("mtrtype", mtrName);
+	            $("#ULmtr_address").val(url);
+	        });
+	        
+	        $("#ULmtr_add").click(function () {
+	        	onSubnit(mtrId)
+	        })
+        }else {
+        	$("#ULmtr_add").click(function () {
+        		onSubnit()
+            })
+        }
     }
 
     //关闭窗口
@@ -85,5 +84,67 @@ define(function (require, exports, module) {
             + seperator1 + strDate + " " + strHour + seperator2
             + strMin + seperator2 + strSec;
         return currentdate;
+    }
+    
+    function onSubnit(mtrId){
+    	var mtrName = $("#ULmtr_name").val();
+        var mtrUrl = $("#ULmtr_address").val();
+        
+    	if(mtrId == null){
+    		var action = "Post";
+    		var material = {
+                    name: mtrName,
+                    name_eng: '',
+                    url_name: mtrUrl,
+                    description: '',
+                    is_live: '1',
+                    Download_Auth_Type: 'None',
+                    Download_Auth_Paras: '',
+                    size: '0',
+                    md5: '',
+                    duration: '0',
+                    create_time: getNowFormatDate()
+                };
+    		var data = JSON.stringify({
+                action: action,
+                project_name: UTIL.getCookie("project_name"),
+                material: material,
+            });
+    		var url = CONFIG.serverRoot + '/backend_mgt/v1/materials';
+            UTIL.ajax('post', url, data, function(msg){
+                if(msg.rescode == 200){
+                    var typeId = $("#mtrChoise li.active").attr("typeid");
+                    MTR.loadPage(1, Number(typeId));
+                    close();
+                    alert("添加成功");
+                }else{
+                    alert("添加失败");
+                }
+            });
+    	}else {
+    		var action = "Put";
+    		var Data = {
+                    Name: mtrName,
+                    URL: mtrUrl,
+                };
+    		var data = JSON.stringify({
+                action: action,
+                project_name: UTIL.getCookie("project_name"),
+                Data: Data,
+            });
+    		var url = CONFIG.serverRoot + '/backend_mgt/v1/materials/' + mtrId;
+            UTIL.ajax('post', url, data, function(msg){
+                if(msg.rescode == 200){
+                    var pageNum = $("#materials-table-pager li.active").find("a").text();
+                    MTR.loadPage(pageNum, 5);
+                    close();
+                    alert("修改成功");
+                }else{
+                    alert("修改失败");
+                }
+            });
+    	}
+    	
+        
     }
 })
