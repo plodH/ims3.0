@@ -47,3 +47,7 @@
 }
 
 #channel-editor-wrapper .channel-editor-footer {}
+
+#channel-editor-wrapper ul>li.selected {
+    border-color: red;
+}
