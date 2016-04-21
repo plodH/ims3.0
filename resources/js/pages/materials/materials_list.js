@@ -32,6 +32,12 @@ define(function (require, exports, module) {
         	openLive();
         })
 
+        // 频道添加直播
+        $('#mtr_addMtr').click(function () {
+            var page = "resources/pages/channel/addMtr.html";
+            UTIL.cover.load(page);
+        })
+
         //加载视频列表
         $('#mtrVideo').click(function () {
             mtrChoise($(this));
@@ -76,29 +82,31 @@ define(function (require, exports, module) {
             }
             if (w) {
                 if (confirm("删除资源会删除频道对应的资源,确定删除资源？")) {
+                	var mtrId;
+                	var typeId = $("#mtrChoise li.active").attr("typeid");
                     for (var x = 0; x < $(".mtr_cb").length; x++) {
                         if ($(".mtr_cb:eq(" + x + ")").get(0).checked) {
-                            MaterialIDs.push($(".mtr_cb:eq(" + x + ")").attr("mtrID"));
+                        	mtrId = $(".mtr_cb:eq(" + x + ")").attr("mtrID")
+                            MaterialIDs.push(Number(mtrId));
                         }
                     }
                     var pageNum = $("#materials-table-pager li.active").find("a").text();
-                    var pager = {
-                        page: String(pageNum),
-                        total: '0',
-                        per_page: nDisplayItems,
-                        orderby: 'CreateTime',
-                        sortby: 'DESC',
-                        keyword: keyword
-                    };
-                    var data = JSON.stringify({
-                        action: 'DeleteMulti',
-                        project_name: UTIL.getCookie("project_name"),
-                        MaterialIDs: MaterialIDs,
-                        Pager: pager
-                    });
-                    var url = CONFIG.serverRoot + '/backend_mgt/v1/materials';
+                    if (typeId == "4"){
+                    	var data = JSON.stringify({
+                            Action: 'DeleteMulti',
+                            Project: UTIL.getCookie("project_name"),
+                            MaterialIDs: MaterialIDs,
+                        });
+                    	var url = CONFIG.serverRoot + '/backend_mgt/v1/webmaterials';
+                    }else {
+                    	var data = JSON.stringify({
+                            action: 'DeleteMulti',
+                            project_name: UTIL.getCookie("project_name"),
+                            MaterialIDs: MaterialIDs,
+                        });
+                    	var url = CONFIG.serverRoot + '/backend_mgt/v1/materials';
+                    }
                     UTIL.ajax('post', url, data, function () {
-                        var typeId = $("#mtrChoise li.active").attr("typeid");
                         exports.loadPage(pageNum, Number(typeId)); //刷新页面
                     });
                 }
@@ -147,6 +155,8 @@ define(function (require, exports, module) {
 
     // 加载页面数据
     exports.loadPage = function (pageNum, type) {
+    	$("#addtext_box").empty();
+        $("#list_box").css("display","block");
         $("#mtrLisTitle").html("");
         $("#mtrTable tbody").html("");
         $(".checkbox-toggle").data("clicks", false)
@@ -345,7 +355,7 @@ define(function (require, exports, module) {
     //打开直播编辑窗口
     function openLive() {
     	var page = "resources/pages/materials/materials_addLive.html";
-        INDEX.coverArea(page);
+        UTIL.cover.load(page);
     }
     //打开文本编辑器窗口
     function openEditor() {

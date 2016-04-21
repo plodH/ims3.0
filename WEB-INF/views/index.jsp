@@ -60,7 +60,7 @@
           <li class="dropdown user user-menu">
             <a class="dropdown-toggle" data-toggle="dropdown">
               <img src="resources/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
-              <span class="hidden-xs"><sec:authentication property="name"/></span>
+              <span id="username" class="hidden-xs"><sec:authentication property="name"/></span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
@@ -98,15 +98,17 @@
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
       <!-- Sidebar user panel -->
-      <div class="user-panel">
-        <div class="pull-left image">
-          <img src="resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
-        </div>
-        <div class="pull-left info">
-          <p id="username"><sec:authentication property="name"/></p>
-          <h6 class="gray-light">${project_name_cn}</h6>
-        </div>
-      </div>
+
+      <!--<div class="user-panel">-->
+        <!--<div class="pull-left image">-->
+          <!--<img src="resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">-->
+        <!--</div>-->
+        <!--<div class="pull-left info">-->
+          <!--<p ><sec:authentication property="name"/></p>-->
+          <!--<h6 class="gray-light">${project_name_cn}</h6>-->
+        <!--</div>-->
+      <!--</div>-->
+
       <!-- search form -->
       <!--<form action="#" method="get" class="sidebar-form">
         <div class="input-group">

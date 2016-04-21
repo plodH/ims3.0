@@ -1,0 +1,41 @@
+<div id="mtrEdit_box" class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close CA_close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">添加资源</h4>
+    </div>
+    <div class="box-header with-border">
+        <h3 class="box-title">Input</h3>
+
+        <div class="box-tools pull-right">
+            <div class="has-feedback">
+                <input type="text" class="form-control input-sm" placeholder="Search...">
+                <span class="glyphicon glyphicon-search form-control-feedback"></span>
+            </div>
+        </div>
+        <!-- /.box-tools -->
+    </div>
+    <!-- /.box-header -->
+    <div class="modal-body">
+        <div class="table-responsive mailbox-messages">
+            <!-- 资源列表 -->
+            <table id="mtrTable" class="table table-hover table-striped">
+                <tbody>
+
+                </tbody>
+            </table>
+            <!-- /.table -->
+        </div>
+    </div>
+    <div class="modal-footer">
+        <!--<button type="button" class="btn btn-default pull-left CA_close" data-dismiss="modal">杩斿洖</button>-->
+        <button id="Emtr_updata" type="button" class="btn btn-primary pull-left">完成</button>
+    </div>
+</div>
+
+
+<script>
+    seajs.use("pages/channel/addMtr.js", function (addMtr) {
+        addMtr.init()
+    })
+</script>
