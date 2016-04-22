@@ -10,8 +10,10 @@ define(function(require, exports, module) {
 
   exports.save;
   exports.title;
+  exports.channelID;
 
   exports.init = function() {
+    //if(exports.channelID){}else{alert(1)}
     $('#term_sel_title').html(exports.title);
     initTree();
     initEvent();
@@ -114,6 +116,9 @@ define(function(require, exports, module) {
   }
 
   function loadTermList(pageNum){
+
+    // loading
+    $('#term_sel_list').html('<i class="fa fa-refresh fa-spin" style="display:block; text-align: center; padding:10px;"></i>');
 
     var dom = $('#select-termclass-tree').find('.focus');
     $('#select-termlist-title').html(_tree.getFocusName(dom));

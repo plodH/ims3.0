@@ -21,7 +21,6 @@
             <a id="tct_edit"><i class="fa fa-edit"></i></a>
             <a id="tct_delete"><i class="fa fa-trash-o"></i></a>
             <a id="tct_add"><i class="fa fa-plus"></i></a>
-            <a id="tct_config"><i class="fa fa-gear"></i></a>
           </div>
         </div>
         <ul id="termclass-tree" class="tree-menu">
@@ -36,6 +35,7 @@
           <h3 class="box-title">
             <span id="termlist-title"></span>
             <small id="term_status" style="padding-left: 20px;"></small>
+            <small><button id="tct_config" type="button" class="btn btn-default btn-xs"><i class="fa fa-gear"></i> 配置</button></small>
           </h3>
 
           <div class="box-tools">
@@ -58,6 +58,8 @@
               <button id="term_batch_start" type="button" class="btn btn-default btn-sm">唤醒</button>
               <button  id="term_batch_stop" type="button" class="btn btn-default btn-sm">休眠</button>
             </div>
+
+            <button id="term_refresh" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>  
             <div id="term-status" class="btn-group pull-right">
               <button type="button" class="btn btn-default btn-sm" value="running">运行（<span id="term_running"></span>）</button>
               <button type="button" class="btn btn-default btn-sm" value="shutdown">休眠（<span id="term_shutdown"></span>）</button>

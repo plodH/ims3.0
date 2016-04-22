@@ -7,6 +7,7 @@ define(function(require, exports, module) {
 
   exports.save;
   exports.title;
+  exports.roleID;
 
   exports.init = function() {
     $('#mul-TermClass-title').html(exports.title);

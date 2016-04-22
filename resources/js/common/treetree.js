@@ -246,6 +246,13 @@ define(function(require, exports, module) {
               '</a>' +
             '</li>');
 
+          // 判断是否为选中状态
+          if(data[i].checked){
+            if(tree.checkMode === 'multiple'){
+              li.children('a').find('input[type$="checkbox"]').get(0).checked = true;
+            }
+          }
+
           dom.append(li);
 
           if(treeview === 'treeview'){

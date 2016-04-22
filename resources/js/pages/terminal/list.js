@@ -72,6 +72,11 @@ define(function(require, exports, module) {
       
     })
 
+    // refresh
+    $('#term_refresh').click(function(){
+      loadTermList(_pageNO);
+    })
+
     // serach
     $('#term_search').click(function(){
       loadTermList(_pageNO);
@@ -298,6 +303,9 @@ define(function(require, exports, module) {
 
   function loadTermList(pageNum){
 
+    // loading
+    $('#term_list').html('<i class="fa fa-refresh fa-spin" style="display:block; text-align: center; padding:10px;"></i>');
+
     var dom = $('#termclass-tree').find('.focus');
     $('#termlist-title').html(_tree.getFocusName(dom));
 
@@ -312,7 +320,7 @@ define(function(require, exports, module) {
     }
 
     if($('#termclass-tree').length > 0){
-      _timerLoadTermList = setInterval(function(){loadTermList()}, CONFIG.termListLoadInterval);
+      // _timerLoadTermList = setInterval(function(){loadTermList()}, CONFIG.termListLoadInterval);
     }
     else{
       return;
@@ -501,6 +509,11 @@ define(function(require, exports, module) {
           })
 
           // 编辑
+          $(this).find('a:nth(0)').click(function(e){
+            e.preventDefault();
+            e.stopPropagation();
+
+          })
 
           // 截屏
           $(this).find('a:nth(1)').click(function(e){
