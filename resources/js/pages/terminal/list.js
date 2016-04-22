@@ -580,7 +580,7 @@ define(function(require, exports, module) {
       function(data){
         if(data.rescode === '200'){
           data = data.TermTree.children;
-          _tree = {domId: 'termclass-tree', check: '0'};
+          _tree = {domId: 'termclass-tree', checkMode: 'single'};
           _tree = TREE.new(_tree);
           _tree.createTree($('#'+_tree.domId), data);
 
@@ -595,7 +595,6 @@ define(function(require, exports, module) {
           // 终端分类列表各项点击
           $('#termclass-tree li > a').each(function(i, e){
             $(this).click(function(e){
-              _tree.setFocus($(this).parent());
               // alert('loadtermlist: '+$(this).parent().attr('node-id'))
               // 复原筛选框
               if($('#term-status button.btn-primary').length > 0){
@@ -822,124 +821,6 @@ define(function(require, exports, module) {
         }
       }
     );
-
-    /*var tree = {domId: 'termclass-tree', canCheck: false};
-    tree = TREE.new(tree);
-    var data = [
-        {
-            "children": [
-                {
-                    "id": 2, 
-                    "name": "未分类终端",
-                    "children": []
-                }, 
-                {
-                    "children": [
-                        {
-                            "children": [
-                                {
-                                    "id": 316, 
-                                    "name": "自定义分类1-1-1",
-                                    "children": []
-                                }
-                            ], 
-                            "id": 313, 
-                            "name": "自定义分类1-1"
-                        }, 
-                        {
-                            "id": 314, 
-                            "name": "自定义分类1-2",
-                            "children": []
-                        }
-                    ], 
-                    "id": 310, 
-                    "name": "自定义分类1"
-                }, 
-                {
-                    "children": [
-                        {
-                            "id": 315, 
-                            "name": "自定义分类2-1",
-                            "children": []
-                        }
-                    ], 
-                    "id": 311, 
-                    "name": "自定义分类2"
-                }, 
-                {
-                    "id": 312, 
-                    "name": "自定义分类3",
-                    "children": []
-                }
-            ], 
-            "id": 1, 
-            "name": "全部终端"
-        },
-        {
-            "children": [
-                {
-                    "id": 2, 
-                    "name": "未分类终端",
-                    "children": []
-                }, 
-                {
-                    "children": [
-                        {
-                            "children": [
-                                {
-                                    "id": 316, 
-                                    "name": "自定义分类1-1-1",
-                                    "children": []
-                                }
-                            ], 
-                            "id": 313, 
-                            "name": "自定义分类1-1"
-                        }, 
-                        {
-                            "id": 314, 
-                            "name": "自定义分类1-2",
-                            "children": []
-                        }
-                    ], 
-                    "id": 310, 
-                    "name": "自定义分类1"
-                }, 
-                {
-                    "children": [
-                        {
-                            "id": 315, 
-                            "name": "自定义分类2-1",
-                            "children": []
-                        }
-                    ], 
-                    "id": 311, 
-                    "name": "自定义分类2"
-                }, 
-                {
-                    "id": 312, 
-                    "name": "自定义分类3",
-                    "children": []
-                }
-            ], 
-            "id": 1, 
-            "name": "全部终端"
-        }
-    ]
-    tree.createTree($('#'+tree.domId), data);
-    */
-
-    // $('.treetree li .fa-angle-left').each(function(i, e){
-    //   $(this).click(function(e){
-    //     alert(1)
-    //   })
-    // })
-
-    // $('.treetree li').each(function(i, e){
-    //   $(this).click(function(e){
-    //     e.preventDefault();
-    //     e.stopPropagation();
-    //   })
-    // })
   }
 
 });

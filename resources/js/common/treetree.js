@@ -9,7 +9,8 @@ define(function(require, exports, module) {
 
 	    var tree = {};
 	    tree.domId = t.domId;
-	    tree.check = t.check;
+	    tree.checkMode = t.checkMode;
+
 
 	    tree.createTree = function(dom, data){
 
@@ -20,69 +21,124 @@ define(function(require, exports, module) {
 	      // 创建树
 	      tree.createNode(dom, data);
 
-	      // 树的展开收起
-	      $('#'+ tree.domId +' li .fa-angle-right').each(function(i, e){
-	        $(this).click(function(e){
-	        	e.preventDefault();
-  		      e.stopPropagation();
-	        	var li = $(this).parent().parent();
-						if (li.hasClass('open')) {
-							tree.closeNode(li);
-						}else{
-							tree.openNode(li);
-						}
-	        })
-	      })
-
-        // 树的选中和取消选中事件
-        if(tree.check !== '0'){
+        // 整行点击
+        $('#'+ tree.domId +' li').each(function(i, e){
           
+          // check click事件
+          $(this).children('a').find('input[type$="checkbox"]').click(function(e){
+
+            var dom = $(this).parent().parent();
+            e.stopPropagation();
+
+            if(tree.checkMode === 'multiple'){
+              tree.checkChildren(dom);
+              tree.checkParent(dom);
+            }
+          })
+
           // 整行点击
-          $('#'+ tree.domId +' li').each(function(i, e){
+          $(this).children('a').click(function(e){
             
-            // check click事件
-            $(this).children('a').find('input[type$="checkbox"]').click(function(e){
-              e.stopPropagation();
-              if($(this).get(0).checked){
-                tree.setMultipleFocus($(this).parent().parent());
-              }else{
-                tree.cancelFocus($(this).parent().parent());
-              }
-            })
+            var dom = $(this).parent();
+            tree.setFocus(dom);
 
-            // 整行点击
-            $(this).children('a').click(function(e){
-              
-              var dom = $(this).parent();
-              if(tree.check === 'single'){
-                tree.setFocus(dom);
-              }
-              else if(tree.check === 'multiple'){
-                if(!$(this).find('input[type$="checkbox"]').get(0).checked){
-                  tree.setMultipleFocus($(this).parent());
-                  $(this).find('input[type$="checkbox"]').get(0).checked = true;
-                }else{
-                  tree.cancelFocus($(this).parent());
-                  $(this).find('input[type$="checkbox"]').get(0).checked = false;
-                }
-              }
+            // 树的展开收起
+            if (dom.hasClass('open')) {
+              tree.closeNode(dom);
+            }else{
+              tree.openNode(dom);
+            }
 
-            })
+          })
+        })
+	    }
+
+      // 向下检查
+      tree.checkChildren = function(dom){
+
+        // 取消选择
+        if (!dom.children('a').find('input[type$="checkbox"]').get(0).checked){
+          dom.children('ul').find('li').each(function(i,e){
+            $(e).find('input[type$="checkbox"]').get(0).checked = false;
           })
         }
-	    }
+
+        // 选择
+        else{
+          dom.children('ul').find('li').each(function(i,e){
+            $(e).find('input[type$="checkbox"]').get(0).checked = true;
+          })
+        }
+      }
+
+      // 向上检查
+      tree.checkParent = function(dom){
+        var parent = dom.parent().parent();
+        if( parent.children('ul').attr('id') == tree.domId ){
+          return;
+        }
+    
+        //取消选择
+        if (!dom.children('a').find('input[type$="checkbox"]').get(0).checked){
+          
+          if( parent.children('a').find('input[type$="checkbox"]').get(0).checked ){
+            
+            parent.children('a').find('input[type$="checkbox"]').get(0).checked = false;
+            
+            if( parent.parent().attr('id') != tree.domId ){
+            
+              tree.checkParent(parent);
+            
+            }
+          }
+          
+        //选择  
+        }else{
+          
+          var checked = true;
+
+          parent.children('ul').find('li').each(function(i,e){
+            if($(e).children('a').find('input[type$="checkbox"]').get(0).checked === false){
+              checked = false;
+              return false;
+            }
+          })
+
+          if( checked ){
+            
+            parent.children('a').find('input[type$="checkbox"]').get(0).checked = true;
+            
+            if( parent.parent().attr('id') != tree.domId ){
+            
+              tree.checkParent(parent);
+            
+            }
+          }
+        
+        }
+      }
 
       tree.getSelectedNodeID = function(){
         var data = [];
-        if(tree.check === 'single'){
+        if(tree.checkMode === 'single'){
           $('#'+tree.domId + ' li.focus').each(function(i,e){
             data.push({nodeId : Number($(e).attr('node-id'))})
           })
-        }else if(tree.check === 'multiple'){
-
+        }else if(tree.checkMode === 'multiple'){
+          getMultipleSelectedNodeID($('#'+tree.domId));
         }
-        
         return data;
+
+        function getMultipleSelectedNodeID(ul){
+          ul.children('li').each(function(i,e){
+            if($(e).children('a').find('input[type$="checkbox"]').get(0).checked){
+              data.push({nodeId : Number($(e).attr('node-id'))})
+            }
+            else if($(e).hasClass('treeview')){
+              getMultipleSelectedNodeID($(e).children('ul'))
+            }
+          })
+        }
       }
 
       tree.getFocusName = function(dom){
@@ -169,7 +225,7 @@ define(function(require, exports, module) {
 
         // 是否可选中
         var checkbox = '';
-        if(tree.check === 'multiple'){
+        if(tree.checkMode === 'multiple'){
           checkbox = '<input type="checkbox">';
         }
 

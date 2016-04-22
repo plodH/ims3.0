@@ -39,7 +39,7 @@ define(function(require, exports, module) {
       function(data){
         if(data.rescode === '200'){
           data = data.TermTree.children;
-          _tree = {domId: 'move-termclass-tree', check: 'single'};
+          _tree = {domId: 'move-termclass-tree', checkMode: 'single'};
           _tree = TREE.new(_tree);
           _tree.createTree($('#'+_tree.domId), data);
           // 选中、打开第一个结点
