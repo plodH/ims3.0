@@ -95,8 +95,29 @@ define(function (require, exports, module) {
         }
     };
 
-    ProgramView.prototype.togglePreview = function () {
-
+    ProgramView.prototype.previewData = function () {
+        var resources = {};
+        this.layout.widgets.forEach(function (el, idx, arr) {
+            var data = null;
+            switch (el.type) {
+                case 'WebBox':
+                    data = {material: el.material, style: el.style === '' ? {} : JSON.parse(el.style)};
+                    break;
+                case 'ClockBox':
+                    data = {};
+                    break;
+                case 'VideoBox':
+                    data = {material: el.material};
+                    break;
+                case 'ImageBox':
+                    data = {material: el.material};
+                    break;
+            }
+            if (data) {
+                resources[el.id] = data;
+            }
+        });
+        return resources;
     };
     
     ProgramView.prototype.destroy = function () {
@@ -117,7 +138,16 @@ define(function (require, exports, module) {
                     widgets[i].requestFocus();
                 }
             }
-            self.onSelectWidget(self.findWidgetById(widgetId));
+            //self.onSelectWidget(self.findWidgetById(widgetId));
+        });
+        $('#channel-editor-wrapper .btn-channel-preview').click(function () {
+            if (!self.editMode) {
+                self.editor.showPreview(self.previewData());
+                self.editMode = true;
+            } else {
+                self.editor.hidePreview();
+                self.editMode = false;
+            }
         });
     };
 
