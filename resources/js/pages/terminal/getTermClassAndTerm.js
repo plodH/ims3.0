@@ -8,9 +8,11 @@ define(function(require, exports, module) {
       _pageNO = 1,
       _checkList = [];
 
-  exports.getSelectedTerm;
+  exports.save;
+  exports.title;
 
   exports.init = function() {
+    $('#term_sel_title').html(exports.title);
     initTree();
     initEvent();
 
@@ -22,8 +24,16 @@ define(function(require, exports, module) {
     // 保存
     $('#term_sel_save').click(function(){
       var categoryList = _tree.getSelectedNodeID();
-      // alert('请选择终端分类或终端');
-      // exports.getSelectedTerm(data);
+      categoryList = JSON.parse(JSON.stringify(categoryList).replace(/nodeId/,'categoryID'));
+      var termList = _checkList;
+      if(categoryList.length === 0 && termList.length ===0){
+        alert('请选择终端分类/终端');
+      }else{
+        var data = [];
+        data.categoryList = categoryList;
+        data.termList = termList;
+        exports.save(data);
+      } 
     })
   }
 
@@ -218,8 +228,7 @@ define(function(require, exports, module) {
             $(e).find('input[type="checkbox"]').iCheck('check');
             _checkList.length = 0;
             _checkList.add($(e).attr('tid'),$(e).attr('status'));
-            onCheckBoxChange();
-            setBatchBtn();
+            onCheckBoxChange(); 
           })
 
         })

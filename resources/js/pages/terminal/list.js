@@ -3,7 +3,7 @@ define(function(require, exports, module) {
   var TREE = require("common/treetree.js"),
       CONFIG = require("common/config.js"),
       UTIL = require("common/util.js"),
-      MOVE = require("pages/terminal/move.js"),
+      SINGLETERMCLASS = require("pages/terminal/getSingleTermClass.js"),
       _tree,
       _timerLoadTermList,
       _pagesize = 10,
@@ -13,9 +13,32 @@ define(function(require, exports, module) {
       _termStatusCount;
 
 	exports.init = function(){
+    test();
     initTree();
     initEvent();
 	}
+
+  function test(){
+    $('#ct').click(function(){
+      var getClassAndTerm = require('pages/terminal/getTermClassAndTerm.js');
+      getClassAndTerm.title = '发布到...';
+      getClassAndTerm.save = function(data){
+        console.log(data);
+        UTIL.cover.close();
+      }
+      UTIL.cover.load('resources/pages/terminal/getTermClassAndTerm.html');
+    })
+
+    $('#c').click(function(){
+      var getClass = require('pages/terminal/getMultipleTermClass.js');
+      getClass.title = '请选取';
+      getClass.save = function(data){
+        console.log(data);
+        UTIL.cover.close();
+      }
+      UTIL.cover.load('resources/pages/terminal/getMultipleTermClass.html');
+    })
+  }
 
   function setBatchBtn(){
     if(_checkList.length === 0){
@@ -43,6 +66,11 @@ define(function(require, exports, module) {
   }
 
   function initEvent(){
+
+    // 终端配置按钮点击
+    $('#tct_config').click(function(){
+      
+    })
 
     // serach
     $('#term_search').click(function(){
@@ -178,7 +206,7 @@ define(function(require, exports, module) {
         return;
       }
 
-      MOVE.getSelectedID = function(id){
+      SINGLETERMCLASS.save = function(id){
 
         var data = {
           "project_name" : CONFIG.projectName,
@@ -205,7 +233,8 @@ define(function(require, exports, module) {
           }
         )
       }
-      UTIL.cover.load('resources/pages/terminal/move.html');
+      SINGLETERMCLASS.title = "移动到...";
+      UTIL.cover.load('resources/pages/terminal/getSingleTermClass.html');
 
     })
   }
@@ -611,11 +640,6 @@ define(function(require, exports, module) {
               }
               loadTermList();
             })
-          })
-
-          // 终端配置按钮点击
-          $('#tct_config').click(function(){
-            UTIL.cover.load('resources/pages/terminal/selectTerm.html');
           })
 
           // 添加终端分类按钮点击
