@@ -83,6 +83,16 @@ define(function (require, exports, module) {
         });
         this.editor = new layoutEditor.LayoutEditor(data, canvasWidth, canvasHeight, false);
         this.editor.attachToDOM(canvas[0]);
+        for (var i = this.editor.mLayout.mWidgets.length - 1; i >= 0; i--) {
+            var widget = this.editor.mLayout.mWidgets[i],
+                data = {
+                    id: widget.mId,
+                    name: widget.mTypeName,
+                    background_color: widget.mBackgroundColor
+                };
+            $('#channel-editor-wrapper .channel-program-layout-footer')
+                .append(templates.channel_edit_widget_item(data));
+        }
     };
 
     ProgramView.prototype.togglePreview = function () {
@@ -94,7 +104,35 @@ define(function (require, exports, module) {
     };
 
     ProgramView.prototype.registerEventListeners = function () {
+        var self = this;
+        this.editor.onFocusChanged(function () {
+            var focusedWidget = self.editor.getLayout().getFocusedWidget();
+            var widgetId = focusedWidget.mId;
+            self.onSelectWidget(self.findWidgetById(widgetId));
+        });
+        $('#channel-editor-wrapper .channel-program-layout-footer li').click(function () {
+            var widgetId = Number(this.getAttribute('data-id')), widgets = self.editor.mLayout.mWidgets;
+            for (var i = 0; i < widgets.length; i++) {
+                if (widgets[i].mId === widgetId) {
+                    widgets[i].requestFocus();
+                }
+            }
+            self.onSelectWidget(self.findWidgetById(widgetId));
+        });
+    };
 
+    ProgramView.prototype.findWidgetById = function (id) {
+        for (var i = 0; i < this.layout.widgets.length; i++) {
+            if (this.layout.widgets[i].id === id) {
+                return this.layout.widgets[i];
+            }
+        }
+        return null;
+    };
+
+    ProgramView.prototype.onSelectWidget = function (widget) {
+        this.loadWidget(widget);
+        
     };
     
     function createProgramView(program) {
