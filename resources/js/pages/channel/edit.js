@@ -8,7 +8,8 @@ define(function(require, exports, module) {
 	var templates = require('common/templates'),
 		config = require('common/config'),
 		util = require('common/util'),
-		layoutDialog = require('pages/layout/list_dialog');
+		layoutDialog = require('pages/layout/list_dialog'),
+		programView = require('pages/channel/program');
 
 	/**
 	 * 全局配置
@@ -260,7 +261,11 @@ define(function(require, exports, module) {
 		/**
 		 * 当前节目的id
 		 */
-        g_CurrentProgramId;
+        g_CurrentProgramId,
+		/**
+		 * 当前节目视图
+		 */
+		g_ProgramView;
 
 	/**
 	 * 初始化节目列表
@@ -328,6 +333,12 @@ define(function(require, exports, module) {
 		g_CurrentProgramId = programId;
 		$('#channel-editor-wrapper ul>li').removeClass('selected');
 		$('#channel-editor-wrapper ul>li[data-id=' + g_CurrentProgramId + ']').addClass('selected');
+		if (g_ProgramView) {
+			g_ProgramView.destroy();
+		}
+		var newView = programView.createProgramView(findProgramById(g_CurrentProgramId));
+		programView.loadProgramView(newView);
+		g_ProgramView = newView;
 	}
 	
 });
