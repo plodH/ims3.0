@@ -214,6 +214,7 @@
 <!-- Backbone -->
 <script src="resources/js/bower_components/backbone/backbone-min.js"></script>
 
+
 <script>
 	seajs.config({
 	  base: "./resources/js/"

@@ -90,7 +90,7 @@ define(function (require, exports, module) {
                     name: widget.mTypeName,
                     background_color: widget.mBackgroundColor
                 };
-            $('#channel-editor-wrapper .channel-program-layout-footer')
+            $('#channel-editor-wrapper .channel-program-layout-footer>ul')
                 .append(templates.channel_edit_widget_item(data));
         }
     };
@@ -132,7 +132,7 @@ define(function (require, exports, module) {
 
     ProgramView.prototype.onSelectWidget = function (widget) {
         this.loadWidget(widget);
-        
+
     };
     
     function createProgramView(program) {

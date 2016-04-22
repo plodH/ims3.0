@@ -823,7 +823,7 @@ define(function (require, exports, module) {
         this.mFocusMask.style.left        = widget ? this.mFocusedWidget.mLeft  * zoomFactor + 'px' : '0px';
         this.mFocusMask.style.width       = widget ? this.mFocusedWidget.mWidth * zoomFactor + 'px' : '0px';
         this.mFocusMask.style.height      = widget ? this.mFocusedWidget.mHeight    * zoomFactor + 'px' : '0px';
-        this.mFocusMask.style.border      = widget ? 'solid 2px #f00' : 'none';
+        this.mFocusMask.style.border      = widget ? 'solid 1px rgb(0,255,255)' : 'none';
         this.mContext.notifyFocusChanged();
     };
 
