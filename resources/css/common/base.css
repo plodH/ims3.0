@@ -110,6 +110,7 @@ a {
 	max-width: 431px;
     text-overflow: ellipsis;
     overflow: hidden;
+    white-space: nowrap;
 }
 
 .mtr_size {
@@ -143,10 +144,10 @@ a {
     top: 0px;
 }
 
-#upload_box, #mtrEdit_box, #mtrUplLive_box{
+#upload_box, #mtrEdit_box, #mtrUplLive_box, #mtrChoise_box {
 	width: 600px;
     margin: auto;
-    max-height: 560px;
+    max-height: 80%;
 }
 
 #box_fileList{
@@ -161,6 +162,19 @@ a {
 	max-width: 240px;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+/*资源选择页面*/
+.mtr_choise_name {
+	width: 50%;
+	max-width: 300px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.mtr_choise_status {
+	width: 15%;
 }
 
 /*layout edit*/

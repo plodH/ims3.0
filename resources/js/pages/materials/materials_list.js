@@ -94,14 +94,14 @@ define(function (require, exports, module) {
                     if (typeId == "4"){
                     	var data = JSON.stringify({
                             Action: 'DeleteMulti',
-                            Project: UTIL.getCookie("project_name"),
+                            Project: CONFIG.projectName,
                             MaterialIDs: MaterialIDs,
                         });
                     	var url = CONFIG.serverRoot + '/backend_mgt/v1/webmaterials';
                     }else {
                     	var data = JSON.stringify({
                             action: 'DeleteMulti',
-                            project_name: UTIL.getCookie("project_name"),
+                            project_name: CONFIG.projectName,
                             MaterialIDs: MaterialIDs,
                         });
                     	var url = CONFIG.serverRoot + '/backend_mgt/v1/materials';
@@ -130,7 +130,7 @@ define(function (require, exports, module) {
         		openLive();
         	}else {
         		var page = "resources/pages/materials/materials_edit.html";
-                INDEX.coverArea(page);
+        		UTIL.cover.load(page);
         	}
         })
 
@@ -205,7 +205,7 @@ define(function (require, exports, module) {
         };
         var data = JSON.stringify({
             action: 'GetPage',
-            project_name: UTIL.getCookie("project_name"),
+            project_name: CONFIG.projectName,
             material_type: mtrType,
             Pager: pager
         });
@@ -229,7 +229,8 @@ define(function (require, exports, module) {
             page: CONFIG.pager.page,
             currentPage: Number(json.Pager.page),
             onPageChange: function (num, type) {
-                if (type === 'change') {
+                if (type == 'change') {
+                	$('#materials-table-pager').jqPaginator('destroy');
                     var typeId = $("#mtrChoise li.active").attr("typeid");
                     exports.loadPage(num, Number(typeId));
                 }
@@ -256,9 +257,9 @@ define(function (require, exports, module) {
                 	for (var x = 0; x < mtrData.length; x++) {
                         var mtrtr = '<tr mtrID="' + mtrData[x].ID + '">' +
                             '<td class="mtr_checkbox"><input type="checkbox" id="mtr_cb" class="mtr_cb" mtrID="' + mtrData[x].ID + '" url="' + mtrData[x].URL + '"></td>' +
-                            '<td class="mtr_name">' + mtrData[x].Name + '</td>' +
+                            '<td class="mtr_name" title="' +mtrData[x].Name+ '">' + mtrData[x].Name + '</td>' +
                             '<td class="mtr_size">' + mtrData[x].Size + '</td>' +
-                            '<td class="mtr_time">' + mtrData[x].Duration + '</td>' +
+                            '<td class="mtr_time">00:00:00</td>' +
                             '<td class="mtr_uploadUser">' + mtrData[x].CreateName + '</td>' +
                             '<td class="mtr_uploadDate">' + mtrData[x].CreateTime + '</td>' +
                             '</tr>';
@@ -268,7 +269,7 @@ define(function (require, exports, module) {
                 	for (var x = 0; x < mtrData.length; x++) {
                         var mtrtr = '<tr mtrID="' + mtrData[x].ID + '">' +
                             '<td class="mtr_checkbox"><input type="checkbox" id="mtr_cb" class="mtr_cb" mtrID="' + mtrData[x].ID + '" url="' + mtrData[x].URL + '"></td>' +
-                            '<td class="mtr_name"><a href="' + mtrData[x].URL + '" target="_blank">' + mtrData[x].Name + '</a></td>' +
+                            '<td class="mtr_name" title="' +mtrData[x].Name+ '"><a href="' + mtrData[x].URL + '" target="_blank">' + mtrData[x].Name + '</a></td>' +
                             '<td class="mtr_size">' + mtrData[x].Size + '</td>' +
                             '<td class="mtr_time">' + mtrData[x].Duration + '</td>' +
                             '<td class="mtr_uploadUser">' + mtrData[x].CreateName + '</td>' +

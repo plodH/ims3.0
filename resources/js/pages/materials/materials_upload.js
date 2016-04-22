@@ -35,6 +35,7 @@ define(function (require, exports, module) {
 
         //最小化上传窗口
         $('#BtMinimize').click(function () {
+        	alert("可点击右上方的云按钮重新打开上传页面！");
             $("#page_upload").css("display", "none");
             $("#dpUpl").css("display", "block");
         })
