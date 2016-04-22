@@ -13,15 +13,15 @@
     <div class="col-md-9" class="box box-primary"  style="padding-left:0; padding-right:0; height:400px; overflow:auto; border-left: 1px solid #f4f4f4">
         <div class="box-header with-border">
            <!-- Check all button -->
-           <button id="term-list-select-all" type="button" class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i>
+           <button id="term－sel-list-select-all" type="button" class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i>
            </button>
           <h3 class="box-title">
-            <span id="termlist-title"> 全部</span>
+            <span id="select-termlist-title"> 全部</span>
           </h3>
 
           <div class="box-tools">
             <div class="has-feedback">
-              <input id="term_search" type="text" class="form-control input-sm" placeholder="搜索终端">
+              <input id="term_sel_search" type="text" class="form-control input-sm" placeholder="搜索终端">
               <span class="glyphicon glyphicon-search form-control-feedback"></span>
             </div>
           </div>
@@ -31,63 +31,7 @@
         <div class="box-body no-padding">
           <div class="table-responsive mailbox-messages">
             <table class="table table-hover table-striped">
-              <tbody id="term_list">
-                <tr tid="1" status="offline">
-                    <td>
-                        <div class="icheckbox_flat-blue" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins></div>
-                    </td>
-                    <td>测试终端1</td>
-                    <td>离线</td>
-                    <td>当前频道：</td>
-                </tr>
-                <tr tid="1" status="offline">
-                    <td>
-                        <div class="icheckbox_flat-blue" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins></div>
-                    </td>
-                    <td>测试终端1</td>
-                    <td>离线</td>
-                    <td>当前频道：</td>
-                </tr>
-                <tr tid="1" status="offline">
-                    <td>
-                        <div class="icheckbox_flat-blue" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins></div>
-                    </td>
-                    <td>测试终端1</td>
-                    <td>离线</td>
-                    <td>当前频道：</td>
-                </tr>
-                <tr tid="1" status="offline">
-                    <td>
-                        <div class="icheckbox_flat-blue" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins></div>
-                    </td>
-                    <td>测试终端1</td>
-                    <td>离线</td>
-                    <td>当前频道：</td>
-                </tr>
-                <tr tid="1" status="offline">
-                    <td>
-                        <div class="icheckbox_flat-blue" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins></div>
-                    </td>
-                    <td>测试终端1</td>
-                    <td>离线</td>
-                    <td>当前频道：</td>
-                </tr>
-                <tr tid="1" status="offline">
-                    <td>
-                        <div class="icheckbox_flat-blue" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins></div>
-                    </td>
-                    <td>测试终端1</td>
-                    <td>离线</td>
-                    <td>当前频道：</td>
-                </tr>
-                <tr tid="1" status="offline">
-                    <td>
-                        <div class="icheckbox_flat-blue" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins></div>
-                    </td>
-                    <td>测试终端1</td>
-                    <td>离线</td>
-                    <td>当前频道：</td>
-                </tr>
+              <tbody id="term_sel_list">
               </tbody>
             </table>
             <!-- /.table -->
@@ -98,7 +42,7 @@
         <div class="box-footer no-padding">
           <div class="mailbox-controls">
             <div class="text-center">
-              <ul id="term-table-pager" class="pagination"><li jp-role="first" jp-data="1" class="disabled"><a href="javascript:;">首页</a></li><li jp-role="prev" jp-data="0" class="disabled"><a href="javascript:;">上一页</a></li><li jp-role="page" jp-data="1" class="active"><a href="javascript:;">1</a></li><li jp-role="page" jp-data="2"><a href="javascript:;">2</a></li><li jp-role="page" jp-data="3"><a href="javascript:;">3</a></li><li jp-role="page" jp-data="4"><a href="javascript:;">4</a></li><li jp-role="page" jp-data="5"><a href="javascript:;">5</a></li><li jp-role="page" jp-data="6"><a href="javascript:;">6</a></li><li jp-role="page" jp-data="7"><a href="javascript:;">7</a></li><li jp-role="page" jp-data="8"><a href="javascript:;">8</a></li><li jp-role="page" jp-data="9"><a href="javascript:;">9</a></li><li jp-role="page" jp-data="10"><a href="javascript:;">10</a></li><li jp-role="next" jp-data="2"><a href="javascript:;">下一页</a></li><li jp-role="last" jp-data="66"><a href="javascript:;">末页</a></li></ul>
+              <ul id="select-term-table-pager" class="pagination"></ul>
             </div>
             <!-- /.pull-right -->
           </div>

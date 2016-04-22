@@ -6,7 +6,7 @@ define(function(require, exports, module) {
       MOVE = require("pages/terminal/move.js"),
       _tree,
       _timerLoadTermList,
-      _pagesize = CONFIG.pager.pageSize,
+      _pagesize = 10,
       _pageNO = 1,
       _checkList = [],
       _snapTermID,
@@ -195,6 +195,11 @@ define(function(require, exports, module) {
               alert('移动终端失败')
             }else{
               UTIL.cover.close();
+              // 复原筛选框
+              if($('#term-status button.btn-primary').length > 0){
+                $('#term-status button.btn-primary').removeClass('btn-primary');
+                $('#term-status button.btn-primary').addClass('btn-defalut');
+              }
               loadTermList(_pageNO);
             }
           }
@@ -458,9 +463,12 @@ define(function(require, exports, module) {
 
           // 点击整行
           $(e).click(function(){
-            var input = $(e).find('input[type="checkbox"]');
-            var check = !input.parent().hasClass('checked');
-            input.iCheck((check?'check':'uncheck'));
+            $('#term_list tr input[type="checkbox"]').iCheck('uncheck');
+            $(e).find('input[type="checkbox"]').iCheck('check');
+            _checkList.length = 0;
+            _checkList.add($(e).attr('tid'),$(e).attr('status'));
+            onCheckBoxChange();
+            setBatchBtn();
           })
 
           // 编辑
