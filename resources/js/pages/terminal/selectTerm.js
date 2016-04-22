@@ -203,12 +203,10 @@ define(function(require, exports, module) {
         .on('ifChecked', function(event){
            _checkList.add($(this).parent().parent().parent().attr('tid'),$(this).parent().parent().parent().attr('status'));
            onCheckBoxChange();
-           setBatchBtn();
         })
         .on('ifUnchecked', function(event){
            _checkList.delete($(this).parent().parent().parent().attr('tid'));
            onCheckBoxChange();
-           setBatchBtn();
         });
 
         // 点击
