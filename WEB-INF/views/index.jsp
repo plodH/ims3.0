@@ -60,7 +60,7 @@
           <li class="dropdown user user-menu">
             <a class="dropdown-toggle" data-toggle="dropdown">
               <img src="resources/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
-              <span id="username" class="hidden-xs"><sec:authentication property="name"/></span>
+              <span id="username" class="hidden-xs"><sec:authentication property="name"/>@${project_name}</span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
@@ -68,7 +68,7 @@
                 <img src="resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
 
                 <p>
-                  <sec:authentication property="name"/>
+                  <sec:authentication property="name"/>@${project_name}
                   <small>Member since Nov. 2012</small>
                 </p>
               </li>
@@ -131,7 +131,7 @@
             <li><a href="#"><i class="fa fa-circle-o"></i> 日志</a></li>
           </ul>
         </li>
-        <li id="treeview_mtr">
+        <li id="treeview_mtr" class="treeview">
           <a href="#materials/materials_list">
             <i class="fa fa-book"></i> <span>资源</span>
           </a>
@@ -156,13 +156,10 @@
           <ul class="treeview-menu">
             <li><a href="#channel/list"><i class="fa fa-circle-o"></i> 频道列表</a></li>
             <li><a href="#channel/edit"><i class="fa fa-circle-o"></i> 新建频道</a></li>
+            <li><a href="#layout/list"><i class="fa fa-circle-o"></i> 布局列表</a></li>
           </ul>
         </li>
-		<li id="treeview_layout">
-          <a href="#layout/list">
-            <i class="fa fa-book"></i> <span>布局</span>
-          </a>
-        </li>
+		
       </ul>
     </section>
     <!-- /.sidebar -->
