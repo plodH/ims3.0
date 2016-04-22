@@ -453,6 +453,10 @@ define(function (require, exports, module) {
     LayoutEditor.prototype.attachToDOM  = function (el) {
         this.onDraw();
         el.appendChild(this.mElement);
+        var self = this, $el = $(el);
+        $(window).bind('resize', function () {
+             self.resize($el.width(), $el.height());
+        });
     };
 
     /**
@@ -499,6 +503,14 @@ define(function (require, exports, module) {
      */
     LayoutEditor.prototype.notifyWidgetsChanged = function () {
         this.mWidgetsChangedListener && this.mWidgetsChangedListener(this);
+    };
+
+    LayoutEditor.prototype.showPreview = function (resources) {
+        this.mLayout.showPreview(resources);
+    };
+
+    LayoutEditor.prototype.hidePreview = function () {
+        this.mLayout.hidePreview();
     };
 
     /**
@@ -925,6 +937,23 @@ define(function (require, exports, module) {
         return true;
     };
 
+    Layout.prototype.showPreview = function (resources) {
+        var self = this;
+        Object.keys(resources).forEach(function (id) {
+            self.mWidgets.forEach(function (el, idx, arr) {
+                if (id === el.mId) {
+                    el.showPreivew(resources[id]);
+                }
+            });
+        });
+    };
+
+    Layout.prototype.hidePreview = function () {
+        this.mWidgets.forEach(function (el, idx, arr) {
+            el.hidePreview();
+        });
+    };
+
     /**
      * Widget类的构造函数
      * @param obj
@@ -1184,6 +1213,14 @@ define(function (require, exports, module) {
         //}
     };
 
+    Widget.prototype.showPreview = function () {};
+
+    Widget.prototype.hiddenPreivew = function () {
+        while (this.mElement.firstChild) {
+            this.mElement.removeChild(this.mElement.firstChild);
+        }
+    };
+
     /**
      * 图片控件
      * @constructor
@@ -1193,8 +1230,12 @@ define(function (require, exports, module) {
     }
     ImageWidget.prototype = Object.create(Widget.prototype);
     ImageWidget.prototype.constructor = ImageWidget;
-    ImageWidget.prototype.onDraw = function () {
-        Widget.prototype.onDraw.call(this);
+    ImageWidget.prototype.showPreview = function (resource) {
+        var img = document.createElement('img');
+        img.setAttribute('width', '100%');
+        img.setAttribute('height', '100%');
+        img.setAttribute('src', resource.url);
+        this.mElement.appendChild(img);
     };
 
     /**
@@ -1206,8 +1247,37 @@ define(function (require, exports, module) {
     }
     VideoWidget.prototype = Object.create(Widget.prototype);
     VideoWidget.prototype.constructor = VideoWidget;
-    VideoWidget.prototype.onDraw = function () {
-        Widget.prototype.onDraw.call(this);
+    VideoWidget.prototype.showPreview = function (resource) {
+        
+        function suffix(suffix) {
+            return this.indexOf(suffix, this.length - suffix.length) !== -1;
+        }
+        
+        if (
+            suffix.call(resource.url, '.jpg') ||
+            suffix.call(resource.url, '.png') ||
+            suffix.call(resource.url, '.bmp') ||
+            suffix.call(resource.url, '.gif') ||
+            suffix.call(resource.url, '.jpeg')
+        ) {
+            var img = document.createElement('img');
+            img.setAttribute('width', '100%');
+            img.setAttribute('height', '100%');
+            img.setAttribute('src', resource.url);
+            this.mElement.appendChild(img);
+        } else {
+            var video = document.createElement('video'),
+                source = document.createElement('source');
+            video.setAttribute('autoplay', '');
+            video.setAttribute('loop', '');
+            video.setAttribute('width', '100%');
+            video.setAttribute('height', '100%');
+            source.setAttribute('src', resource.url);
+            source.setAttribute('type', 'video/mp4');
+            source.textContent = '您的浏览器不支持video标签.';
+            video.appendChild(source);
+            this.mElement.appendChild(video);
+        }
     };
 
     /**
@@ -1219,8 +1289,12 @@ define(function (require, exports, module) {
     }
     AudioWidget.prototype = Object.create(Widget.prototype);
     AudioWidget.prototype.constructor = AudioWidget;
-    AudioWidget.prototype.onDraw = function () {
-        Widget.prototype.onDraw.call(this);
+    AudioWidget.prototype.showPreview = function (resource) {
+        var img = document.createElement('img');
+        img.setAttribute('width', '100%');
+        img.setAttribute('height', '100%');
+        img.setAttribute('src', resource.url);
+        this.mElement.appendChild(img);
     };
 
     /**
@@ -1232,8 +1306,30 @@ define(function (require, exports, module) {
     }
     HTMLWidget.prototype = Object.create(Widget.prototype);
     HTMLWidget.prototype.constructor = HTMLWidget;
-    HTMLWidget.prototype.onDraw = function () {
-        Widget.prototype.onDraw.call(this);
+    HTMLWidget.prototype.showPreview = function (resource) {
+        if (resource.style.type === 'Marquee') {
+            var marquee = document.createElement('marquee');
+            marquee.setAttribute('width', '100%');
+            marquee.setAttribute('height', '100%');
+            marquee.setAttribute('direction', 'left');
+            marquee.style.fontSize = (this.mElement.offsetHeight * 0.9) + 'px';
+            marquee.textContent(resource.url);
+            this.mElement.appendChild(marquee);
+        } else {
+            var iframe = document.createElement('iframe');
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('scrolling', 'no');
+            iframe.setAttribute('seamless', 'seamless');
+            iframe.setAttribute('allowtransparency', 'true');
+            iframe.style.width =
+                iframe.style.height = '100%';
+            iframe.style.overflowY = 'hidden';
+            this.mElement.appendChild(iframe);
+            var frameWindow = iframe.contentWindow || iframe.contentWindow.document || iframe.contentDocument;
+            frameWindow.document.open();
+            frameWindow.document.write(resource.url);
+            frameWindow.document.close();
+        }
     };
 
     /**
@@ -1245,8 +1341,8 @@ define(function (require, exports, module) {
     }
     ClockWidget.prototype = Object.create(Widget.prototype);
     ClockWidget.prototype.constructor = ClockWidget;
-    ClockWidget.prototype.onDraw = function () {
-        Widget.prototype.onDraw.call(this);
+    ClockWidget.prototype.showPreview = function (resource) {
+        //
     };
 
     exports.LayoutEditor = LayoutEditor;

@@ -74,6 +74,7 @@
 
 #channel-editor-wrapper .channel-program-layout-body {
     height: calc(100% - 160px);
+    position: relative;
 }
 
 #channel-editor-wrapper .channel-program-layout-footer {

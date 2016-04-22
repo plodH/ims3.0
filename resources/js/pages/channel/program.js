@@ -4,7 +4,8 @@ define(function (require, exports, module) {
 
     var templates = require('common/templates'),
         config = require('common/config'),
-        util = require('common/util');
+        util = require('common/util'),
+        layoutEditor = require('common/layout_editor');
 
     var requestUrl = config.serverRoot,
         projectName = config.projectName;
@@ -45,10 +46,55 @@ define(function (require, exports, module) {
         };
         $('#channel-editor-wrapper .channel-program-editor')
             .html(templates.channel_edit_program(data));
+        this.renderEditor();
+        this.registerEventListeners();
+        this.loadWidget(this.layout.widgets[0]);
+    };
+
+    ProgramView.prototype.renderEditor = function () {
+        var widgets = [],
+            data = {
+                id: this.layout.id,
+                name: this.layout.name,
+                nameEng: this.layout.nameEng,
+                width: this.layout.width,
+                height: this.layout.height,
+                topMargin: this.layout.topMargin,
+                leftMargin: this.layout.leftMargin,
+                rightMargin: this.layout.rightMargin,
+                bottomMargin: this.layout.bottomMargin,
+                backgroundColor: this.layout.backgroundColor,
+                backgroundImage: this.layout.backgroundImage,
+                widgets: widgets
+            },
+            canvas = $('#channel-editor-wrapper .channel-program-layout-body'),
+            canvasHeight = canvas.height(),
+            canvasWidth = canvas.width();
+        this.layout.widgets.forEach(function (el, idx, arr) {
+            widgets.push({
+                top: el.top,
+                left: el.left,
+                width: el.width,
+                height: el.height,
+                id: el.id,
+                type: el.type,
+                typeName: el.typeName
+            });
+        });
+        this.editor = new layoutEditor.LayoutEditor(data, canvasWidth, canvasHeight, false);
+        this.editor.attachToDOM(canvas[0]);
+    };
+
+    ProgramView.prototype.togglePreview = function () {
+
     };
     
     ProgramView.prototype.destroy = function () {
         
+    };
+
+    ProgramView.prototype.registerEventListeners = function () {
+
     };
     
     function createProgramView(program) {
@@ -81,6 +127,12 @@ define(function (require, exports, module) {
             });
         });
     }
+
+    ProgramView.prototype.loadWidget = function (widget) {
+        this.curentWidget = widget;
+        localStorage.setItem('widget', JSON.stringify(widget));
+        $('#channel-editor-wrapper .channel-program-widget').load('resources/pages/channel/edit_widget.html');
+    }
     
     function loadProgramView(view) {
 
@@ -95,7 +147,20 @@ define(function (require, exports, module) {
             util.ajax('post', requestUrl + '/backend_mgt/v1/programs', data, function (res) {
                 var widgetIds = [],
                     widgets = [],
-                    layout = {};
+                    layout = {
+                        name: res.Layout.Name,
+                        nameEng: res.Layout.Name_eng,
+                        width: res.Layout.Width,
+                        height: res.Layout.Height,
+                        topMargin: res.Layout.TopMargin,
+                        leftMargin: res.Layout.LeftMargin,
+                        rightMargin: res.Layout.RightMargin,
+                        bottomMargin: res.Layout.BottomMargin,
+                        backgroundColor: res.Layout.BackgroundColor,
+                        backgroundImage: {
+                           url: res.Layout.BackgroundPic_URL
+                        }
+                    };
                 res.ControlBoxs.forEach(function (el, idx, arr) {
                     widgetIds.push(el.ID);
                     widgets.push({

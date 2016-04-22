@@ -208,8 +208,11 @@
 <script src="resources/plugins/iCheck/icheck.min.js"></script>
 <script src="resources/plugins/jqPaginator/jqPaginator.min.js"></script>
 <!-- RubaXa/Sortable -->
-<script src="resources/plugins/Sortable/Sortable.min.js"></script>
-
+<script src="resources/js/bower_components/Sortable/Sortable.min.js"></script>
+<!-- underscore -->
+<script src="resources/js/bower_components/underscore/underscore-min.js"></script>
+<!-- Backbone -->
+<script src="resources/js/bower_components/backbone/backbone-min.js"></script>
 
 <script>
 	seajs.config({
