@@ -1,8 +1,8 @@
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
-        用户列表
-        <small>User list</small>
+        角色列表
+        <small>Roles list</small>
     </h1>
 </section>
 
@@ -12,7 +12,7 @@
         <div class="col-md-12">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 id="userLisTitle" class="box-title"></h3>                    
+                    <h3 id="rolesLisTitle" class="box-title"></h3>                    
                     <!-- /.box-tools -->
                 </div>
                 <!-- /.box-header -->
@@ -20,7 +20,7 @@
                     <div class="mailbox-controls">
                         
                         <div class="btn-group">
-                       		<button id="user_add" type="button" class="btn btn-default btn-sm">添加</button>
+                       		<button id="roles_add" type="button" class="btn btn-default btn-sm">添加</button>
                         </div>
                         <!-- /.btn-group -->
 
@@ -30,7 +30,7 @@
                     </div>
                     <div class="table-responsive mailbox-messages">
                         <!-- 资源列表 -->
-                        <table id="userTable" class="table table-hover table-striped">
+                        <table id="rolesTable" class="table table-hover table-striped">
                             <tbody>
 
                             </tbody>
@@ -42,7 +42,7 @@
                 <!-- /.box-body -->
                 <div class="box-footer no-padding text-center">
                     <!-- 翻页 -->
-                    <ul id="user-table-pager" class="pagination">
+                    <ul id="roles-table-pager" class="pagination">
                     </ul>
                 </div>
             </div>
@@ -57,7 +57,7 @@
 </section>
 <!-- /.content -->
 <script>
-    seajs.use("pages/user/user_list.js", function (userList) {
-        userList.init()
+    seajs.use("pages/user/roles_list.js", function (rolesList) {
+        rolesList.init()
     })
 </script>

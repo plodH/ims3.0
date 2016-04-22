@@ -93,3 +93,22 @@
     clear: both;
 }
 
+#channel-editor-wrapper .channel-program-layout-footer {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#channel-editor-wrapper .channel-program-layout-footer>ul {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+#channel-editor-wrapper .channel-program-layout-footer li {
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    color: #ffffff;
+    margin: 10px;
+}

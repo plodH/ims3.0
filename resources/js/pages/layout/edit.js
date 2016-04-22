@@ -453,10 +453,15 @@ define(function(require, exports, module) {
             focusedWidget = editor.getLayout().getFocusedWidget();
         //$('#layout-editor-wrapper .layout-editor-widget-properties').toggleClass('none', !focusedWidget);
         widgetProperties[0].value = focusedWidget ? focusedWidget.mTypeName : '';
-        widgetProperties[1].value = focusedWidget ? focusedWidget.mTop: 0;
-        widgetProperties[2].value = focusedWidget ? focusedWidget.mLeft : 0;
+        widgetProperties[1].value = focusedWidget ? focusedWidget.mLeft: 0;
+        widgetProperties[2].value = focusedWidget ? focusedWidget.mTop : 0;
         widgetProperties[3].value = focusedWidget ? focusedWidget.mWidth : 0;
         widgetProperties[4].value = focusedWidget ? focusedWidget.mHeight : 0;
+        $('#layout-editor-wrapper li').each(function (idx, el) {
+            var $this = $(this),
+                index = $this.attr('data-widget-index');
+             $this.toggleClass('focused', editor.mLayout.mWidgets[index] === focusedWidget);
+        });
     }
 
     function onAddWidget(ev) {

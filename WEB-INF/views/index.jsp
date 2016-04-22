@@ -144,7 +144,7 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="#user/user_list"><i class="fa fa-circle-o"></i> 用户</a></li>
-            <li><a href="#"><i class="fa fa-circle-o"></i> 角色</a></li>
+            <li><a href="#user/roles_list"><i class="fa fa-circle-o"></i> 角色</a></li>
           </ul>
         </li>
 		<li class="treeview">
@@ -210,6 +210,7 @@
 <script src="resources/js/bower_components/underscore/underscore-min.js"></script>
 <!-- Backbone -->
 <script src="resources/js/bower_components/backbone/backbone-min.js"></script>
+
 
 <script>
 	seajs.config({
