@@ -127,11 +127,11 @@
             <i class="fa fa-dashboard"></i> <span>终端</span> <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li class="active"><a href="#terminal/list"><i class="fa fa-circle-o"></i> 终端</a></li>
+            <li class="active"><a id="menu_termlist" href="#terminal/list"><i class="fa fa-circle-o"></i> 终端</a></li>
             <li><a href="#"><i class="fa fa-circle-o"></i> 日志</a></li>
           </ul>
         </li>
-        <li>
+        <li id="treeview_mtr">
           <a href="#materials/materials_list">
             <i class="fa fa-book"></i> <span>资源</span>
           </a>
@@ -158,7 +158,7 @@
             <li><a href="#channel/edit"><i class="fa fa-circle-o"></i> 新建频道</a></li>
           </ul>
         </li>
-		<li>
+		<li id="treeview_layout">
           <a href="#layout/list">
             <i class="fa fa-book"></i> <span>布局</span>
           </a>

@@ -15,6 +15,10 @@ function inputCheck(){
         return false;
     }
 	
+	var userName = $("#l_username").val();
+	$("#j_username").attr("value", userName.substring(0, userName.indexOf('@')));
+	$("#j_project_name").attr("value", userName.substring(userName.lastIndexOf('@') + 1));
+	
 	cookies();
 }
 

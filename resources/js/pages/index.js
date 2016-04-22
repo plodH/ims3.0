@@ -4,11 +4,29 @@ define(function (require, exports, module) {
 
     exports.init = function () {
 
-        loadPage();
+        loadPage(null);
 
         window.onhashchange = function () {
-            loadPage();
+        	var page = window.location.hash.match(/^#([^?]*)/);
+            loadPage(page);
         }
+        
+        //选择资源
+        $("#treeview_mtr").click(function () {
+        	$(".sidebar-menu li").attr("class","treeview");
+        	$(".sidebar-menu li ul").css("display","none");
+        	$("#treeview_mtr").attr("class","active");
+        	var page = window.location.hash.match(/^#([^?]*)/);
+            loadPage(page);
+        })
+        //选择布局
+        $("#treeview_layout").click(function () {
+        	$(".sidebar-menu li").attr("class","treeview");
+        	$(".sidebar-menu li ul").css("display","none");
+        	$("#treeview_layout").attr("class","active");
+        	var page = window.location.hash.match(/^#([^?]*)/);
+            loadPage(page);
+        })
 
     };
     //上传弹层页面
@@ -16,16 +34,9 @@ define(function (require, exports, module) {
         $("#page_upload").load('resources/pages/materials/materials_upload.html');
         $("#page_upload").css("display","flex");
     }
-    //全屏弹层页面
-    exports.coverArea = function(page){
-        //$("#cover_area").load('resources/pages/materials/materials_edit.html');
-        $("#cover_area").load(page);
-        $("#cover_area").css("display","flex");
-    }
 
-    function loadPage() {
-
-        var page = window.location.hash.match(/^#([^?]*)/);
+    function loadPage(page) {
+    	$("#menu_termlist").trigger("click");
         page = page === null ? 'terminal/list' : page[1];
 
         // load页面
