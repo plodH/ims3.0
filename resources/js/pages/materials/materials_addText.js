@@ -21,8 +21,8 @@ define(function (require, exports, module) {
     }
 
     function loadPage() {
-    	//修改
-    	if ($("#mtr_edit").attr("edit_type") == "文本"){
+    	if ($("#mtr_edit").attr("edit_type") == "文本"){			//修改
+    		$("#mtr_atTitle").html("编辑文本");
     		var mtrId;
             for (var x = 0; x < $(".mtr_cb").length; x++) {
                 if ($(".mtr_cb:eq(" + x + ")").get(0).checked) {
@@ -56,11 +56,14 @@ define(function (require, exports, module) {
             );
             //保存
             $("#Tmtr_submit").click(function () {
+            	if(!inputCheck()) return;
                 onSubmit(mtrId);
             })
-    	}else {
+    	}else {													//添加
+    		$("#mtr_atTitle").html("添加文本");
     		$("#Tmtr_submit").click(function () {
-                onSubmit();
+    			if(!inputCheck()) return;
+    			onSubmit();
             })
     	}
     }
@@ -112,5 +115,17 @@ define(function (require, exports, module) {
     	    });
     	}
         
+    }
+    
+    //检测文本框事件
+    function inputCheck(){
+        var errormsg = ""; 
+    	if ($("#Tmtr_name").val() == ""){
+    		errormsg += "请输入文本资源名称！";
+    	}
+    	if (errormsg != ""){
+    		alert(errormsg);
+    		return;
+    	}
     }
 })

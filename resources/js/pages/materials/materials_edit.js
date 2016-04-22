@@ -21,7 +21,7 @@ define(function (require, exports, module) {
             }
             var data = JSON.stringify({
                 action: 'Put',
-                project_name: UTIL.getCookie("project_name"),
+                project_name: CONFIG.projectName,
                 Data: material
             });
             var url = CONFIG.serverRoot + '/backend_mgt/v1/materials/' + mtrId;
@@ -47,7 +47,7 @@ define(function (require, exports, module) {
         //载入
         var data = JSON.stringify({
             action: 'GetOne',
-            project_name: UTIL.getCookie("project_name"),
+            project_name: CONFIG.projectName,
         });
         var url = CONFIG.serverRoot + '/backend_mgt/v1/materials/' + mtrId;
         UTIL.ajax('post', url, data, edit);
