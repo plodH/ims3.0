@@ -201,6 +201,9 @@
 <script src="resources/js/common/sea.js"></script>
 <script src="resources/plugins/iCheck/icheck.min.js"></script>
 <script src="resources/plugins/jqPaginator/jqPaginator.min.js"></script>
+
+
+
 <script>
 	seajs.config({
 	  base: "./resources/js/"
