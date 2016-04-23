@@ -15,6 +15,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Ion Slider -->
+  <link rel="stylesheet" href="resources/plugins/ionslider/ion.rangeSlider.css">
+  <!-- ion slider Nice -->
+  <link rel="stylesheet" href="resources/plugins/ionslider/ion.rangeSlider.skinNice.css">
+  <!-- bootstrap slider -->
+  <link rel="stylesheet" href="resources/plugins/bootstrap-slider/slider.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="resources/dist/css/AdminLTE.css">
   <!-- AdminLTE Skins. Choose a skin from the css/skins
@@ -194,6 +200,10 @@
 <script src="resources/plugins/jQuery/jQuery-2.2.0.min.js"></script>
 <!-- Bootstrap 3.3.6 -->
 <script src="resources/bootstrap/js/bootstrap.min.js"></script>
+<!-- InputMask -->
+<script src="resources/plugins/input-mask/jquery.inputmask.js"></script>
+<script src="resources/plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
+<script src="resources/plugins/input-mask/jquery.inputmask.extensions.js"></script>
 <!-- SlimScroll -->
 <script src="resources/plugins/slimScroll/jquery.slimscroll.min.js"></script>
 <!-- FastClick -->
@@ -210,8 +220,10 @@
 <script src="resources/js/bower_components/underscore/underscore-min.js"></script>
 <!-- Backbone -->
 <script src="resources/js/bower_components/backbone/backbone-min.js"></script>
-
-
+<!-- Ion Slider -->
+<script src="resources/plugins/ionslider/ion.rangeSlider.min.js"></script>
+<!-- Bootstrap slider -->
+<script src="resources/plugins/bootstrap-slider/bootstrap-slider.js"></script>
 <script>
 	seajs.config({
 	  base: "./resources/js/"

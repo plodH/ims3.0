@@ -512,7 +512,9 @@ define(function(require, exports, module) {
           $(this).find('a:nth(0)').click(function(e){
             e.preventDefault();
             e.stopPropagation();
-
+            var configOneTerm = require('pages/terminal/configOneTerm.js');
+            configOneTerm.termID = Number($(this).parent().parent().attr("tid"));
+            UTIL.cover.load('resources/pages/terminal/configOneTerm.html');
           })
 
           // 截屏
