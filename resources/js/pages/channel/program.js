@@ -5,99 +5,220 @@ define(function (require, exports, module) {
     var templates = require('common/templates'),
         config = require('common/config'),
         util = require('common/util'),
+        crud = require('common/crud'),
         layoutEditor = require('common/layout_editor');
 
     var requestUrl = config.serverRoot,
-        projectName = config.projectName;
+        projectName = config.projectName,
+        db = null,
+        programId = null,
+        layoutId = null,
+        editor = null,
+        editMode = false;
 
-    function ProgramView(program) {
-        this.id = program.id;
-        this.isTimeSegmentLimit = program.isTimeSegmentLimit;
-        this.layoutId = program.layoutId;
-        this.lifeStartTime = program.lifeStartTime;
-        this.lifeEndTime = program.lifeEndTime;
-        this.name = program.name;
-        this.scheduleParams = program.scheduleParams;
-        this.scheduleType = program.scheduleType;
-        this.sequence = program.sequence;
-        this.timeSegmentDuration = program.timeSegmentDuration;
-        this.timeSegmentStart = program.timeSegmentStart;
-        this.layout = null;
+    
+    function load(program) {
+        if (program === null) {
+            $('#channel-editor-wrapper .channel-program-editor').html('没有频道!');
+            return;
+        }
+        db = crud.Database.getInstance();
+        programId = program.id;
+        layoutId = program.layout_id;
+        loadLayoutData(program.layout_id);
     }
     
-    ProgramView.prototype.exportAsJSON = function () {
-    };
+    function loadLayoutData(layoutId) {
+        var layout = db.collection('layout').select({id: layoutId})[0];
+        // layout is cached
+        if (layout) {
+            initProgramView();
+        }
+        // layout is not cached
+        else {
+            var loadLayoutDeferred = $.Deferred(),
+                data = JSON.stringify({
+                    Action: 'GetControlBoxs',
+                    Project: projectName,
+                    ProgramID: programId
+                });
+            loadLayoutDeferred.then(loadWidgetsData).done(initProgramView);
+
+            util.ajax('post', requestUrl + '/backend_mgt/v1/programs', data, function (res) {
+                var layoutRow = parseLayoutData(res.Layout);
+                layoutRow.id = layoutId;
+                db.collection('layout').load(layoutRow);
+                loadLayoutDeferred.resolve(res.ControlBoxs);
+            });
+
+        }
+    }
     
-    ProgramView.prototype.onEvent = function () {
-        
-    };
-    
-    ProgramView.prototype.render = function () {
+    function loadWidgetsData(widgets) {
+        var widgetRows = widgets.map(parseWidgetData),
+            promises = [];
+        widgetRows.forEach(function (row) {
+            row.layout_id = layoutId;
+            db.collection('widget').load(row);
+            var defer = $.Deferred(),
+                data = JSON.stringify({
+                    Action: 'GetMaterials',
+                    Project: projectName,
+                    ControlBoxID: row.id
+                });
+            promises.push(defer);
+            util.ajax('post', requestUrl + '/backend_mgt/v1/controlboxes', data, function (res) {
+                var materialRows = res.Materials.map(parseMaterialData);
+                materialRows.forEach(function (row) {
+
+                    db.collection('material').load(row);
+                });
+                defer.resolve();
+            });
+        });
+        return $.when.apply($, promises);
+    }
+
+    function parseLayoutData(data) {
+        return {
+            name: data.Name,
+            name_eng: data.Name_eng,
+            width: data.Width,
+            height: data.Height,
+            top_margin: data.TopMargin,
+            left_margin: data.LeftMargin,
+            right_margin: data.RightMargin,
+            bottom_margin: data.BottomMargin,
+            background_color: data.BackgroundColor,
+            background_image_mid: data.BackgroundPic_MID,
+            background_image_url: data.BackgroundPic_URL
+        };
+    }
+
+    function parseWidgetData(data) {
+        return {
+            id: data.ID,
+            program_id: data.Program_ID,
+            type_id: data.ControlBox_Type_ID,
+            type: data.ControlBox_Type,
+            type_name: data.ControlBox_Type_Name,
+            material: data.ControlBox_Material,
+            width: data.Width,
+            height: data.Height,
+            left: data.Left,
+            top: data.Top,
+            overall_schedule_params: data.Overall_Schedule_Paras,
+            overall_schedule_type: data.Overall_Schedule_Type,
+            style: data.Style,
+            z_index: data.Z
+        };
+    }
+
+    function parseMaterialData(data) {
+        return {
+            id: data.ID,
+            widget_id: data.ControlBox_ID,
+            is_time_segment_limit: data.Is_TimeSegment_Limit,
+            lifetime_start: data.LifeStartTime,
+            lifetime_end: data.LifeEndTime,
+            resource_id: data.Material_ID,
+            name: data.Name,
+            name_eng: data.Name_eng,
+            schedule_params: data.Schedule_Paras,
+            schedule_type: data.Schedule_Type,
+            sequence: data.Sequence,
+            time_segment_duration: data.TimeSegment_Duration,
+            time_segment_start: data.TimeSegment_Start,
+            type_id: data.Type_ID,
+            type_name: data.Type_Name,
+            url: data.URL
+        };
+    }
+
+    function initProgramView() {
+        var program = db.collection('program').select({id: programId})[0],
+            layout = db.collection('layout').select({id: layoutId})[0],
+            widgets = db.collection('widget').select({layout_id: layoutId});
+        renderProgramView(program, layout, widgets);
+        registerEventListeners();
+    }
+
+    function renderProgramView(program, layout, widgets) {
         var data = {
-            lifetime_start: this.lifeStartTime,
-            lifetime_end: this.lifeEndTime,
-            schedule_type: this.scheduleType,
-            schedule_params: this.scheduleParams,
+            lifetime_start: program.lifetime_start,
+            lifetime_end: program.lifetime_end,
+            schedule_type: program.schedule_type,
+            schedule_params: program.schedule_params,
             layout: {
-                name: this.layout.name,
-                width: this.layout.width,
-                height: this.layout.height
+                name: layout.name,
+                width: layout.width,
+                height: layout.height
             }
         };
         $('#channel-editor-wrapper .channel-program-editor')
             .html(templates.channel_edit_program(data));
-        this.renderEditor();
-        this.registerEventListeners();
-        this.loadWidget(this.layout.widgets[0]);
-    };
+        renderEditor(layout, widgets);
+        loadWidget(widgets[0]);
+    }
 
-    ProgramView.prototype.renderEditor = function () {
-        var widgets = [],
-            data = {
-                id: this.layout.id,
-                name: this.layout.name,
-                nameEng: this.layout.nameEng,
-                width: this.layout.width,
-                height: this.layout.height,
-                topMargin: this.layout.topMargin,
-                leftMargin: this.layout.leftMargin,
-                rightMargin: this.layout.rightMargin,
-                bottomMargin: this.layout.bottomMargin,
-                backgroundColor: this.layout.backgroundColor,
-                backgroundImage: this.layout.backgroundImage,
-                widgets: widgets
-            },
-            canvas = $('#channel-editor-wrapper .channel-program-layout-body'),
+
+    function loadWidget(widget) {
+        console.log(widget);
+    }
+
+    function renderEditor (layout, widgets) {
+
+        var json = {
+                id: layout.id,
+                name: layout.name,
+                nameEng: layout.name_eng,
+                width: layout.width,
+                height: layout.height,
+                topMargin: layout.top_margin,
+                leftMargin: layout.left_margin,
+                rightMargin: layout.right_margin,
+                bottomMargin: layout.bottom_margin,
+                backgroundColor: layout.background_color,
+                backgroundImage: {
+                    type: 'image',
+                    url: layout.background_image_url
+                },
+                widgets: widgets.map(function (el) {
+                    return {
+                        top: el.top,
+                        left: el.left,
+                        width: el.width,
+                        height: el.height,
+                        id: el.id,
+                        type: el.type,
+                        typeName: el.type_name
+                    };
+                })
+            };
+
+        var canvas = $('#channel-editor-wrapper .channel-program-layout-body'),
             canvasHeight = canvas.height(),
             canvasWidth = canvas.width();
-        this.layout.widgets.forEach(function (el, idx, arr) {
-            widgets.push({
-                top: el.top,
-                left: el.left,
-                width: el.width,
-                height: el.height,
-                id: el.id,
-                type: el.type,
-                typeName: el.typeName
-            });
-        });
-        this.editor = new layoutEditor.LayoutEditor(data, canvasWidth, canvasHeight, false);
-        this.editor.attachToDOM(canvas[0]);
-        for (var i = this.editor.mLayout.mWidgets.length - 1; i >= 0; i--) {
-            var widget = this.editor.mLayout.mWidgets[i],
-                data = {
+        editor = new layoutEditor.LayoutEditor(json, canvasWidth, canvasHeight, false);
+
+        editor.attachToDOM(canvas[0]);
+        for (var i = editor.mLayout.mWidgets.length - 1; i >= 0; i--) {
+            var widget = editor.mLayout.mWidgets[i],
+                _data = {
                     id: widget.mId,
                     name: widget.mTypeName,
                     background_color: widget.mBackgroundColor
                 };
             $('#channel-editor-wrapper .channel-program-layout-footer>ul')
-                .append(templates.channel_edit_widget_item(data));
+                .append(templates.channel_edit_widget_item(_data));
         }
-    };
 
-    ProgramView.prototype.previewData = function () {
+    }
+
+
+    function previewData () {
         var resources = {};
-        this.layout.widgets.forEach(function (el, idx, arr) {
+        editor.mLayout.mWidgets.forEach(function (el, idx, arr) {
             var data = null;
             switch (el.type) {
                 case 'WebBox':
@@ -119,20 +240,16 @@ define(function (require, exports, module) {
         });
         return resources;
     };
-    
-    ProgramView.prototype.destroy = function () {
-        
-    };
 
-    ProgramView.prototype.registerEventListeners = function () {
-        var self = this;
-        this.editor.onFocusChanged(function () {
-            var focusedWidget = self.editor.getLayout().getFocusedWidget();
+
+    function registerEventListeners () {
+        editor.onFocusChanged(function () {
+            var focusedWidget = editor.getLayout().getFocusedWidget();
             var widgetId = focusedWidget.mId;
-            self.onSelectWidget(self.findWidgetById(widgetId));
+            onSelectWidget(findWidgetById(widgetId));
         });
         $('#channel-editor-wrapper .channel-program-layout-footer li').click(function () {
-            var widgetId = Number(this.getAttribute('data-id')), widgets = self.editor.mLayout.mWidgets;
+            var widgetId = Number(this.getAttribute('data-id')), widgets = editor.mLayout.mWidgets;
             for (var i = 0; i < widgets.length; i++) {
                 if (widgets[i].mId === widgetId) {
                     widgets[i].requestFocus();
@@ -141,150 +258,30 @@ define(function (require, exports, module) {
             //self.onSelectWidget(self.findWidgetById(widgetId));
         });
         $('#channel-editor-wrapper .btn-channel-preview').click(function () {
-            if (!self.editMode) {
-                self.editor.showPreview(self.previewData());
-                self.editMode = true;
+            if (!editMode) {
+                editor.showPreview(previewData());
+                editMode = true;
             } else {
-                self.editor.hidePreview();
-                self.editMode = false;
+                editor.hidePreview();
+                editMode = false;
             }
         });
-    };
+    }
 
-    ProgramView.prototype.findWidgetById = function (id) {
-        for (var i = 0; i < this.layout.widgets.length; i++) {
-            if (this.layout.widgets[i].id === id) {
-                return this.layout.widgets[i];
+    function findWidgetById (id) {
+        for (var i = 0; i < editor.mLayout.mWidgets.length; i++) {
+            if (editor.mLayout.mWidgets[i].mId === id) {
+                return editor.mLayout.mWidgets[i];
             }
         }
         return null;
-    };
-
-    ProgramView.prototype.onSelectWidget = function (widget) {
-        this.loadWidget(widget);
-
-    };
-    
-    function createProgramView(program) {
-        return new ProgramView(program);
     }
 
-    function requestMaterials(widgetIds, cb) {
-        if (widgetIds.length === 0) {
-            cb({});
-            return;
-        }
-        var successCount = 0, failed = false, responses = {};
-        widgetIds.forEach(function (el, idx, arr) {
-            var data = JSON.stringify({
-                Action: 'GetMaterials',
-                Project: projectName,
-                ControlBoxID: String(el)
-            });
-            util.ajax('post', requestUrl + '/backend_mgt/v1/controlboxes', data, function (res) {
-                if (!failed && Number(res.rescode) !== 200) {
-                    failed = true;
-                    cb({err: res});
-                    return;
-                }
-                successCount++;
-                responses[el] = res.Materials;
-                if (successCount === widgetIds.length) {
-                    cb(responses);
-                }
-            });
-        });
-    }
-
-    ProgramView.prototype.loadWidget = function (widget) {
-        this.curentWidget = widget;
-        localStorage.setItem('widget', JSON.stringify(widget));
-        $('#channel-editor-wrapper .channel-program-widget').load('resources/pages/channel/edit_widget.html');
-    }
-    
-    function loadProgramView(view) {
-
-        if (view.layout) {
-            view.render();
-        } else {
-            var data = JSON.stringify({
-                Action: 'GetControlBoxs',
-                Project: projectName,
-                ProgramID: view.id
-            });
-            util.ajax('post', requestUrl + '/backend_mgt/v1/programs', data, function (res) {
-                var widgetIds = [],
-                    widgets = [],
-                    layout = {
-                        name: res.Layout.Name,
-                        nameEng: res.Layout.Name_eng,
-                        width: res.Layout.Width,
-                        height: res.Layout.Height,
-                        topMargin: res.Layout.TopMargin,
-                        leftMargin: res.Layout.LeftMargin,
-                        rightMargin: res.Layout.RightMargin,
-                        bottomMargin: res.Layout.BottomMargin,
-                        backgroundColor: res.Layout.BackgroundColor,
-                        backgroundImage: {
-                           url: res.Layout.BackgroundPic_URL
-                        }
-                    };
-                res.ControlBoxs.forEach(function (el, idx, arr) {
-                    widgetIds.push(el.ID);
-                    widgets.push({
-                        material: el.ControlBox_Material,
-                        type: el.ControlBox_Type,
-                        typeId: el.ControlBox_Type_ID,
-                        typeName: el.ControlBox_Type_Name,
-                        height: el.Height,
-                        id: el.ID,
-                        left: el.Left,
-                        overallScheduleParams: el.Overall_Schedule_Paras,
-                        overallScheduleType: el.Overall_Schedule_Type,
-                        programId: el.Program_ID,
-                        style: el.Style,
-                        top: el.Top,
-                        width: el.Width,
-                        zIndex: el.Z
-                    });
-                });
-                layout.widgets = widgets;
-
-                requestMaterials(widgetIds, function (data) {
-                    if (data.err) {
-                        alert(data.err);
-                        return;
-                    }
-                    widgets.forEach(function (el, idx, arr) {
-                        el.resources = data[el.id].map(function (material) {
-                            return {
-                                id: material.ID,
-                                widgetId: material.ControlBox_ID,
-                                isTimeSegmentLimit: material.Is_TimeSegment_Limit,
-                                lifeStartTime: material.LifeStartTime,
-                                lifeEndTime: material.LifeEndTime,
-                                name: material.Name,
-                                nameEng: material.Name_eng,
-                                scheduleParams: material.Schedule_Paras,
-                                scheduleType: material.Schedule_Type,
-                                sequence: material.Sequence,
-                                timeSegmentDuration: material.TimeSegment_Duration,
-                                timeSegmentStart: material.TimeSegment_Start,
-                                typeId: el.Type_ID,
-                                typeName: el.Type_Name,
-                                url: el.URL
-                            };
-                        });
-                    });
-                    view.layout = layout;
-                    view.render();
-                });
-            });
-        }
+     function onSelectWidget (widget) {
+        loadWidget(widget);
 
     }
-    
-    exports.createProgramView = createProgramView;
-    exports.loadProgramView = loadProgramView;
+
+    exports.load = load;
 
 });
