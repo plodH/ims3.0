@@ -29,7 +29,7 @@ define(function(require, exports, module) {
   function inputInit(){
     $( "#CO-vol-slider" ).slider({
       max: 100,
-      value: 50
+      value: 60
     });
     // console.log( $( "#CO-vol-slider" ).val() );
 
