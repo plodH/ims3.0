@@ -149,7 +149,7 @@
             <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            <li><a href="#user/user_list"><i class="fa fa-circle-o"></i> 用户</a></li>
+            <li><a href="#user/users_list"><i class="fa fa-circle-o"></i> 用户</a></li>
             <li><a href="#user/roles_list"><i class="fa fa-circle-o"></i> 角色</a></li>
           </ul>
         </li>
@@ -194,7 +194,7 @@
 <!-- /.full-screen -->
 
 <!-- upload按钮-->
-<input id="file" name="file" type="file" multiple="multiple" accept="image/*, audio/*, video/*"/>
+<input id="file" name="file" type="file" multiple accept="image/*, audio/*, video/*"/>
 
 <!-- jQuery 2.2.0 -->
 <script src="resources/plugins/jQuery/jQuery-2.2.0.min.js"></script>

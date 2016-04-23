@@ -9,14 +9,45 @@ define(function (require, exports, module) {
     exports.init = function () {
 				
 		exports.loadUserPage(1); //加载默认页面
+		var rName = ROLES.roleName;
+		var rID = ROLES.roleID;
 		//确定
 		$("#users_updata").click(function(){
-			var checked_id = $(".assign");
-			var cUser = [];
-			for(var i=0;i<checked_id;i++){
-				cUser[i]=checked_id[i];
-				alert(cUser[i]);
-				}
+			var checked = $('.assign');
+			var suc = true;
+			for(var i=0;i<checked.length;i++){	
+				var cheDiv = checked.eq(i).parent();
+				var flag = cheDiv.hasClass("checked");
+				var checked_id = checked.eq(i).attr("userID");
+				var checked_name = checked.eq(i).attr("userName");
+				if(flag){
+					var data = JSON.stringify({
+						project_name:'newui_dev',
+						action:'PUT',
+						Data:{
+							"USERNAME": checked_name,
+							"PASSWORD": "123456",
+							"EMAIL": "",
+							"RoleID":rID,
+							"Description":"",
+							"isValid":1
+							}
+						});
+						var url = CONFIG.serverRoot + '/backend_mgt/v2/userdetails/'+checked_id;
+						UTIL.ajax('post', url, data, function(msg){
+							if(msg.rescode==200){
+								}else{
+									suc = false;
+									};
+							});
+					}
+					else{
+						}
+				
+			};
+			if(suc){alert("分配成功")}else{alert("分配失败")}
+				ROLES.loadRolesPage(1);
+				UTIL.cover.close();
 			})
 		 //关闭窗口
         $(".CA_close").click(function () {
@@ -66,6 +97,11 @@ define(function (require, exports, module) {
         //拼接
         if (json.Users != undefined) {
             var rolData = json.Users;
+			 $("#usersTable tbody").append('<tr>'+
+                                    '<th class=""></th>'+
+                                    '<th class="users_name">用户名</th>'+
+                                    '<th class="users_ID">用户ID</th>'+
+                                '</tr>');
 			//当前角色已绑定的用户
 			var userList = ROLES.uList;
 			var uArry = userList.split(",");
@@ -80,17 +116,17 @@ define(function (require, exports, module) {
 						   }	 
 			   	   };
 				   if(hasUser == true){
-					  var roltr = '<tr userID="' + rolData[i].ID + '">' +
-						  '<td class="user_checkbox"><input type="checkbox" checked="checked" disabled="true" userID="' + rolData[i].ID + '"></td>' +
-						  '<td class="user_name">' + rolData[i].USERNAME + '</td>' +
-						  '<td class="user_id">ID：' + rolData[i].ID + '</td>' + 
+					  var roltr = '<tr userID="' + userID + '">' +
+						  '<td class="user_checkbox"><input type="checkbox" checked="checked" disabled="true" userID="' + userID + '"></td>' +
+						  '<td class="user_name">' + userName + '</td>' +
+						  '<td class="user_id">ID：' + userID + '</td>' + 
 						  '</tr>';
 					  $("#usersTable tbody").append(roltr);
 				   }else{
-					   var roltr = '<tr class="assign" userID="' + rolData[i].ID + '">' +
-						  '<td class="user_checkbox"><input type="checkbox" userID="' + rolData[i].ID + '"></td>' +
-						  '<td class="user_name">' + rolData[i].USERNAME + '</td>' +
-						  '<td class="user_id">ID：' + rolData[i].ID + '</td>' + 
+					   var roltr = '<tr userID="' + userID + '">' +
+						  '<td class="user_checkbox"><input class="assign" type="checkbox" userID="' + userID + '" userName="' + userName + '"></td>' +
+						  '<td class="user_name">' + userName + '</td>' +
+						  '<td class="user_id">ID：' + userID + '</td>' + 
 						  '</tr>';
 					  $("#usersTable tbody").append(roltr);
 				 }		
