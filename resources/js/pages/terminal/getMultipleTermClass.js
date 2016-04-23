@@ -37,6 +37,10 @@ define(function(require, exports, module) {
       "action": "getTree"
     };
 
+    if(exports.roleID){
+      dataParameter.roleID = Number(exports.roleID);
+    }
+
     UTIL.ajax(
       'POST', 
       CONFIG.serverRoot+'/backend_mgt/v2/termcategory', 

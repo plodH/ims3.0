@@ -21,6 +21,7 @@ define(function(require, exports, module) {
   function test(){
     $('#ct').click(function(){
       var getClassAndTerm = require('pages/terminal/getTermClassAndTerm.js');
+      getClassAndTerm.channelID = 118;
       getClassAndTerm.title = '发布到...';
       getClassAndTerm.save = function(data){
         console.log(data);
@@ -32,6 +33,7 @@ define(function(require, exports, module) {
     $('#c').click(function(){
       var getClass = require('pages/terminal/getMultipleTermClass.js');
       getClass.title = '请选取';
+      getClass.roleID = 4;
       getClass.save = function(data){
         console.log(data);
         UTIL.cover.close();

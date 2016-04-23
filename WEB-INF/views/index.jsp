@@ -15,10 +15,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
-  <!-- Ion Slider -->
-  <link rel="stylesheet" href="resources/plugins/ionslider/ion.rangeSlider.css">
-  <!-- ion slider Nice -->
-  <link rel="stylesheet" href="resources/plugins/ionslider/ion.rangeSlider.skinNice.css">
   <!-- bootstrap slider -->
   <link rel="stylesheet" href="resources/plugins/bootstrap-slider/slider.css">
   <!-- Theme style -->
@@ -184,6 +180,7 @@
     </div>
     <strong><a href="http://www.cleartv.cn">清鹤科技</a></strong> All rights
     reserved.
+    <span id="USER-NAME" style="display: none;"><sec:authentication property="name"/></span>
   </footer>
 
 </div>
@@ -220,8 +217,6 @@
 <script src="resources/js/bower_components/underscore/underscore-min.js"></script>
 <!-- Backbone -->
 <script src="resources/js/bower_components/backbone/backbone-min.js"></script>
-<!-- Ion Slider -->
-<script src="resources/plugins/ionslider/ion.rangeSlider.min.js"></script>
 <!-- Bootstrap slider -->
 <script src="resources/plugins/bootstrap-slider/bootstrap-slider.js"></script>
 <script>

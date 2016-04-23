@@ -13,7 +13,7 @@ define(function(require, exports, module) {
   exports.channelID;
 
   exports.init = function() {
-    //if(exports.channelID){}else{alert(1)}
+    
     $('#term_sel_title').html(exports.title);
     initTree();
     initEvent();
@@ -44,6 +44,9 @@ define(function(require, exports, module) {
       "project_name": CONFIG.projectName,
       "action": "getTree"
     };
+    if(exports.channelID){
+      dataParameter.channelID = Number(exports.channelID);
+    }
 
     UTIL.ajax(
       'POST', 
@@ -187,16 +190,20 @@ define(function(require, exports, module) {
           var statusName = (tl[i].Online === 0)?'离线':((tl[i].Status === 'Running')?'运行':'休眠');
           var status = (tl[i].Online === 0)?'offline':((tl[i].Status === 'Running')?'running':'shutdown');
 
+          var checked = '';
+          if(Number(exports.channelID) === tl[i].Channel_ID){
+            checked = 'checked="checked"';
+          }
           $('#term_sel_list').append('' + 
             '<tr tid="'+ tl[i].ID +'" status="' + status + '">' +
               '<td>' +
-                '<input type="checkbox">' +
+                '<input type="checkbox" '+checked+'>' +
               '</td>' +
               '<td>'+ tl[i].Name +'</td>' +
               '<td>'+ statusName +'</td>' +
               '<td>当前频道：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ChannelName) +'</td>' +
             '</tr>'
-            );
+          );
         }
 
         // 复选
@@ -210,7 +217,7 @@ define(function(require, exports, module) {
         // 清空已选list
         _checkList.length = 0;
 
-        // 列表选择按钮添加icheck，单击
+        // 列表选择按钮添加icheck
         $('#term_sel_list tr input[type="checkbox"]').iCheck({
           checkboxClass: 'icheckbox_flat-blue',
           radioClass: 'iradio_flat-blue'
