@@ -320,7 +320,7 @@ define(function(require, exports, module) {
     }
 
     if($('#termclass-tree').length > 0){
-      // _timerLoadTermList = setInterval(function(){loadTermList()}, CONFIG.termListLoadInterval);
+      _timerLoadTermList = setInterval(function(){loadTermList()}, CONFIG.termListLoadInterval);
     }
     else{
       return;
