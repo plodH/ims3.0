@@ -24,7 +24,7 @@ define(function (require, exports, module) {
                 }else{
                 	alert("添加角色失败");
                 }	
-				ROLES.loadPage(1, 1);			
+				ROLES.loadRolesPage(1);			
             });
         });
 		 //关闭窗口

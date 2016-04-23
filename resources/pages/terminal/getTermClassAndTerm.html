@@ -2,7 +2,7 @@
     <div class="modal-header">
         <button id="term_sel_cancel" type="button" class="btn btn-default pull-right">取消</button>
         <button id="term_sel_save" type="button" class="btn btn-primary pull-right" style="margin-right: 10px;">保存</button>
-        <h4 class="modal-title">发布到...</h4>
+        <h4 id="term_sel_title" class="modal-title"></h4>
     </div>
     <div class="col-md-3" style="height:400px; overflow:auto; padding-left:0; padding-right:0;">
         <div class="form-group">   
@@ -50,7 +50,7 @@
       </div>
 </div>
 <script>
-    seajs.use("pages/terminal/selectTerm.js", function (sel_term) {
-        sel_term.init();
+    seajs.use("pages/terminal/getTermClassAndTerm.js", function (classAndTerm) {
+        classAndTerm.init();
     })
 </script>

@@ -8,9 +8,13 @@ define(function(require, exports, module) {
       _pageNO = 1,
       _checkList = [];
 
-  exports.getSelectedTerm;
+  exports.save;
+  exports.title;
+  exports.channelID;
 
   exports.init = function() {
+    
+    $('#term_sel_title').html(exports.title);
     initTree();
     initEvent();
 
@@ -22,8 +26,16 @@ define(function(require, exports, module) {
     // 保存
     $('#term_sel_save').click(function(){
       var categoryList = _tree.getSelectedNodeID();
-      // alert('请选择终端分类或终端');
-      // exports.getSelectedTerm(data);
+      categoryList = JSON.parse(JSON.stringify(categoryList).replace(/nodeId/,'categoryID'));
+      var termList = _checkList;
+      if(categoryList.length === 0 && termList.length ===0){
+        alert('请选择终端分类/终端');
+      }else{
+        var data = [];
+        data.categoryList = categoryList;
+        data.termList = termList;
+        exports.save(data);
+      } 
     })
   }
 
@@ -32,6 +44,9 @@ define(function(require, exports, module) {
       "project_name": CONFIG.projectName,
       "action": "getTree"
     };
+    if(exports.channelID){
+      dataParameter.channelID = Number(exports.channelID);
+    }
 
     UTIL.ajax(
       'POST', 
@@ -105,6 +120,9 @@ define(function(require, exports, module) {
 
   function loadTermList(pageNum){
 
+    // loading
+    $('#term_sel_list').html('<i class="fa fa-refresh fa-spin" style="display:block; text-align: center; padding:10px;"></i>');
+
     var dom = $('#select-termclass-tree').find('.focus');
     $('#select-termlist-title').html(_tree.getFocusName(dom));
 
@@ -172,16 +190,20 @@ define(function(require, exports, module) {
           var statusName = (tl[i].Online === 0)?'离线':((tl[i].Status === 'Running')?'运行':'休眠');
           var status = (tl[i].Online === 0)?'offline':((tl[i].Status === 'Running')?'running':'shutdown');
 
+          var checked = '';
+          if(Number(exports.channelID) === tl[i].Channel_ID){
+            checked = 'checked="checked"';
+          }
           $('#term_sel_list').append('' + 
             '<tr tid="'+ tl[i].ID +'" status="' + status + '">' +
               '<td>' +
-                '<input type="checkbox">' +
+                '<input type="checkbox" '+checked+'>' +
               '</td>' +
               '<td>'+ tl[i].Name +'</td>' +
               '<td>'+ statusName +'</td>' +
               '<td>当前频道：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ChannelName) +'</td>' +
             '</tr>'
-            );
+          );
         }
 
         // 复选
@@ -195,7 +217,7 @@ define(function(require, exports, module) {
         // 清空已选list
         _checkList.length = 0;
 
-        // 列表选择按钮添加icheck，单击
+        // 列表选择按钮添加icheck
         $('#term_sel_list tr input[type="checkbox"]').iCheck({
           checkboxClass: 'icheckbox_flat-blue',
           radioClass: 'iradio_flat-blue'
@@ -218,8 +240,7 @@ define(function(require, exports, module) {
             $(e).find('input[type="checkbox"]').iCheck('check');
             _checkList.length = 0;
             _checkList.add($(e).attr('tid'),$(e).attr('status'));
-            onCheckBoxChange();
-            setBatchBtn();
+            onCheckBoxChange(); 
           })
 
         })
