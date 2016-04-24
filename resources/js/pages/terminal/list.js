@@ -437,7 +437,7 @@ define(function(require, exports, module) {
           var snap = (tl[i].Online === 0)?'':'<a class="pointer">截屏</a>';
 
           $('#term_list').append('' +
-            '<tr tid="'+ tl[i].ID +'" status="' + status + '">' +
+            '<tr tid="'+ tl[i].ID +'" tname="'+tl[i].Name+'" ip="'+tl[i].IP+'" mac="'+tl[i].MAC+'" status="' + status + '">' +
               '<td><input type="checkbox"></td>' +
               '<td>'+ tl[i].Name +'<br />'+ statusName +'</td>' +
               '<td>当前频道：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ChannelName) +'<br />当前节目：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ProgramName) +'<br />当前视频：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ProgramPlayInfo) +
@@ -515,7 +515,11 @@ define(function(require, exports, module) {
             e.preventDefault();
             e.stopPropagation();
             var configOneTerm = require('pages/terminal/configOneTerm.js');
-            configOneTerm.termID = Number($(this).parent().parent().attr("tid"));
+            var li = $(this).parent().parent();
+            configOneTerm.termID = Number(li.attr("tid"));
+            configOneTerm.termName = li.attr("tname");
+            configOneTerm.IP = li.attr("ip");
+            configOneTerm.MAC = li.attr("mac");
             UTIL.cover.load('resources/pages/terminal/configOneTerm.html');
           })
 
