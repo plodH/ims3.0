@@ -941,8 +941,8 @@ define(function (require, exports, module) {
         var self = this;
         Object.keys(resources).forEach(function (id) {
             self.mWidgets.forEach(function (el, idx, arr) {
-                if (id === el.mId) {
-                    el.showPreivew(resources[id]);
+                if (Number(id) === el.mId) {
+                    el.showPreview(resources[id]);
                 }
             });
         });
@@ -1215,10 +1215,11 @@ define(function (require, exports, module) {
 
     Widget.prototype.showPreview = function () {};
 
-    Widget.prototype.hiddenPreivew = function () {
+    Widget.prototype.hidePreview = function () {
         while (this.mElement.firstChild) {
             this.mElement.removeChild(this.mElement.firstChild);
         }
+        this.mElement.textContent = this.mTypeName;
     };
 
     /**
@@ -1230,11 +1231,16 @@ define(function (require, exports, module) {
     }
     ImageWidget.prototype = Object.create(Widget.prototype);
     ImageWidget.prototype.constructor = ImageWidget;
-    ImageWidget.prototype.showPreview = function (resource) {
+    ImageWidget.prototype.showPreview = function (data) {
+
+        if (data.material.length === 0) {
+            return;
+        }
+
         var img = document.createElement('img');
         img.setAttribute('width', '100%');
         img.setAttribute('height', '100%');
-        img.setAttribute('src', resource.url);
+        img.setAttribute('src', data.material);
         this.mElement.appendChild(img);
     };
 
@@ -1247,23 +1253,27 @@ define(function (require, exports, module) {
     }
     VideoWidget.prototype = Object.create(Widget.prototype);
     VideoWidget.prototype.constructor = VideoWidget;
-    VideoWidget.prototype.showPreview = function (resource) {
+    VideoWidget.prototype.showPreview = function (data) {
         
         function suffix(suffix) {
             return this.indexOf(suffix, this.length - suffix.length) !== -1;
         }
+
+        if (data.material.length === 0) {
+            return;
+        }
         
         if (
-            suffix.call(resource.url, '.jpg') ||
-            suffix.call(resource.url, '.png') ||
-            suffix.call(resource.url, '.bmp') ||
-            suffix.call(resource.url, '.gif') ||
-            suffix.call(resource.url, '.jpeg')
+            suffix.call(data.material, '.jpg') ||
+            suffix.call(data.material, '.png') ||
+            suffix.call(data.material, '.bmp') ||
+            suffix.call(data.material, '.gif') ||
+            suffix.call(data.material, '.jpeg')
         ) {
             var img = document.createElement('img');
             img.setAttribute('width', '100%');
             img.setAttribute('height', '100%');
-            img.setAttribute('src', resource.url);
+            img.setAttribute('src', data.material);
             this.mElement.appendChild(img);
         } else {
             var video = document.createElement('video'),
@@ -1272,7 +1282,7 @@ define(function (require, exports, module) {
             video.setAttribute('loop', '');
             video.setAttribute('width', '100%');
             video.setAttribute('height', '100%');
-            source.setAttribute('src', resource.url);
+            source.setAttribute('src', data.material);
             source.setAttribute('type', 'video/mp4');
             source.textContent = '您的浏览器不支持video标签.';
             video.appendChild(source);
@@ -1289,11 +1299,15 @@ define(function (require, exports, module) {
     }
     AudioWidget.prototype = Object.create(Widget.prototype);
     AudioWidget.prototype.constructor = AudioWidget;
-    AudioWidget.prototype.showPreview = function (resource) {
+    AudioWidget.prototype.showPreview = function (data) {
+
+        if (data.material.length === 0) {
+            return;
+        }
         var img = document.createElement('img');
         img.setAttribute('width', '100%');
         img.setAttribute('height', '100%');
-        img.setAttribute('src', resource.url);
+        img.setAttribute('src', data.material);
         this.mElement.appendChild(img);
     };
 
@@ -1306,14 +1320,18 @@ define(function (require, exports, module) {
     }
     HTMLWidget.prototype = Object.create(Widget.prototype);
     HTMLWidget.prototype.constructor = HTMLWidget;
-    HTMLWidget.prototype.showPreview = function (resource) {
-        if (resource.style.type === 'Marquee') {
+    HTMLWidget.prototype.showPreview = function (data) {
+
+        if (data.material.length === 0) {
+            return;
+        }
+        if (data.style.Type === 'Marquee') {
             var marquee = document.createElement('marquee');
             marquee.setAttribute('width', '100%');
             marquee.setAttribute('height', '100%');
             marquee.setAttribute('direction', 'left');
             marquee.style.fontSize = (this.mElement.offsetHeight * 0.9) + 'px';
-            marquee.textContent(resource.url);
+            marquee.textContent(data.material);
             this.mElement.appendChild(marquee);
         } else {
             var iframe = document.createElement('iframe');
@@ -1327,7 +1345,7 @@ define(function (require, exports, module) {
             this.mElement.appendChild(iframe);
             var frameWindow = iframe.contentWindow || iframe.contentWindow.document || iframe.contentDocument;
             frameWindow.document.open();
-            frameWindow.document.write(resource.url);
+            frameWindow.document.write(data.material);
             frameWindow.document.close();
         }
     };

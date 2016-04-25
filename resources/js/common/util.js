@@ -57,6 +57,10 @@ define(function(require, exports, module) {
 
 	function ajax(type, url, data, successFn){
 
+		var data = JSON.parse(data);
+		data.user = $('#USER-NAME').html();
+		data = JSON.stringify(data);
+
 		var ajax = $.ajax({
 		  type: type,
 		  url: url,

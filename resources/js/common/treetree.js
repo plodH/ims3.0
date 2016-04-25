@@ -11,7 +11,6 @@ define(function(require, exports, module) {
 	    tree.domId = t.domId;
 	    tree.checkMode = t.checkMode;
 
-
 	    tree.createTree = function(dom, data){
 
 	      if(data.length === 0) {
@@ -198,6 +197,23 @@ define(function(require, exports, module) {
         }
 	    }
 
+      tree.openAncestorsNode = function(dom){
+        var ul = dom.parent();
+        if(ul.attr('id') === tree.domId){
+          return;
+        }
+        else{
+          var li = ul.parent();
+          if (li.hasClass('open')){
+            return;
+          }
+          else{
+            tree.openNode(li);
+            tree.openAncestorsNode(li);
+          }
+        }
+      }
+
 	    tree.openNode = function(dom){
 	    	dom.addClass('open');
 	    	dom.children('a').find('.fa-folder-o').removeClass('fa-folder-o').addClass('fa-folder-open-o');
@@ -247,6 +263,18 @@ define(function(require, exports, module) {
             '</li>');
 
           dom.append(li);
+
+          // 判断是否为选中状态
+          if(tree.checkMode === 'multiple'){
+            var parentChecked = false;
+            if(dom.prev('a').length > 0){
+              parentChecked = (dom.prev('a').find('input[type$="checkbox"]').get(0).checked)?true:false;
+            }
+            if(data[i].isChecked === 1 || parentChecked){
+              li.children('a').find('input[type$="checkbox"]').get(0).checked = true;
+              tree.openAncestorsNode(li);
+            }
+          }
 
           if(treeview === 'treeview'){
             var ul = $('<ul class="tree-menu-2"></ul>');

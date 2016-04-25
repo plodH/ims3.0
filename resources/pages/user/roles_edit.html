@@ -10,7 +10,22 @@
             <input type="text" class="form-control" id="role_name" placeholder="请输入角色名称" style="width:80%;">
             <button id="name_change" type="button" class="btn btn-primary" style=" position:absolute;right:15px;top:40px;">修改名称</button>
             <label>功能：</label>
-            <textarea id="users_name"></textarea>
+            <div class="form-group">
+                <div class="table-responsive mailbox-messages">
+                            <!-- 功能列表 -->
+                            <table id="moduleTable" class="table table-hover table-striped">
+                                <tbody>
+    
+                                </tbody>
+                            </table>
+                            <!-- /.table -->
+                </div>
+                <div class="box-footer no-padding text-center">
+                        <!-- 翻页 -->
+                        <ul id="module-table-pager" class="pagination">
+                        </ul>
+                </div>
+            </div>
             
         </div>
     </div>

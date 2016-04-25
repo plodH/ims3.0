@@ -3,7 +3,7 @@ define(function(require, exports, module) {
   var TREE = require("common/treetree.js"),
       CONFIG = require("common/config.js"),
       UTIL = require("common/util.js"),
-      MOVE = require("pages/terminal/move.js"),
+      SINGLETERMCLASS = require("pages/terminal/getSingleTermClass.js"),
       _tree,
       _timerLoadTermList,
       _pagesize = 10,
@@ -13,9 +13,34 @@ define(function(require, exports, module) {
       _termStatusCount;
 
 	exports.init = function(){
+    test();
     initTree();
     initEvent();
 	}
+
+  function test(){
+    $('#ct').click(function(){
+      var getClassAndTerm = require('pages/terminal/getTermClassAndTerm.js');
+      getClassAndTerm.channelID = 118;
+      getClassAndTerm.title = '发布到...';
+      getClassAndTerm.save = function(data){
+        console.log(data);
+        UTIL.cover.close();
+      }
+      UTIL.cover.load('resources/pages/terminal/getTermClassAndTerm.html');
+    })
+
+    $('#c').click(function(){
+      var getClass = require('pages/terminal/getMultipleTermClass.js');
+      getClass.title = '请选取';
+      getClass.roleID = 4;
+      getClass.save = function(data){
+        console.log(data);
+        UTIL.cover.close();
+      }
+      UTIL.cover.load('resources/pages/terminal/getMultipleTermClass.html');
+    })
+  }
 
   function setBatchBtn(){
     if(_checkList.length === 0){
@@ -43,6 +68,16 @@ define(function(require, exports, module) {
   }
 
   function initEvent(){
+
+    // 终端配置按钮点击
+    $('#tct_config').click(function(){
+      
+    })
+
+    // refresh
+    $('#term_refresh').click(function(){
+      loadTermList(_pageNO);
+    })
 
     // serach
     $('#term_search').click(function(){
@@ -178,7 +213,7 @@ define(function(require, exports, module) {
         return;
       }
 
-      MOVE.getSelectedID = function(id){
+      SINGLETERMCLASS.save = function(id){
 
         var data = {
           "project_name" : CONFIG.projectName,
@@ -205,7 +240,8 @@ define(function(require, exports, module) {
           }
         )
       }
-      UTIL.cover.load('resources/pages/terminal/move.html');
+      SINGLETERMCLASS.title = "移动到...";
+      UTIL.cover.load('resources/pages/terminal/getSingleTermClass.html');
 
     })
   }
@@ -268,6 +304,9 @@ define(function(require, exports, module) {
   }
 
   function loadTermList(pageNum){
+
+    // loading
+    $('#term_list').html('<i class="fa fa-refresh fa-spin" style="display:block; text-align: center; padding:10px;"></i>');
 
     var dom = $('#termclass-tree').find('.focus');
     $('#termlist-title').html(_tree.getFocusName(dom));
@@ -398,7 +437,7 @@ define(function(require, exports, module) {
           var snap = (tl[i].Online === 0)?'':'<a class="pointer">截屏</a>';
 
           $('#term_list').append('' +
-            '<tr tid="'+ tl[i].ID +'" status="' + status + '">' +
+            '<tr tid="'+ tl[i].ID +'" tname="'+tl[i].Name+'" ip="'+tl[i].IP+'" mac="'+tl[i].MAC+'" status="' + status + '">' +
               '<td><input type="checkbox"></td>' +
               '<td>'+ tl[i].Name +'<br />'+ statusName +'</td>' +
               '<td>当前频道：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ChannelName) +'<br />当前节目：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ProgramName) +'<br />当前视频：'+ ((tl[i].CurrentPlayInfo==='')?'':JSON.parse(tl[i].CurrentPlayInfo).ProgramPlayInfo) +
@@ -472,6 +511,17 @@ define(function(require, exports, module) {
           })
 
           // 编辑
+          $(this).find('a:nth(0)').click(function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            var configOneTerm = require('pages/terminal/configOneTerm.js');
+            var li = $(this).parent().parent();
+            configOneTerm.termID = Number(li.attr("tid"));
+            configOneTerm.termName = li.attr("tname");
+            configOneTerm.IP = li.attr("ip");
+            configOneTerm.MAC = li.attr("mac");
+            UTIL.cover.load('resources/pages/terminal/configOneTerm.html');
+          })
 
           // 截屏
           $(this).find('a:nth(1)').click(function(e){
@@ -611,11 +661,6 @@ define(function(require, exports, module) {
               }
               loadTermList();
             })
-          })
-
-          // 终端配置按钮点击
-          $('#tct_config').click(function(){
-            UTIL.cover.load('resources/pages/terminal/selectTerm.html');
           })
 
           // 添加终端分类按钮点击

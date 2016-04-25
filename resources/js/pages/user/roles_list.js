@@ -2,11 +2,10 @@ define(function (require, exports, module) {
     var CONFIG = require("common/config.js");
     var UTIL = require("common/util.js");
     var templates = require('common/templates');
-    var nDisplayItems = 10,
-        keyword = "";
+    var nDisplayItems = 10;
 
     exports.init = function () {
-        exports.loadPage(1, 1); //加载默认页面
+        exports.loadRolesPage(1); //加载默认页面
         //添加
         $("#roles_add").click(function () {
             //var page = "resources/pages/materials/materials_edit.html"
@@ -16,7 +15,7 @@ define(function (require, exports, module) {
     }
 
     // 加载页面数据
-    exports.loadPage = function (pageNum, type) {
+    exports.loadRolesPage = function (pageNum) {
         $("#rolesLisTitle").html("");
         $("#rolesTable tbody").html("");
         $(".fa.fa-check-square-o").attr("class", "fa fa-square-o");
@@ -55,13 +54,20 @@ define(function (require, exports, module) {
             onPageChange: function (num, type) {
                 if (type === 'change') {
 					$('#roles-table-pager').jqPaginator('destroy');
-					exports.loadPage(num, 1);
+					exports.loadRolesPage(num);
                 }
             }
         });
         //拼接
         if (json.Roles != undefined) {
             var rolData = json.Roles;
+			$("#rolesTable tbody").append('<tr>'+                              
+                                    '<th class="roles_name">角色名</th>'+
+                                    '<th class="roles_ID">角色ID</th>'+
+									'<th class="users">用户</th>'+
+									'<th class=""></th>'+
+									'<th class=""></th>'+
+                                '</tr>');
             for (var x = 0; x < rolData.length; x++) {
 				//var stringArry;
 				var rID = rolData[x].RoleID;
@@ -90,7 +96,7 @@ define(function (require, exports, module) {
 //					});
 					
 				//alert(stringArry);
-                var roltr = '<tr rolesID="' + rolData[x].RoleID + '">' +
+                var roltr = '<tr rolesID="' + rolData[x].RoleID + '" rolesName="' + rolData[x].RoleName + '">' +
                     '<td class="roles_name"><a class="role_name">' + rolData[x].RoleName + '</a></td>' +
                     '<td class="roles_id">ID：' + rolData[x].RoleID + '</td>' + 
 					'<td class="users" style="width:300px;overflow:hidden;text-overflow:ellipsis;">' + users + '</td>' + 
@@ -109,8 +115,13 @@ define(function (require, exports, module) {
 						action: 'Delete'		
 					});
 					var url = CONFIG.serverRoot + '/backend_mgt/v2/roles/' + currentID;
-					UTIL.ajax('post', url, data, function () {
-                        exports.loadPage(1,1); //刷新页面
+					UTIL.ajax('post', url, data, function (msg) {
+						if(msg.rescode==200){
+							alert("删除成功")
+							}else{
+								alert("删除失败")
+								};
+                        exports.loadRolesPage(1); //刷新页面
                     });
 				}
         	});
@@ -128,6 +139,10 @@ define(function (require, exports, module) {
 				var self = $(this);
 				var userList = self.parent().prev().prev().html();
 				exports.uList = userList;
+				var rName = self.parent().parent().attr("rolesName");
+				exports.roleName = rName;
+				var currentID = self.parent().parent().attr("rolesID");
+				exports.roleID = currentID;
 				UTIL.cover.load('resources/pages/user/roles_assign.html');
 				});
         }

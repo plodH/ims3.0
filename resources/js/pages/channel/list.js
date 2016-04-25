@@ -33,7 +33,6 @@ define(function(require, exports, module) {
         });
         $('#channel-table').delegate('.btn-channel-detail', 'click', function (ev) {
             var channelId = getChannelId(ev.target);
-            console.log(channelId);
             ev.stopPropagation();
         });
         $('#channel-list-controls .select-all').click(function (ev) {
