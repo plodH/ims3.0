@@ -127,10 +127,12 @@
         <li class="treeview active">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>终端</span> <i class="fa fa-angle-left pull-right"></i>
+            <li><a id="menu_termlog" href="#termlog/list"><i class="fa fa-circle-o"></i> 日志</a></li>
           </a>
           <ul class="treeview-menu">
             <li class="active"><a id="menu_termlist" href="#terminal/list"><i class="fa fa-circle-o"></i> 终端</a></li>
             <li><a href="#"><i class="fa fa-circle-o"></i> 日志</a></li>
+            <li><a id="menu_userlog" href="#userlog/list"><i class="fa fa-circle-o"></i> 操作日志</a></li>
           </ul>
         </li>
         <li id="treeview_mtr" class="treeview">
