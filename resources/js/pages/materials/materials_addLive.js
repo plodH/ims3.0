@@ -156,12 +156,14 @@ define(function (require, exports, module) {
         if ($("#ULmtr_name").val() == "") {
             errormsg += "请输入直播源名称！\n";
         }
-        if ($("#ULmtr_name").val() == "") {
+        if ($("#ULmtr_address").val() == "") {
             errormsg += "请输入直播源地址！";
         }
         if (errormsg != "") {
             alert(errormsg);
-            return;
+            return false;
+        }else {
+        	return true;
         }
     }
 })

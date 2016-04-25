@@ -125,7 +125,10 @@ define(function (require, exports, module) {
     	}
     	if (errormsg != ""){
     		alert(errormsg);
-    		return;
+    		return false;
+    	}else {
+    		return true;
     	}
+    	
     }
 })
